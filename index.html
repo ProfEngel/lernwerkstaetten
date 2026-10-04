@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mathe- & Lern-Werkstatt</title>
+
+  <!-- PWA & iPad Home Screen Konfiguration -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LernWerkstatt">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f59e0b">
+
+  <!-- Offline-App Icon als SVG-Data-URI -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' width='180' height='180'><rect width='180' height='180' rx='42' fill='%23f59e0b'/><circle cx='90' cy='90' r='58' fill='%23ffffff'/><text x='90' y='110' font-size='62' text-anchor='middle'>🎒</text></svg>">
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🎒</text></svg>">
+
+  <!-- Manifest Data-URI für Installation -->
+  <link rel="manifest" href="data:application/manifest+json;utf8,{&quot;name&quot;:&quot;Mathe- &amp; Lern-Werkstatt&quot;,&quot;short_name&quot;:&quot;LernWerkstatt&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23fef3c7&quot;,&quot;theme_color&quot;:&quot;%23f59e0b&quot;}">
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --primary: #f59e0b;
+      --primary-dark: #b45309;
+      --hour-red: #e11d48;
+      --min-blue: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 16px) calc(var(--safe-left) + 12px);
+      background: #fffbeb;
+      color: #1e293b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input, select, button {
+      font-family: inherit;
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+
+    .font-num {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 2px solid #fde68a;
+    }
+
+    /* Navigation */
+    .nav-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .nav-tab {
+      background: #f1f5f9;
+      border: 2px solid transparent;
+      color: #475569;
+      padding: 10px 6px;
+      border-radius: 18px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-tab.active {
+      background: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+      border-color: #d97706;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 9px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary { background: #f59e0b; color: #fff; }
+    .btn-primary:hover { background: #d97706; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #e11d48; color: #fff; }
+
+    /* Sprechblasen für die Umgangssprache */
+    .speech-bubble {
+      position: relative;
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      border-radius: 16px;
+      padding: 8px 14px;
+      color: #1e40af;
+      font-weight: 800;
+      font-size: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
+      max-width: 290px;
+      width: 100%;
+    }
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0 8px 8px 8px;
+      border-style: solid;
+      border-color: transparent transparent #eff6ff transparent;
+    }
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0 9px 9px 9px;
+      border-style: solid;
+      border-color: transparent transparent #93c5fd transparent;
+    }
+
+    /* Geld-Interaktion */
+    .money-elem {
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
+    }
+    .money-elem:hover {
+      transform: translateY(-4px) scale(1.04);
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+    }
+    .money-elem:active {
+      transform: scale(0.95);
+    }
+
+    .stack-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #e11d48;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    /* 100er-Tafel Grid */
+    .hundred-grid {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .cell-100 {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      position: relative;
+      transition: all 0.15s ease;
+    }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- OFFLINE SVG FILTER & VERLÄUFE -->
+  <svg width="0" height="0" style="position: absolute;">
+    <defs>
+      <radialGradient id="gradCopper" cx="36%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="#fecdd3"/>
+        <stop offset="40%" stop-color="#f43f5e"/>
+        <stop offset="80%" stop-color="#9f1239"/>
+        <stop offset="100%" stop-color="#4c0519"/>
+      </radialGradient>
+      <linearGradient id="rimCopper" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffe4e6"/>
+        <stop offset="100%" stop-color="#881337"/>
+      </linearGradient>
+
+      <radialGradient id="gradGold" cx="36%" cy="30%" r="68%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="40%" stop-color="#f59e0b"/>
+        <stop offset="80%" stop-color="#b45309"/>
+        <stop offset="100%" stop-color="#78350f"/>
+      </radialGradient>
+      <linearGradient id="rimGold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fffbeb"/>
+        <stop offset="100%" stop-color="#92400e"/>
+      </linearGradient>
+
+      <radialGradient id="gradSilver" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="45%" stop-color="#cbd5e1"/>
+        <stop offset="80%" stop-color="#64748b"/>
+        <stop offset="100%" stop-color="#334155"/>
+      </radialGradient>
+      <linearGradient id="rimSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f8fafc"/>
+        <stop offset="100%" stop-color="#475569"/>
+      </linearGradient>
+
+      <linearGradient id="gradHolo" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fbcfe8" stop-opacity="0.85"/>
+        <stop offset="25%" stop-color="#bae6fd" stop-opacity="0.9"/>
+        <stop offset="50%" stop-color="#fef08a" stop-opacity="0.8"/>
+        <stop offset="75%" stop-color="#bbf7d0" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#e9d5ff" stop-opacity="0.85"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="app-shell">
+    
+    <!-- HEADER -->
+    <header class="card" style="padding: 12px 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #fef3c7; padding-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 44px; height: 44px; border-radius: 14px; background: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 3px 8px rgba(245, 158, 11, 0.4);">
+            🎒
+          </div>
+          <div>
+            <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #78350f; line-height: 1.1;">Mathe- & Lern-Werkstatt</h1>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">iPad & Offline bereit • Uhr • Geld • Rechnen</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="background: #fef3c7; border: 1.5px solid #fcd34d; border-radius: 14px; padding: 4px 10px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 18px;">⭐</span>
+            <span id="starCounter" class="font-num" style="font-weight: 800; color: #92400e; font-size: 16px;">0</span>
+          </div>
+          <button id="soundToggleBtn" onclick="toggleAudio()" class="btn btn-secondary" style="padding: 6px 10px; font-size: 16px;" title="Ton umschalten">
+            <span id="soundIcon">🔊</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="nav-bar">
+        <button id="tabBtn-clock" onclick="switchModule('clock')" class="nav-tab active">
+          <span>🕰️</span> <span>Lern-Uhr</span>
+        </button>
+        <button id="tabBtn-money" onclick="switchModule('money')" class="nav-tab">
+          <span>💶</span> <span>Euro & Cent</span>
+        </button>
+        <button id="tabBtn-plusminus" onclick="switchModule('plusminus')" class="nav-tab">
+          <span>➕➖</span> <span>Plus & Minus</span>
+        </button>
+        <button id="tabBtn-multidiv" onclick="switchModule('multidiv')" class="nav-tab">
+          <span>✖➗</span> <span>Mal & Geteilt</span>
+        </button>
+      </nav>
+    </header>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 1: LERN-UHR MIT UMGANGSSPRACHE & SEKTOREN -->
+    <!-- ========================================================= -->
+    <main id="mod-clock" class="card" style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; align-items: center;">
+        
+        <!-- Uhr-Grafik, Digitalanzeige & Umgangssprach-Sprechblase -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <svg id="clockSvg" width="310" height="310" viewBox="0 0 320 320" style="max-width: 100%; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.08));"></svg>
+          
+          <!-- Kindgerechte Umgangssprach-Anzeige -->
+          <div class="speech-bubble" id="clkColloquialBubble">
+            🗣️ „Genau 12 Uhr“
+          </div>
+
+          <!-- Digitale Zeitkarte -->
+          <div style="display: flex; align-items: center; gap: 4px; background: #0f172a; padding: 6px 16px; border-radius: 16px; border: 2px solid #334155; color: white;">
+            <span id="clkHourTxt" class="font-num" style="background: rgba(225, 29, 72, 0.2); color: #fb7185; padding: 2px 8px; border-radius: 8px; font-size: 26px; font-weight: 800; border: 1px solid #e11d48;">12</span>
+            <span style="font-size: 24px; font-weight: 800; color: #94a3b8;">:</span>
+            <span id="clkMinTxt" class="font-num" style="background: rgba(2, 132, 199, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 8px; font-size: 26px; font-weight: 800; border: 1px solid #0284c7;">00</span>
+            <span style="font-size: 14px; margin-left: 4px; color: #94a3b8; font-weight: 700;">Uhr</span>
+          </div>
+
+          <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 700;">
+            <span style="background: #ffe4e6; color: #be123c; padding: 3px 8px; border-radius: 8px; border: 1px solid #fecdd3;">🔴 Kurzer Zeiger = Stunde</span>
+            <span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 8px; border: 1px solid #bae6fd;">🔵 Langer Zeiger = Minute</span>
+          </div>
+        </div>
+
+        <!-- Steuerung Lernuhr -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Zifferblatt-Ansicht:</span>
+            <button id="clkSectorToggleBtn" onclick="toggleClockSectors()" class="btn btn-secondary" style="width: 100%; margin-top: 4px; border: 1.5px solid #cbd5e1;">
+              🎨 Farbige Stundenräume: AN
+            </button>
+          </div>
+
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #475569;">
+              <span>Animations-Tempo:</span>
+              <span id="clkSpeedVal" class="font-num" style="color: #b45309; font-weight: 800;">30 Min/s</span>
+            </div>
+            <input type="range" id="clkSpeedInput" min="5" max="150" value="30" step="5" oninput="setClockSpeed(this.value)" style="accent-color: #f59e0b; cursor: pointer;">
+          </div>
+
+          <div>
+            <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Zeitsprünge:</span>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px;">
+              <button onclick="addClockDelta(15)" class="btn btn-secondary" style="font-size: 12px; background: #e0f2fe; color: #0369a1;">+15 Min (Viertel)</button>
+              <button onclick="addClockDelta(30)" class="btn btn-secondary" style="font-size: 12px; background: #e0f2fe; color: #0369a1;">+30 Min (Halb)</button>
+              <button onclick="addClockDelta(45)" class="btn btn-secondary" style="font-size: 12px; background: #e0f2fe; color: #0369a1;">+45 Min (Dreiviertel)</button>
+              <button onclick="addClockDelta(60)" class="btn btn-secondary" style="font-size: 12px; background: #fef3c7; color: #92400e;">+1 Std</button>
+              <button onclick="addClockDelta(195)" class="btn btn-secondary" style="font-size: 12px; background: #fef3c7; color: #92400e;">+3h 15m</button>
+              <button onclick="addClockDelta(-15)" class="btn btn-secondary" style="font-size: 12px; background: #f1f5f9; color: #475569;">-15 Min</button>
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Ziel-Uhrzeit eingeben:</span>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="time" id="clkDirectTime" value="15:30" class="font-num" style="flex: 1; padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 800; font-size: 16px;">
+              <button onclick="setClockDirect()" class="btn btn-primary" style="padding: 8px 16px;">🚀 Loslaufen</button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; padding-top: 6px; border-top: 1px solid #f1f5f9;">
+            <button id="clkPauseBtn" onclick="toggleClockPause()" class="btn btn-secondary" style="flex: 1; background: #1e293b; color: white;">
+              <span id="clkPauseIcon">⏸️</span> <span id="clkPauseTxt">Pause</span>
+            </button>
+            <button onclick="resetClockToNoon()" class="btn btn-secondary" style="flex: 1;">
+              🔄 12:00 Reset
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 2: EURO & CENT KAUFLADEN -->
+    <!-- ========================================================= -->
+    <main id="mod-money" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Spiel- und Schwierigkeits-Leiste -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; background: #fffbeb; padding: 8px 12px; border-radius: 16px; border: 1.5px solid #fde68a;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #78350f;">Modus:</span>
+          <div style="display: flex; gap: 4px;">
+            <button id="mnyBtnPay" onclick="setMoneyMode('pay')" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">🛒 Bezahlen</button>
+            <button id="mnyBtnChange" onclick="setMoneyMode('change')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">🪙 Wechselgeld</button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #78350f;">Schwierigkeit:</span>
+          <div style="display: flex; gap: 4px;">
+            <button id="mnyDiffEasy" onclick="setMoneyDiff('easy')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🟢 Glatt/50c</button>
+            <button id="mnyDiffMed" onclick="setMoneyDiff('medium')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🟡 10er-Cent</button>
+            <button id="mnyDiffHard" onclick="setMoneyDiff('hard')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🔴 Krumm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unter-Modus Wechselgeld (Leicht vs. Schwer mit Kassen-Sperre) -->
+      <div id="mnyChangeSubBar" class="hidden" style="background: #e0f2fe; border: 1.5px solid #bae6fd; border-radius: 16px; padding: 8px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #0369a1;">
+          <span>🧮</span> <span>Wechselgeld-Modus:</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button id="mnySubEasyBtn" onclick="setMoneySubMode('easy')" class="btn btn-primary" style="padding: 5px 12px; font-size: 11px; background: #0284c7;">👶 Leicht (Rechenhilfe an)</button>
+          <button id="mnySubHardBtn" onclick="setMoneySubMode('hard')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">🧠 Schwer (Erst selbst rechnen!)</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; align-items: start;">
+        
+        <!-- Linke Spalte: Produkt, Zahlteller & Kassen-Monitor -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Produktkarte -->
+          <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; align-items: center; position: relative;">
+            <button onclick="newShopItem()" class="btn btn-secondary" style="position: absolute; top: 8px; right: 8px; padding: 4px 8px; font-size: 11px;">
+              🔄 Neuer Artikel
+            </button>
+            <div id="mnyItemEmoji" style="font-size: 54px; line-height: 1.1; margin: 4px 0;">🧸</div>
+            <h3 id="mnyItemTitle" style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">Teddybär</h3>
+            <div style="margin-top: 6px; background: #e11d48; color: white; padding: 4px 14px; border-radius: 12px; font-weight: 900; font-size: 20px;" class="font-num">
+              <span id="mnyItemPrice">14,50 €</span>
+            </div>
+          </div>
+
+          <!-- Kundengeld-Zahlteller -->
+          <div id="mnyCustomerPlate" class="hidden" style="background: #fef3c7; border: 2px solid #fcd34d; border-radius: 20px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #78350f;">🧑‍💼 Kunde bezahlt mit:</span>
+              <span id="mnyCustomerGivenBadge" class="font-num" style="background: white; padding: 2px 8px; border-radius: 8px; font-weight: 900; color: #047857; font-size: 14px; border: 1px solid #fcd34d;">20,00 €</span>
+            </div>
+            <div id="mnyCustomerTrayVisuals" style="background: rgba(255,255,255,0.9); border-radius: 12px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 52px; align-items: center;"></div>
+          </div>
+
+          <!-- Kopfrechnen-Schloss bei Modus Schwer -->
+          <div id="mnyMentalCard" class="hidden" style="background: #ffffff; border: 2px solid #a855f7; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #581c87;">1. Wie viel Wechselgeld?</span>
+              <span id="mnyLockBadge" style="font-size: 11px; font-weight: 800; color: #7e22ce; background: #f3e8ff; padding: 2px 6px; border-radius: 6px;">🔒 Kasse gesperrt</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <input type="number" id="mnyInputEuro" placeholder="0" class="font-num" style="width: 54px; text-align: center; padding: 6px; border: 2px solid #cbd5e1; border-radius: 10px; font-weight: 800; font-size: 16px;">
+              <span style="font-weight: 900;">,</span>
+              <input type="number" id="mnyInputCent" placeholder="00" class="font-num" style="width: 54px; text-align: center; padding: 6px; border: 2px solid #cbd5e1; border-radius: 10px; font-weight: 800; font-size: 16px;">
+              <span style="font-weight: 800;">€</span>
+              <button onclick="checkMoneyMentalMath()" class="btn" style="background: #9333ea; color: white; padding: 6px 12px; font-size: 12px;">🔍 Prüfen</button>
+            </div>
+            <div id="mnyMentalMsg" class="hidden" style="font-size: 11px; padding: 6px 10px; border-radius: 10px; font-weight: 700;"></div>
+          </div>
+
+          <!-- Kassen-Monitor -->
+          <div id="mnyCashRegister" style="background: #0f172a; border: 3px solid #334155; border-radius: 20px; padding: 12px; color: white; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Kassen-Monitor</span>
+              <span id="mnyRegBadge" style="font-size: 11px; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 2px 6px; border-radius: 6px;">Geld fehlt noch</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div style="background: #1e293b; padding: 6px 10px; border-radius: 12px;">
+                <div style="font-size: 10px; color: #94a3b8;">Zielbetrag:</div>
+                <div id="mnyRegTarget" class="font-num" style="font-size: 17px; font-weight: 800; color: #fde047;">14,50 €</div>
+              </div>
+              <div style="background: #1e293b; padding: 6px 10px; border-radius: 12px;">
+                <div style="font-size: 10px; color: #94a3b8;">Auf Theke:</div>
+                <div id="mnyRegPaid" class="font-num" style="font-size: 17px; font-weight: 800; color: #ffffff;">0,00 €</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 4px;">
+              <button onclick="clearPlacedMoney()" class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 11px; background: #334155; color: #cbd5e1;">🗑️ Abräumen</button>
+              <button onclick="checkMoneyResult()" class="btn btn-success" style="flex: 1; padding: 6px; font-size: 11px;">✅ Kassieren</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding-top: 4px; border-top: 1px solid #1e293b;">
+              <span style="color: #94a3b8;">💡 Sparsamste Wahl:</span>
+              <button onclick="toggleMoneySmartHint()" style="background: none; border: none; color: #fde047; font-weight: 800; cursor: pointer; text-decoration: underline;" id="mnyHintBtn">Tipp zeigen</button>
+            </div>
+            <div id="mnySmartHintBox" class="hidden" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px; border-radius: 10px; font-size: 11px; color: #fde68a;"></div>
+          </div>
+
+          <div id="mnyReceipt" class="hidden" style="background: white; border: 2px solid #10b981; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+
+        <!-- Rechte Spalte: Bezahlmatte & Kasse mit realistischen Scheinen/Münzen -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Bezahlmatte -->
+          <div style="background: #064e3b; border: 3px solid #022c22; border-radius: 20px; padding: 10px; color: white; display: flex; flex-direction: column; min-height: 140px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 800; color: #a7f3d0;" id="mnyMatTitle">Theke: Aufgelegtes Geld</span>
+              <span style="font-size: 10px; color: #6ee7b7;">Klick nimmt Stück zurück</span>
+            </div>
+            <div id="mnyPlacedTray" style="background: rgba(2, 44, 34, 0.7); border: 1.5px dashed #059669; border-radius: 14px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; min-height: 90px; max-height: 180px; overflow-y: auto;">
+              <span style="font-size: 12px; color: rgba(167, 243, 208, 0.5);">Noch kein Geld hingelegt.<br>Tippe unten auf Scheine/Münzen!</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #a7f3d0;">
+              <span>Stückzahl: <strong id="mnyPieceCount" style="color: white;">0</strong></span>
+              <span>Gesamtwert: <strong id="mnyPlacedTotalTxt" class="font-num" style="color: white; font-size: 13px;">0,00 €</strong></span>
+            </div>
+          </div>
+
+          <!-- Kassenlade mit SVGs -->
+          <div id="mnyWalletBox" style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 12px; position: relative;">
+            <div id="mnyLockedOverlay" class="hidden" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.75); border-radius: 20px; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 16px;">
+              <span style="font-size: 36px;">🔒</span>
+              <strong style="margin-top: 6px; font-size: 14px;">Kassenlade ist gesperrt!</strong>
+              <span style="font-size: 11px; color: #fde68a;">Rechne zuerst das Wechselgeld in Schritt 1 aus.</span>
+            </div>
+
+            <!-- Scheine 5€ - 100€ -->
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Euro-Banknoten:</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-between; margin-top: 4px;">
+                <div onclick="addMoneyPlaced('500')" class="money-elem" id="slot-500"></div>
+                <div onclick="addMoneyPlaced('1000')" class="money-elem" id="slot-1000"></div>
+                <div onclick="addMoneyPlaced('2000')" class="money-elem" id="slot-2000"></div>
+                <div onclick="addMoneyPlaced('5000')" class="money-elem" id="slot-5000"></div>
+                <div onclick="addMoneyPlaced('10000')" class="money-elem" id="slot-10000"></div>
+              </div>
+            </div>
+
+            <!-- Münzen 1€ & 2€ Bimetall -->
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Euro-Münzen (Bimetall):</span>
+              <div style="display: flex; justify-content: space-around; background: white; padding: 8px; border-radius: 14px; border: 1.5px solid #e2e8f0; margin-top: 4px;">
+                <div onclick="addMoneyPlaced('100')" class="money-elem" id="slot-100"></div>
+                <div onclick="addMoneyPlaced('200')" class="money-elem" id="slot-200"></div>
+              </div>
+            </div>
+
+            <!-- Cent-Münzen Gold & Kupfer -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="background: #fffbeb; padding: 8px; border-radius: 14px; border: 1.5px solid #fef3c7;">
+                <span style="font-size: 10px; font-weight: 800; color: #92400e; display: block; margin-bottom: 4px;">Nordisches Gold (ct):</span>
+                <div style="display: flex; justify-content: space-around; align-items: center;">
+                  <div onclick="addMoneyPlaced('50')" class="money-elem" id="slot-50"></div>
+                  <div onclick="addMoneyPlaced('20')" class="money-elem" id="slot-20"></div>
+                  <div onclick="addMoneyPlaced('10')" class="money-elem" id="slot-10"></div>
+                </div>
+              </div>
+              <div style="background: #fff1f2; padding: 8px; border-radius: 14px; border: 1.5px solid #ffe4e6;">
+                <span style="font-size: 10px; font-weight: 800; color: #be123c; display: block; margin-bottom: 4px;">Kupfer (ct):</span>
+                <div style="display: flex; justify-content: space-around; align-items: center;">
+                  <div onclick="addMoneyPlaced('5')" class="money-elem" id="slot-5"></div>
+                  <div onclick="addMoneyPlaced('2')" class="money-elem" id="slot-2"></div>
+                  <div onclick="addMoneyPlaced('1')" class="money-elem" id="slot-1"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 3: PLUS & MINUS (MIT ZEHNERÜBERGANG) -->
+    <!-- ========================================================= -->
+    <main id="mod-plusminus" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Eingabezeile -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #fffbeb; padding: 10px 14px; border-radius: 18px; border: 1.5px solid #fde68a;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" id="pmA" value="84" min="10" max="99" class="font-num" style="width: 58px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <select id="pmOp" style="font-size: 18px; font-weight: 800; padding: 6px 10px; border: 2px solid #cbd5e1; border-radius: 12px; background: white;">
+            <option value="-">−</option>
+            <option value="+">+</option>
+          </select>
+          <input type="number" id="pmB" value="15" min="2" max="89" class="font-num" style="width: 58px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <button onclick="calcPMSteps()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">Rechnung laden</button>
+          <button onclick="randomPM()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Zufall</button>
+        </div>
+
+        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+          <button id="pmSubTab-100" onclick="switchPMSub('100')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🔢 100er-Tafel</button>
+          <button id="pmSubTab-bags" onclick="switchPMSub('bags')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎒 Säckchen & Murmeln</button>
+          <button id="pmSubTab-line" onclick="switchPMSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Rechenleiste</button>
+        </div>
+      </div>
+
+      <!-- 3 Didaktische Formelkarten -->
+      <div id="pmStepCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;"></div>
+
+      <!-- Anschauungsflächen -->
+      <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; align-items: center;">
+        
+        <!-- 100er Tafel mit markant gefärbten Zehnersprüngen -->
+        <div id="pmSec-100" style="width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b;">
+            <span>🐸 Frosch hüpft über die Tafel:</span>
+            <div style="display: flex; gap: 8px;">
+              <span>🟡 Einer</span>
+              <span>🟠 Zehner-Stopp</span>
+              <span>🟣 Zehner-Sprung</span>
+            </div>
+          </div>
+          <div id="pmHundredBoard" class="hundred-grid" style="background: #f8fafc; padding: 8px; border-radius: 14px; border: 2px solid #cbd5e1;"></div>
+        </div>
+
+        <!-- Säckchen & Murmeln mit Aufplatzen/Bündeln -->
+        <div id="pmSec-bags" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: #78350f;">
+            <span>Bündelung (10er-Säckchen & Einer-Murmeln):</span>
+            <span id="pmBagDesc" class="font-num" style="background: #fef3c7; padding: 2px 8px; border-radius: 8px;">84</span>
+          </div>
+          <div id="pmBagsContainer" style="background: #fffbeb; border: 2px dashed #fde68a; border-radius: 16px; padding: 16px; min-height: 150px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center;"></div>
+        </div>
+
+        <!-- Rechenleiste mit Sprungbögen -->
+        <div id="pmSec-line" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #64748b;">Zahlenstrahl mit Sprungbögen:</span>
+          <canvas id="pmCanvas" width="840" height="180" style="width: 100%; background: #f8fafc; border-radius: 14px; border: 1.5px solid #cbd5e1;"></canvas>
+        </div>
+
+        <!-- Steuerung Animation -->
+        <div style="width: 100%; margin-top: 12px; padding-top: 10px; border-top: 1.5px solid #f1f5f9; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
+            <button onclick="stepPM(-1)" class="btn btn-secondary" style="font-size: 12px;">◀ Schritt zurück</button>
+            <button id="pmPlayBtn" onclick="togglePMPlay()" class="btn btn-primary" style="font-size: 12px;">
+              <span>🎬</span> <span id="pmPlayTxt">Vollanimation</span>
+            </button>
+            <button onclick="stepPM(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+            <span>Tempo:</span>
+            <input type="range" id="pmSpeed" min="200" max="1400" value="700" style="width: 90px; accent-color: #f59e0b;">
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 4: MAL & GETEILT (MIT KEKSE-BACKBLECH & REST) -->
+    <!-- ========================================================= -->
+    <main id="mod-multidiv" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Eingabezeile -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #fffbeb; padding: 10px 14px; border-radius: 18px; border: 1.5px solid #fde68a;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" id="mdA" value="23" min="1" max="99" class="font-num" style="width: 58px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <select id="mdOp" onchange="onMDOpChange()" style="font-size: 18px; font-weight: 800; padding: 6px 10px; border: 2px solid #cbd5e1; border-radius: 12px; background: white;">
+            <option value="/">÷</option>
+            <option value="*">×</option>
+          </select>
+          <input type="number" id="mdB" value="5" min="1" max="12" class="font-num" style="width: 58px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <button onclick="calcMDSteps()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">Rechnen</button>
+          <button onclick="randomMD()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Zufall</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label id="mdRestLabel" style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: #be123c; background: #ffe4e6; padding: 5px 8px; border-radius: 10px; cursor: pointer;">
+            <input type="checkbox" id="mdAllowRest" checked onchange="calcMDSteps()" style="accent-color: #e11d48;">
+            <span>Mit Rest 🍰</span>
+          </label>
+          <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+            <button id="mdSubTab-cookies" onclick="switchMDSub('cookies')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🍪 Backblech</button>
+            <button id="mdSubTab-grid" onclick="switchMDSub('grid')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🟦 Punktefeld</button>
+            <button id="mdSubTab-line" onclick="switchMDSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Zahlenstrahl</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sonnen-Brücke & Info -->
+      <div id="mdBridgeBox" style="background: #fef3c7; border: 1.5px solid #fde68a; border-radius: 16px; padding: 8px 12px; font-size: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px;"></div>
+
+      <!-- Anschauungsflächen -->
+      <div style="background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        
+        <!-- Backblech & Teller -->
+        <div id="mdSec-cookies" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Oberes Backblech -->
+          <div style="background: #1e293b; border: 3px solid #334155; border-radius: 16px; padding: 10px; color: white;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 6px;">
+              <span>🧑‍🍳 Backblech (Ausgangskekse):</span>
+              <span id="mdTrayStatus" class="font-num" style="color: #fde047;">23 Kekse</span>
+            </div>
+            <div id="mdCookiesTray" style="background: #0f172a; border-radius: 12px; padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 70px; align-items: center;"></div>
+          </div>
+
+          <!-- Fertige Teller & Rest-Schale -->
+          <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #78350f;">
+              <span>🍽️ Gepackte Portionen:</span>
+              <span id="mdPlateCountTxt" class="font-num">0 Teller</span>
+            </div>
+            <div id="mdPlatesContainer" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-height: 90px; align-items: flex-start; padding: 4px;"></div>
+          </div>
+        </div>
+
+        <!-- Punktefeld -->
+        <div id="mdSec-grid" class="hidden" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+          <span style="font-size: 12px; font-weight: 800; color: #64748b; self-start: true;">Punktefeld mit Sonnen-Aufteilung:</span>
+          <div id="mdGridContainer" style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; overflow-x: auto; max-width: 100%;"></div>
+        </div>
+
+        <!-- Zahlenstrahl -->
+        <div id="mdSec-line" class="hidden" style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #64748b;">Zahlenstrahl mit Vielfachen-Bögen:</span>
+          <canvas id="mdCanvas" width="840" height="180" style="width: 100%; background: #f8fafc; border-radius: 14px; border: 1.5px solid #cbd5e1;"></canvas>
+        </div>
+
+        <!-- Animation Controls -->
+        <div style="margin-top: 6px; padding-top: 10px; border-top: 1.5px solid #f1f5f9; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
+            <button onclick="stepMD(-1)" class="btn btn-secondary" style="font-size: 12px;">◀ Schritt zurück</button>
+            <button id="mdPlayBtn" onclick="toggleMDPlay()" class="btn btn-primary" style="font-size: 12px;">
+              <span>🎬</span> <span id="mdPlayTxt">Vollanimation</span>
+            </button>
+            <button onclick="stepMD(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+            <span>Tempo:</span>
+            <input type="range" id="mdSpeed" min="200" max="1400" value="700" style="width: 90px; accent-color: #f59e0b;">
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+
+  <script>
+    // =========================================================
+    // INLINE SERVICE WORKER (100% OFFLINE AUF IPAD)
+    // =========================================================
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'lernwerkstatt-offline-v2';
+        self.addEventListener('install', e => { self.skipWaiting(); });
+        self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+        self.addEventListener('fetch', e => {
+          e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+        });
+      `;
+      try {
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      } catch (err) {}
+    }
+
+    // =========================================================
+    // WEB AUDIO SYNTHESIZER
+    // =========================================================
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      isSoundOn = !isSoundOn;
+      document.getElementById('soundIcon').textContent = isSoundOn ? '🔊' : '🔇';
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.08, gainVal = 0.2) {
+      if (!isSoundOn) return;
+      try {
+        const ctx = getAudio();
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        g.gain.setValueAtTime(gainVal, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(g);
+        g.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      if (!isSoundOn) return;
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'triangle', 0.35, 0.22), idx * 80);
+      });
+    }
+
+    // =========================================================
+    // KONFETTI-FEUERWERK
+    // =========================================================
+    const confCanvas = document.getElementById('confettiCanvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confetti = [];
+
+    function resizeConf() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConf);
+    resizeConf();
+
+    function fireConfetti() {
+      confetti = [];
+      const cols = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+      for (let i = 0; i < 70; i++) {
+        confetti.push({
+          x: confCanvas.width / 2 + (Math.random() * 200 - 100),
+          y: confCanvas.height / 3 + (Math.random() * 80 - 40),
+          vx: (Math.random() - 0.5) * 12,
+          vy: Math.random() * -10 - 2,
+          size: Math.random() * 8 + 4,
+          col: cols[Math.floor(Math.random() * cols.length)],
+          rot: Math.random() * 360,
+          speed: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function drawConfetti() {
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      let alive = false;
+      confetti.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35;
+        p.rot += p.speed;
+        p.alpha -= 0.014;
+        if (p.alpha > 0 && p.y < confCanvas.height) {
+          alive = true;
+          confCtx.save();
+          confCtx.translate(p.x, p.y);
+          confCtx.rotate((p.rot * Math.PI) / 180);
+          confCtx.fillStyle = p.col;
+          confCtx.globalAlpha = Math.max(0, p.alpha);
+          confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          confCtx.restore();
+        }
+      });
+      if (alive) requestAnimationFrame(drawConfetti);
+      else confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+    }
+
+    // =========================================================
+    // NAVIGATION & GLOBALE STERNE
+    // =========================================================
+    function switchModule(id) {
+      ['clock', 'money', 'plusminus', 'multidiv'].forEach(m => {
+        document.getElementById(`mod-${m}`).classList.add('hidden');
+        document.getElementById(`tabBtn-${m}`).classList.remove('active');
+      });
+      document.getElementById(`mod-${id}`).classList.remove('hidden');
+      document.getElementById(`tabBtn-${id}`).classList.add('active');
+
+      if (id === 'plusminus') setTimeout(renderPMLine, 40);
+      if (id === 'multidiv') setTimeout(renderMDLine, 40);
+    }
+
+    function addStars(n) {
+      const el = document.getElementById('starCounter');
+      el.textContent = parseInt(el.textContent, 10) + n;
+    }
+
+    // =========================================================
+    // MODUL 1: LERN-UHR MIT DEUTSCHER UMGANGSSPRACHE
+    // =========================================================
+    const clkSvg = document.getElementById("clockSvg");
+    const clkCx = 160, clkCy = 160, clkR = 142;
+    let clkCurrentMin = 720;
+    let clkTargetMin = 720;
+    let clkSpeed = 30;
+    let clkIsPaused = false;
+    let clkShowSectors = true;
+    let clkLastTime = null;
+
+    const clkColors = [
+      "#ffe4e6", "#fef3c7", "#f7fee7", "#dcfce7", "#ecfdf5", "#e0f2fe",
+      "#e0e7ff", "#ede9fe", "#fae8ff", "#fce7f3", "#ffedd5", "#f1f5f9"
+    ];
+
+    function initClock() {
+      drawClock();
+      requestAnimationFrame(clockTick);
+    }
+
+    function getGermanColloquialTime(totalMinutes) {
+      const norm = Math.round(totalMinutes);
+      let h = Math.floor(norm / 60) % 24;
+      if (h < 0) h += 24;
+      let m = norm % 60;
+      if (m < 0) m += 60;
+
+      // 12-Stunden-Format für die Sprache (1..12)
+      let curH12 = h % 12;
+      if (curH12 === 0) curH12 = 12;
+      let nextH12 = (curH12 % 12) + 1;
+
+      // Exakte 5-Minuten-Phrasen
+      if (m === 0) return `Genau ${curH12} Uhr`;
+      if (m === 5) return `Fünf nach ${curH12}`;
+      if (m === 10) return `Zehn nach ${curH12}`;
+      if (m === 15) return `Viertel nach ${curH12}`;
+      if (m === 20) return `Zehn vor halb ${nextH12}`;
+      if (m === 25) return `Fünf vor halb ${nextH12}`;
+      if (m === 30) return `Halb ${nextH12}`;
+      if (m === 35) return `Fünf nach halb ${nextH12}`;
+      if (m === 40) return `Zehn nach halb ${nextH12}`;
+      if (m === 45) return `Viertel vor ${nextH12}`;
+      if (m === 50) return `Zehn vor ${nextH12}`;
+      if (m === 55) return `Fünf vor ${nextH12}`;
+
+      // Dazwischenliegende Minuten
+      if (m < 15) return `${m} Minuten nach ${curH12}`;
+      if (m < 30) return `${30 - m} Minuten vor halb ${nextH12}`;
+      if (m < 45) return `${m - 30} Minuten nach halb ${nextH12}`;
+      return `${60 - m} Minuten vor ${nextH12}`;
+    }
+
+    function drawClock() {
+      clkSvg.innerHTML = "";
+
+      // Zifferblatt
+      const dial = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dial.setAttribute("cx", clkCx); dial.setAttribute("cy", clkCy); dial.setAttribute("r", clkR);
+      dial.setAttribute("fill", "#ffffff"); dial.setAttribute("stroke", "#334155"); dial.setAttribute("stroke-width", "5");
+      clkSvg.appendChild(dial);
+
+      // Farbige Stundensektoren
+      const curHourIdx = Math.floor(((clkCurrentMin % 720 + 720) % 720) / 60);
+      if (clkShowSectors) {
+        for (let i = 0; i < 12; i++) {
+          const sDeg = i * 30 - 90;
+          const eDeg = (i + 1) * 30 - 90;
+          const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          p.setAttribute("d", getSectorPath(clkCx, clkCy, clkR - 5, sDeg, eDeg));
+          p.setAttribute("fill", clkColors[i]);
+          p.setAttribute("opacity", i === curHourIdx ? "1" : "0.45");
+          if (i === curHourIdx) {
+            p.setAttribute("stroke", "#e11d48");
+            p.setAttribute("stroke-width", "2");
+          }
+          clkSvg.appendChild(p);
+        }
+      }
+
+      // Teilstriche & Zahlen
+      for (let m = 0; m < 60; m++) {
+        const rad = (m * 6 - 90) * Math.PI / 180;
+        const isFive = m % 5 === 0;
+        const len = isFive ? 12 : 5;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", clkCx + (clkR - 8) * Math.cos(rad));
+        line.setAttribute("y1", clkCy + (clkR - 8) * Math.sin(rad));
+        line.setAttribute("x2", clkCx + (clkR - 8 - len) * Math.cos(rad));
+        line.setAttribute("y2", clkCy + (clkR - 8 - len) * Math.sin(rad));
+        line.setAttribute("stroke", isFive ? "#1e293b" : "#94a3b8");
+        line.setAttribute("stroke-width", isFive ? "3" : "1.2");
+        clkSvg.appendChild(line);
+
+        if (isFive) {
+          const val = m === 0 ? 12 : m / 5;
+          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          txt.setAttribute("x", clkCx + (clkR - 28) * Math.cos(rad));
+          txt.setAttribute("y", clkCy + (clkR - 28) * Math.sin(rad) + 6);
+          txt.setAttribute("font-size", "17");
+          txt.setAttribute("font-weight", "800");
+          txt.setAttribute("text-anchor", "middle");
+          txt.setAttribute("fill", "#0f172a");
+          txt.textContent = val;
+          clkSvg.appendChild(txt);
+        }
+      }
+
+      // Roter Stundenzeiger (kurz, kräftig)
+      const hDeg = (clkCurrentMin / 60) * 30;
+      const hRad = (hDeg - 90) * Math.PI / 180;
+      const hHand = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      hHand.setAttribute("x1", clkCx - 12 * Math.cos(hRad));
+      hHand.setAttribute("y1", clkCy - 12 * Math.sin(hRad));
+      hHand.setAttribute("x2", clkCx + 64 * Math.cos(hRad));
+      hHand.setAttribute("y2", clkCy + 64 * Math.sin(hRad));
+      hHand.setAttribute("stroke", "#e11d48");
+      hHand.setAttribute("stroke-width", "8");
+      hHand.setAttribute("stroke-linecap", "round");
+      clkSvg.appendChild(hHand);
+
+      // Blauer Minutenzeiger (lang, schlank)
+      const mDeg = clkCurrentMin * 6;
+      const mRad = (mDeg - 90) * Math.PI / 180;
+      const mHand = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      mHand.setAttribute("x1", clkCx - 18 * Math.cos(mRad));
+      mHand.setAttribute("y1", clkCy - 18 * Math.sin(mRad));
+      mHand.setAttribute("x2", clkCx + 105 * Math.cos(mRad));
+      mHand.setAttribute("y2", clkCy + 105 * Math.sin(mRad));
+      mHand.setAttribute("stroke", "#0284c7");
+      mHand.setAttribute("stroke-width", "4.5");
+      mHand.setAttribute("stroke-linecap", "round");
+      clkSvg.appendChild(mHand);
+
+      // Mittelkappe
+      const pin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      pin.setAttribute("cx", clkCx); pin.setAttribute("cy", clkCy); pin.setAttribute("r", 6.5);
+      pin.setAttribute("fill", "#0f172a");
+      clkSvg.appendChild(pin);
+
+      updateClockText();
+    }
+
+    function getSectorPath(x, y, radius, sAngle, eAngle) {
+      const sRad = sAngle * Math.PI / 180;
+      const eRad = eAngle * Math.PI / 180;
+      return `M ${x} ${y} L ${x + radius * Math.cos(sRad)} ${y + radius * Math.sin(sRad)} A ${radius} ${radius} 0 0 1 ${x + radius * Math.cos(eRad)} ${y + radius * Math.sin(eRad)} Z`;
+    }
+
+    function updateClockText() {
+      const norm = Math.round(clkCurrentMin);
+      let h = Math.floor(norm / 60) % 24;
+      if (h < 0) h += 24;
+      let m = norm % 60;
+      if (m < 0) m += 60;
+      document.getElementById("clkHourTxt").textContent = String(h).padStart(2, "0");
+      document.getElementById("clkMinTxt").textContent = String(m).padStart(2, "0");
+      document.getElementById("clkColloquialBubble").textContent = `🗣️ „${getGermanColloquialTime(clkCurrentMin)}“`;
+    }
+
+    function clockTick(ts) {
+      if (!clkLastTime) clkLastTime = ts;
+      const dt = (ts - clkLastTime) / 1000;
+      clkLastTime = ts;
+
+      if (!clkIsPaused && clkCurrentMin !== clkTargetMin) {
+        const step = clkSpeed * dt;
+        const diff = clkTargetMin - clkCurrentMin;
+        if (Math.abs(diff) <= step) clkCurrentMin = clkTargetMin;
+        else clkCurrentMin += Math.sign(diff) * step;
+        drawClock();
+      }
+      requestAnimationFrame(clockTick);
+    }
+
+    function addClockDelta(m) {
+      clkTargetMin += m;
+      clkIsPaused = false;
+      document.getElementById('clkPauseTxt').textContent = 'Pause';
+      playTone(600, 'sine', 0.05);
+    }
+
+    function setClockDirect() {
+      const val = document.getElementById("clkDirectTime").value;
+      if (!val) return;
+      const [h, m] = val.split(":").map(Number);
+      const targetAbs = h * 60 + m;
+      let diff = (targetAbs - (clkCurrentMin % 1440) + 1440) % 1440;
+      clkTargetMin = clkCurrentMin + diff;
+      clkIsPaused = false;
+      document.getElementById('clkPauseTxt').textContent = 'Pause';
+      playTone(700, 'sine', 0.08);
+    }
+
+    function toggleClockPause() {
+      clkIsPaused = !clkIsPaused;
+      document.getElementById('clkPauseTxt').textContent = clkIsPaused ? 'Weiter' : 'Pause';
+      document.getElementById('clkPauseIcon').textContent = clkIsPaused ? '▶' : '⏸️';
+    }
+
+    function resetClockToNoon() {
+      clkCurrentMin = 720;
+      clkTargetMin = 720;
+      clkIsPaused = false;
+      drawClock();
+      playTone(520, 'triangle', 0.1);
+    }
+
+    function toggleClockSectors() {
+      clkShowSectors = !clkShowSectors;
+      document.getElementById('clkSectorToggleBtn').textContent = clkShowSectors ? '🎨 Farbige Stundenräume: AN' : '⚪ Normales Zifferblatt: AN';
+      drawClock();
+    }
+
+    function setClockSpeed(v) {
+      clkSpeed = Number(v);
+      document.getElementById('clkSpeedVal').textContent = clkSpeed + ' Min/s';
+    }
+
+    // =========================================================
+    // MODUL 2: EURO & CENT LOGIK
+    // =========================================================
+    function makeBanknoteSVG(val, scale = 1) {
+      const c = {
+        500:   { val: '5', bg: '#ccfbf1', border: '#0d9488', text: '#115e59', w: 110, h: 56 },
+        1000:  { val: '10', bg: '#ffe4e6', border: '#e11d48', text: '#9f1239', w: 116, h: 60 },
+        2000:  { val: '20', bg: '#dbeafe', border: '#3b82f6', text: '#1e40af', w: 122, h: 64 },
+        5000:  { val: '50', bg: '#ffedd5', border: '#f97316', text: '#9a3412', w: 128, h: 68 },
+        10000: { val: '100', bg: '#d1fae5', border: '#10b981', text: '#065f46', w: 134, h: 72 }
+      }[val];
+      return `
+        <svg width="${c.w * scale}" height="${c.h * scale}" viewBox="0 0 ${c.w} ${c.h}" style="border-radius:4px; box-shadow:0 3px 6px rgba(0,0,0,0.15); border:1px solid rgba(0,0,0,0.2);">
+          <rect width="${c.w}" height="${c.h}" rx="3" fill="${c.bg}"/>
+          <rect x="2" y="2" width="${c.w - 4}" height="${c.h - 4}" rx="2" fill="none" stroke="${c.border}" stroke-width="0.8" opacity="0.6"/>
+          <text x="6" y="${c.h - 8}" font-family="monospace" font-size="${c.val.length > 2 ? 18 : 22}" font-weight="900" fill="${c.text}">${c.val}</text>
+          <g transform="translate(${c.w - 12}, 0)">
+            <rect width="9" height="${c.h}" fill="url(#gradHolo)" opacity="0.85"/>
+            <text x="4.5" y="${c.h * 0.7}" font-family="monospace" font-size="5" font-weight="900" fill="#ffffff" text-anchor="middle">€</text>
+          </g>
+        </svg>
+      `;
+    }
+
+    function makeCoinSVG(val, scale = 1) {
+      const s = {
+        1:   { r: 17, fill: 'url(#gradCopper)', rim: 'url(#rimCopper)', l: '1', sub: 'CT' },
+        2:   { r: 19, fill: 'url(#gradCopper)', rim: 'url(#rimCopper)', l: '2', sub: 'CT' },
+        5:   { r: 22, fill: 'url(#gradCopper)', rim: 'url(#rimCopper)', l: '5', sub: 'CT' },
+        10:  { r: 21, fill: 'url(#gradGold)', rim: 'url(#rimGold)', l: '10', sub: 'CT' },
+        20:  { r: 23, fill: 'url(#gradGold)', rim: 'url(#rimGold)', l: '20', sub: 'CT' },
+        50:  { r: 25, fill: 'url(#gradGold)', rim: 'url(#rimGold)', l: '50', sub: 'CT' },
+        100: { r: 24, bi: true, out: 'url(#gradSilver)', outR: 'url(#rimSilver)', in: 'url(#gradGold)', inR: 'url(#rimGold)', l: '1', sub: '€' },
+        200: { r: 27, bi: true, out: 'url(#gradGold)', outR: 'url(#rimGold)', in: 'url(#gradSilver)', inR: 'url(#rimSilver)', l: '2', sub: '€' }
+      }[val];
+      const diam = s.r * 2;
+      let inner = '';
+      if (s.bi) {
+        inner = `
+          <circle cx="${s.r}" cy="${s.r}" r="${s.r - 1}" fill="${s.out}" stroke="${s.outR}" stroke-width="2"/>
+          <circle cx="${s.r}" cy="${s.r}" r="${s.r * 0.68}" fill="${s.in}" stroke="${s.inR}" stroke-width="1.2"/>
+          <text x="${s.r - 2}" y="${s.r + 5}" font-family="monospace" font-size="${s.r * 0.65}" font-weight="900" fill="#fff" text-anchor="middle">${s.l}</text>
+          <text x="${s.r + 7}" y="${s.r + 1}" font-family="sans-serif" font-size="${s.r * 0.35}" font-weight="800" fill="#fff">€</text>
+        `;
+      } else {
+        inner = `
+          <circle cx="${s.r}" cy="${s.r}" r="${s.r - 1}" fill="${s.fill}" stroke="${s.rim}" stroke-width="2"/>
+          <text x="${s.r - 2}" y="${s.r + 4}" font-family="monospace" font-size="${s.r * 0.65}" font-weight="900" fill="#fff" text-anchor="middle">${s.l}</text>
+          <text x="${s.r + 6}" y="${s.r + 1}" font-family="sans-serif" font-size="${s.r * 0.3}" font-weight="800" fill="#fff">${s.sub}</text>
+        `;
+      }
+      return `<svg width="${diam * scale}" height="${diam * scale}" viewBox="0 0 ${diam} ${diam}" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));">${inner}</svg>`;
+    }
+
+    const M_DENOMS = [
+      { id: '10000', name: '100 € Schein', type: 'note', val: 10000 },
+      { id: '5000',  name: '50 € Schein',  type: 'note', val: 5000 },
+      { id: '2000',  name: '20 € Schein',  type: 'note', val: 2000 },
+      { id: '1000',  name: '10 € Schein',  type: 'note', val: 1000 },
+      { id: '500',   name: '5 € Schein',   type: 'note', val: 500 },
+      { id: '200',   name: '2 € Münze',    type: 'coin', val: 200 },
+      { id: '100',   name: '1 € Münze',    type: 'coin', val: 100 },
+      { id: '50',    name: '50 ct Münze',  type: 'coin', val: 50 },
+      { id: '20',    name: '20 ct Münze',  type: 'coin', val: 20 },
+      { id: '10',    name: '10 ct Münze',  type: 'coin', val: 10 },
+      { id: '5',     name: '5 ct Münze',   type: 'coin', val: 5 },
+      { id: '2',     name: '2 ct Münze',   type: 'coin', val: 2 },
+      { id: '1',     name: '1 ct Münze',   type: 'coin', val: 1 }
+    ];
+
+    const M_ITEMS = {
+      easy: [
+        { name: "Bio-Milch", emoji: "🥛", cents: 200 },
+        { name: "Apfel", emoji: "🍎", cents: 100 },
+        { name: "Eis", emoji: "🍦", cents: 250 },
+        { name: "Buch", emoji: "📚", cents: 1200 }
+      ],
+      medium: [
+        { name: "Teddybär", emoji: "🧸", cents: 1480 },
+        { name: "Flugzeug", emoji: "✈️", cents: 870 },
+        { name: "Malblock", emoji: "🎨", cents: 390 }
+      ],
+      hard: [
+        { name: "Skateboard", emoji: "🛹", cents: 4887 },
+        { name: "Fahrradhelm", emoji: "⛑️", cents: 3995 },
+        { name: "Schulranzen", emoji: "🎒", cents: 6749 }
+      ]
+    };
+
+    let mnyMode = 'change';
+    let mnySub = 'easy';
+    let mnyDiff = 'easy';
+    let curItem = null;
+    let customerTotal = 0;
+    let customerCoins = [];
+    let placedCoins = {};
+    let isRegisterUnlocked = true;
+    let showMnyHint = false;
+
+    function fmtC(c) {
+      return (Math.floor(c / 100)) + ',' + String(c % 100).padStart(2, '0') + ' €';
+    }
+
+    function initMoney() {
+      [500, 1000, 2000, 5000, 10000].forEach(v => {
+        document.getElementById(`slot-${v}`).innerHTML = makeBanknoteSVG(v, 0.85);
+      });
+      [1, 2, 5, 10, 20, 50, 100, 200].forEach(v => {
+        document.getElementById(`slot-${v}`).innerHTML = makeCoinSVG(v, 0.9);
+      });
+      newShopItem();
+    }
+
+    function newShopItem() {
+      const list = M_ITEMS[mnyDiff];
+      curItem = list[Math.floor(Math.random() * list.length)];
+
+      if (mnyMode === 'change') {
+        const budgets = [
+          { t: 500, p: [{ id: '500', c: 1 }] },
+          { t: 1000, p: [{ id: '1000', c: 1 }] },
+          { t: 2000, p: [{ id: '2000', c: 1 }] },
+          { t: 5000, p: [{ id: '5000', c: 1 }] }
+        ].filter(b => b.t > curItem.cents);
+        const pick = budgets.length > 0 ? budgets[0] : { t: 10000, p: [{ id: '10000', c: 1 }] };
+        customerTotal = pick.t;
+        customerCoins = pick.p;
+      } else {
+        customerTotal = 0;
+        customerCoins = [];
+      }
+
+      isRegisterUnlocked = !(mnyMode === 'change' && mnySub === 'hard');
+      placedCoins = {};
+      showMnyHint = false;
+      document.getElementById('mnySmartHintBox').classList.add('hidden');
+      document.getElementById('mnyReceipt').classList.add('hidden');
+      document.getElementById('mnyInputEuro').value = '';
+      document.getElementById('mnyInputCent').value = '';
+      document.getElementById('mnyMentalMsg').className = 'hidden';
+
+      renderMoneyUI();
+    }
+
+    function renderMoneyUI() {
+      document.getElementById('mnyItemEmoji').textContent = curItem.emoji;
+      document.getElementById('mnyItemTitle').textContent = curItem.name;
+      document.getElementById('mnyItemPrice').textContent = fmtC(curItem.cents);
+
+      const custSec = document.getElementById('mnyCustomerPlate');
+      const subBar = document.getElementById('mnyChangeSubBar');
+      const matTitle = document.getElementById('mnyMatTitle');
+
+      if (mnyMode === 'pay') {
+        custSec.classList.add('hidden');
+        subBar.classList.add('hidden');
+        matTitle.textContent = "Theke: Geld für den Einkauf";
+      } else {
+        custSec.classList.remove('hidden');
+        subBar.classList.remove('hidden');
+        matTitle.textContent = "Theke: Wechselgeld für den Kunden";
+        renderCustomerTray();
+      }
+
+      renderLockState();
+      renderPlacedMoney();
+      updateMoneyCalculation();
+    }
+
+    function renderCustomerTray() {
+      document.getElementById('mnyCustomerGivenBadge').textContent = fmtC(customerTotal);
+      const container = document.getElementById('mnyCustomerTrayVisuals');
+      container.innerHTML = '';
+      customerCoins.forEach(item => {
+        const d = M_DENOMS.find(x => x.id === item.id);
+        const w = document.createElement('div');
+        w.innerHTML = d.type === 'note' ? makeBanknoteSVG(parseInt(item.id), 0.65) : makeCoinSVG(parseInt(item.id), 0.8);
+        container.appendChild(w);
+      });
+    }
+
+    function renderLockState() {
+      const card = document.getElementById('mnyMentalCard');
+      const lockOverlay = document.getElementById('mnyLockedOverlay');
+      if (mnyMode === 'change' && mnySub === 'hard') {
+        card.classList.remove('hidden');
+        if (!isRegisterUnlocked) {
+          lockOverlay.classList.remove('hidden');
+          document.getElementById('mnyLockBadge').textContent = '🔒 Kasse gesperrt';
+        } else {
+          lockOverlay.classList.add('hidden');
+          document.getElementById('mnyLockBadge').textContent = '🔓 Kasse geöffnet!';
+        }
+      } else {
+        card.classList.add('hidden');
+        lockOverlay.classList.add('hidden');
+      }
+    }
+
+    function checkMoneyMentalMath() {
+      const e = parseInt(document.getElementById('mnyInputEuro').value || '0', 10);
+      const c = parseInt(document.getElementById('mnyInputCent').value || '0', 10);
+      const entered = e * 100 + c;
+      const expected = customerTotal - curItem.cents;
+      const msg = document.getElementById('mnyMentalMsg');
+
+      if (entered === expected) {
+        isRegisterUnlocked = true;
+        playChime();
+        fireConfetti();
+        addStars(1);
+        msg.className = 'font-num';
+        msg.style.background = '#d1fae5';
+        msg.style.color = '#065f46';
+        msg.style.display = 'block';
+        msg.textContent = `🎉 Richtig! (${fmtC(expected)}). Die Kasse ist jetzt geöffnet!`;
+        renderLockState();
+      } else {
+        playTone(220, 'sawtooth', 0.2);
+        msg.className = 'font-num';
+        msg.style.background = '#ffe4e6';
+        msg.style.color = '#9f1239';
+        msg.style.display = 'block';
+        msg.textContent = `Nicht ganz! Tipp: Rechne ${fmtC(curItem.cents)} hoch zu ${fmtC(customerTotal)}.`;
+      }
+    }
+
+    function addMoneyPlaced(id) {
+      if (!isRegisterUnlocked) return;
+      placedCoins[id] = (placedCoins[id] || 0) + 1;
+      playTone(1000, 'sine', 0.04);
+      renderPlacedMoney();
+      updateMoneyCalculation();
+    }
+
+    function removeMoneyPlaced(id) {
+      if (!isRegisterUnlocked) return;
+      if (!placedCoins[id]) return;
+      placedCoins[id]--;
+      if (placedCoins[id] <= 0) delete placedCoins[id];
+      playTone(850, 'sine', 0.04);
+      renderPlacedMoney();
+      updateMoneyCalculation();
+    }
+
+    function clearPlacedMoney() {
+      if (!isRegisterUnlocked) return;
+      placedCoins = {};
+      renderPlacedMoney();
+      updateMoneyCalculation();
+    }
+
+    function getPlacedTotal() {
+      let sum = 0;
+      for (const [id, count] of Object.entries(placedCoins)) {
+        const d = M_DENOMS.find(x => x.id === id);
+        if (d) sum += d.val * count;
+      }
+      return sum;
+    }
+
+    function renderPlacedMoney() {
+      const tray = document.getElementById('mnyPlacedTray');
+      tray.innerHTML = '';
+      const keys = Object.keys(placedCoins);
+      let count = 0;
+
+      if (keys.length === 0) {
+        tray.innerHTML = '<span style="font-size:12px; color:rgba(167,243,208,0.5);">Noch kein Geld hingelegt.<br>Tippe unten auf Scheine/Münzen!</span>';
+        document.getElementById('mnyPieceCount').textContent = '0';
+        document.getElementById('mnyPlacedTotalTxt').textContent = '0,00 €';
+        return;
+      }
+
+      keys.sort((a, b) => parseInt(b) - parseInt(a));
+      keys.forEach(id => {
+        const c = placedCoins[id];
+        count += c;
+        const d = M_DENOMS.find(x => x.id === id);
+        const w = document.createElement('div');
+        w.style.position = 'relative';
+        w.style.cursor = 'pointer';
+        w.onclick = () => removeMoneyPlaced(id);
+        w.innerHTML = `
+          ${d.type === 'note' ? makeBanknoteSVG(parseInt(id), 0.65) : makeCoinSVG(parseInt(id), 0.8)}
+          ${c > 1 ? `<span class="stack-badge">${c}</span>` : ''}
+        `;
+        tray.appendChild(w);
+      });
+
+      document.getElementById('mnyPieceCount').textContent = count;
+      document.getElementById('mnyPlacedTotalTxt').textContent = fmtC(getPlacedTotal());
+    }
+
+    function updateMoneyCalculation() {
+      const target = mnyMode === 'pay' ? curItem.cents : (customerTotal - curItem.cents);
+      const placed = getPlacedTotal();
+      document.getElementById('mnyRegTarget').textContent = fmtC(target);
+      document.getElementById('mnyRegPaid').textContent = fmtC(placed);
+
+      const diff = target - placed;
+      const badge = document.getElementById('mnyRegBadge');
+      if (diff === 0) {
+        badge.textContent = 'Exakt passend!';
+        badge.style.background = 'rgba(16, 185, 129, 0.2)';
+        badge.style.color = '#34d399';
+      } else if (diff > 0) {
+        badge.textContent = 'Fehlt: ' + fmtC(diff);
+        badge.style.background = 'rgba(245, 158, 11, 0.2)';
+        badge.style.color = '#fbbf24';
+      } else {
+        badge.textContent = 'Zu viel: ' + fmtC(Math.abs(diff));
+        badge.style.background = 'rgba(225, 29, 72, 0.2)';
+        badge.style.color = '#f87171';
+      }
+    }
+
+    function getOptimalCoins(target) {
+      let rem = target;
+      const res = [];
+      for (const d of M_DENOMS) {
+        if (rem >= d.val) {
+          const cnt = Math.floor(rem / d.val);
+          res.push({ d, count: cnt });
+          rem %= d.val;
+        }
+      }
+      return res;
+    }
+
+    function toggleMoneySmartHint() {
+      showMnyHint = !showMnyHint;
+      const box = document.getElementById('mnySmartHintBox');
+      const btn = document.getElementById('mnyHintBtn');
+      if (showMnyHint) {
+        box.classList.remove('hidden');
+        btn.textContent = 'Tipp ausblenden';
+        const target = mnyMode === 'pay' ? curItem.cents : (customerTotal - curItem.cents);
+        const opt = getOptimalCoins(target);
+        box.innerHTML = '<strong>Optimal (' + opt.reduce((a,c)=>a+c.count,0) + ' Teile):</strong> ' + opt.map(o => `${o.count}× ${o.d.name}`).join(' + ');
+      } else {
+        box.classList.add('hidden');
+        btn.textContent = 'Tipp zeigen';
+      }
+    }
+
+    function checkMoneyResult() {
+      const target = mnyMode === 'pay' ? curItem.cents : (customerTotal - curItem.cents);
+      const placed = getPlacedTotal();
+      const rec = document.getElementById('mnyReceipt');
+      if (placed === target) {
+        playChime();
+        fireConfetti();
+        const opt = getOptimalCoins(target);
+        const minP = opt.reduce((a, c) => a + c.count, 0);
+        let curP = 0;
+        for (const c of Object.values(placedCoins)) curP += c;
+
+        const isSmart = (curP === minP);
+        addStars(isSmart ? 2 : 1);
+
+        rec.innerHTML = `
+          <div style="font-weight:800; color:#065f46; font-size:13px;">🧾 Kassenbon: Perfekt bezahlt!</div>
+          <div style="font-size:11px; color:#475569;">${isSmart ? '🌟 Kluge Münzwahl! Mit den wenigsten Teilen gelöst (+2 ⭐⭐)' : 'Prima! (+1 ⭐)'}</div>
+          <button onclick="newShopItem()" class="btn btn-success" style="width:100%; margin-top:4px; font-size:12px;">Nächster Artikel 🛍️️</button>
+        `;
+        rec.classList.remove('hidden');
+      } else {
+        playTone(220, 'sawtooth', 0.2);
+        rec.innerHTML = `<span style="color:#e11d48; font-weight:700; font-size:12px;">Der Betrag stimmt noch nicht ganz!</span>`;
+        rec.classList.remove('hidden');
+      }
+    }
+
+    function setMoneyMode(m) {
+      mnyMode = m;
+      document.getElementById('mnyBtnPay').className = m === 'pay' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('mnyBtnChange').className = m === 'change' ? 'btn btn-primary' : 'btn btn-secondary';
+      newShopItem();
+    }
+
+    function setMoneySubMode(s) {
+      mnySub = s;
+      document.getElementById('mnySubEasyBtn').className = s === 'easy' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('mnySubHardBtn').className = s === 'hard' ? 'btn btn-primary' : 'btn btn-secondary';
+      newShopItem();
+    }
+
+    function setMoneyDiff(d) {
+      mnyDiff = d;
+      ['easy', 'medium', 'hard'].forEach(x => {
+        document.getElementById(`mnyDiff${x.charAt(0).toUpperCase() + x.slice(1)}`).className = x === d ? 'btn btn-primary' : 'btn btn-secondary';
+      });
+      newShopItem();
+    }
+
+    // =========================================================
+    // MODUL 3: PLUS & MINUS LOGIK (ZEHNERÜBERGANG)
+    // =========================================================
+    let pmSteps = [];
+    let pmIdx = 0;
+    let pmPlaying = false;
+    let pmTimer = null;
+
+    function calcPMSteps() {
+      const a = parseInt(document.getElementById('pmA').value, 10);
+      const op = document.getElementById('pmOp').value;
+      const b = parseInt(document.getElementById('pmB').value, 10);
+
+      pmSteps = [];
+      const onesB = b % 10;
+      const tensB = Math.floor(b / 10) * 10;
+
+      pmSteps.push({ val: a, type: 'start' });
+
+      if (op === '-') {
+        const onesA = a % 10;
+        const stopTen = a - onesA;
+        const rem = onesB - onesA;
+
+        if (onesA > 0 && onesB > onesA) {
+          for (let i = 1; i <= onesA; i++) pmSteps.push({ val: a - i, type: i === onesA ? 'stop' : 'one' });
+          for (let i = 1; i <= rem; i++) pmSteps.push({ val: stopTen - i, type: 'love' });
+          let c = stopTen - rem;
+          for (let t = 0; t < tensB / 10; t++) { c -= 10; pmSteps.push({ val: c, type: 'ten' }); }
+        } else {
+          pmSteps.push({ val: a - onesB, type: 'one' });
+          pmSteps.push({ val: a - b, type: 'ten' });
+        }
+      } else {
+        const dist = (10 - (a % 10)) % 10;
+        const rem = onesB - dist;
+        if (dist > 0 && onesB > dist) {
+          for (let i = 1; i <= dist; i++) pmSteps.push({ val: a + i, type: i === dist ? 'stop' : 'one' });
+          for (let i = 1; i <= rem; i++) pmSteps.push({ val: a + dist + i, type: 'love' });
+          let c = a + dist + rem;
+          for (let t = 0; t < tensB / 10; t++) { c += 10; pmSteps.push({ val: c, type: 'ten' }); }
+        } else {
+          pmSteps.push({ val: a + onesB, type: 'one' });
+          pmSteps.push({ val: a + b, type: 'ten' });
+        }
+      }
+
+      pmIdx = 0;
+      renderPMCards();
+      renderPMBoard();
+      renderPMBags();
+      renderPMLine();
+    }
+
+    function renderPMCards() {
+      const a = parseInt(document.getElementById('pmA').value, 10);
+      const op = document.getElementById('pmOp').value;
+      const b = parseInt(document.getElementById('pmB').value, 10);
+      const cont = document.getElementById('pmStepCards');
+      if (op === '-') {
+        const stop = a - (a % 10);
+        const rem = (b % 10) - (a % 10);
+        cont.innerHTML = `
+          <div style="background:#fef3c7; border:1px solid #fde68a; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#78350f; text-align:center;">1️⃣ Zum Zehner: ${a} − ${a % 10} = ${stop}</div>
+          <div style="background:#ffe4e6; border:1px solid #fecdd3; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#9f1239; text-align:center;">2️⃣ Verliebte Zahl: 10 − ${rem} = ${10 - rem} ➔ ${stop - rem}</div>
+          <div style="background:#ede9fe; border:1px solid #ddd6fe; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#5b21b6; text-align:center;">3️⃣ Zehner-Sprung: − ${Math.floor(b/10)*10} = ${a - b}</div>
+        `;
+      } else {
+        cont.innerHTML = `
+          <div style="background:#fef3c7; border:1px solid #fde68a; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#78350f; text-align:center;">1️⃣ Zum Zehner auffüllen</div>
+          <div style="background:#ffe4e6; border:1px solid #fecdd3; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#9f1239; text-align:center;">2️⃣ Restliche Einer dazu</div>
+          <div style="background:#ede9fe; border:1px solid #ddd6fe; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#5b21b6; text-align:center;">3️⃣ Zehner-Sprünge</div>
+        `;
+      }
+    }
+
+    function renderPMBoard() {
+      const board = document.getElementById('pmHundredBoard');
+      board.innerHTML = '';
+      const cur = pmSteps[pmIdx];
+      const visited = {};
+      for (let i = 0; i <= pmIdx; i++) visited[pmSteps[i].val] = pmSteps[i].type;
+
+      for (let n = 1; n <= 100; n++) {
+        const c = document.createElement('div');
+        c.className = 'cell-100 font-num';
+        c.textContent = n;
+
+        if (visited[n]) {
+          const t = visited[n];
+          if (t === 'start') { c.style.background = '#bae6fd'; c.style.borderColor = '#38bdf8'; }
+          else if (t === 'one') { c.style.background = '#fef08a'; c.style.borderColor = '#facc15'; }
+          else if (t === 'stop') { c.style.background = '#fbbf24'; c.style.borderColor = '#d97706'; }
+          else if (t === 'love') { c.style.background = '#fbcfe8'; c.style.borderColor = '#f472b6'; }
+          else if (t === 'ten') { c.style.background = '#c7d2fe'; c.style.borderColor = '#818cf8'; font_weight = '900'; }
+        }
+
+        if (cur && cur.val === n) {
+          const f = document.createElement('span');
+          f.textContent = '🐸';
+          f.style.position = 'absolute';
+          f.style.top = '-10px';
+          f.style.fontSize = '14px';
+          c.appendChild(f);
+          c.style.transform = 'scale(1.1)';
+          c.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        }
+        board.appendChild(c);
+      }
+    }
+
+    function renderPMBags() {
+      const cont = document.getElementById('pmBagsContainer');
+      cont.innerHTML = '';
+      const cur = pmSteps[pmIdx];
+      if (!cur) return;
+      const n = cur.val;
+      document.getElementById('pmBagDesc').textContent = 'Aktueller Wert: ' + n;
+
+      const tens = Math.floor((n % 100) / 10);
+      const ones = n % 10;
+      for (let t = 0; t < tens; t++) {
+        cont.innerHTML += `<div style="background:#f59e0b; color:white; border-radius:12px; padding:8px 12px; font-weight:800; font-size:12px; display:flex; flex-direction:column; align-items:center;">🎒 10er</div>`;
+      }
+      if (ones > 0) {
+        cont.innerHTML += `<div style="background:white; border:2px solid #cbd5e1; border-radius:12px; padding:6px 10px; font-weight:800; font-size:12px; display:flex; align-items:center; gap:4px;">🔵 ${ones} Einer</div>`;
+      }
+    }
+
+    function renderPMLine() {
+      const canvas = document.getElementById('pmCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+      const lineY = h - 45;
+
+      ctx.beginPath();
+      ctx.moveTo(30, lineY); ctx.lineTo(w - 30, lineY);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 3; ctx.stroke();
+
+      function gx(v) { return 40 + (v / 100) * (w - 80); }
+
+      for (let i = 0; i <= 100; i += 10) {
+        const x = gx(i);
+        ctx.beginPath(); ctx.moveTo(x, lineY - 6); ctx.lineTo(x, lineY + 6);
+        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#475569'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(i, x, lineY + 20);
+      }
+
+      for (let i = 1; i <= pmIdx; i++) {
+        const x1 = gx(pmSteps[i - 1].val);
+        const x2 = gx(pmSteps[i].val);
+        ctx.beginPath();
+        ctx.moveTo(x1, lineY);
+        ctx.quadraticCurveTo((x1 + x2) / 2, lineY - Math.min(60, Math.abs(x2 - x1) * 0.5), x2, lineY);
+        ctx.strokeStyle = pmSteps[i].type === 'ten' ? '#4f46e5' : '#e11d48';
+        ctx.lineWidth = 2.5; ctx.stroke();
+      }
+
+      if (pmSteps[pmIdx]) {
+        const cx = gx(pmSteps[pmIdx].val);
+        ctx.font = '20px serif';
+        ctx.fillText('🐸', cx, lineY - 10);
+      }
+    }
+
+    function stepPM(dir) {
+      const next = pmIdx + dir;
+      if (next >= 0 && next < pmSteps.length) {
+        pmIdx = next;
+        playTone(500 + pmIdx * 25, 'sine', 0.04);
+        renderPMBoard();
+        renderPMBags();
+        renderPMLine();
+      }
+    }
+
+    function togglePMPlay() {
+      pmPlaying = !pmPlaying;
+      document.getElementById('pmPlayTxt').textContent = pmPlaying ? 'Stopp' : 'Vollanimation';
+      if (pmPlaying) {
+        if (pmIdx >= pmSteps.length - 1) pmIdx = 0;
+        const spd = parseInt(document.getElementById('pmSpeed').value, 10);
+        pmTimer = setInterval(() => {
+          if (pmIdx < pmSteps.length - 1) stepPM(1);
+          else togglePMPlay();
+        }, spd);
+      } else {
+        clearInterval(pmTimer);
+      }
+    }
+
+    function switchPMSub(id) {
+      ['100', 'bags', 'line'].forEach(x => {
+        document.getElementById(`pmSec-${x}`).classList.add('hidden');
+        document.getElementById(`pmSubTab-${x}`).className = 'btn btn-secondary';
+      });
+      document.getElementById(`pmSec-${id}`).classList.remove('hidden');
+      document.getElementById(`pmSubTab-${id}`).className = 'btn btn-primary';
+      if (id === 'line') setTimeout(renderPMLine, 40);
+    }
+
+    function randomPM() {
+      document.getElementById('pmA').value = Math.floor(Math.random() * 50) + 30;
+      document.getElementById('pmB').value = Math.floor(Math.random() * 20) + 12;
+      calcPMSteps();
+    }
+
+    // =========================================================
+    // MODUL 4: MAL & GETEILT LOGIK (MIT BACKBLECH & REST)
+    // =========================================================
+    let mdSteps = [];
+    let mdIdx = 0;
+    let mdPlaying = false;
+    let mdTimer = null;
+
+    function onMDOpChange() {
+      const op = document.getElementById('mdOp').value;
+      document.getElementById('mdRestLabel').style.display = op === '/' ? 'flex' : 'none';
+      calcMDSteps();
+    }
+
+    function calcMDSteps() {
+      const n1 = parseInt(document.getElementById('mdA').value, 10);
+      const op = document.getElementById('mdOp').value;
+      const n2 = parseInt(document.getElementById('mdB').value, 10);
+      const allowRest = document.getElementById('mdAllowRest').checked;
+      const bridge = document.getElementById('mdBridgeBox');
+
+      mdSteps = [];
+      if (op === '/') {
+        let tot = n1;
+        if (!allowRest && tot % n2 !== 0) {
+          tot = Math.floor(tot / n2) * n2;
+          document.getElementById('mdA').value = tot;
+        }
+        const full = Math.floor(tot / n2);
+        const rem = tot % n2;
+
+        bridge.innerHTML = `
+          <span>☀️ Aufteilen: ${tot} Kekse in Schalen à ${n2} Kekse</span>
+          <span class="font-num" style="background:white; padding:2px 8px; border-radius:8px; font-weight:800;">= ${full} Teller ${rem > 0 ? `+ Rest ${rem} 🥣` : ''}</span>
+        `;
+
+        mdSteps.push({ phase: 'start', packed: 0, hl: null, remP: false, desc: 'Ausgangskekse auf dem Blech' });
+        for (let p = 1; p <= full; p++) {
+          mdSteps.push({ phase: 'outline', packed: p - 1, hl: p, remP: false, desc: `Portion ${p} umrandet` });
+          mdSteps.push({ phase: 'pack', packed: p, hl: null, remP: false, desc: `Portion ${p} gepackt!` });
+        }
+        if (rem > 0) {
+          mdSteps.push({ phase: 'outline-rem', packed: full, hl: 'rem', remP: false, desc: `Rest-Kekse (${rem}) umrandet` });
+          mdSteps.push({ phase: 'pack-rem', packed: full, hl: null, remP: true, desc: `Rest in Schale 🥣 gelegt!` });
+        }
+      } else {
+        const tot = n1 * n2;
+        let hint = '';
+        if (n1 === 6 || n1 === 7) hint = `Sonnenaufgabe 5×${n2} = ${5*n2} nutzen!`;
+        else if (n1 === 9) hint = `Sonnenaufgabe 10×${n2} = ${10*n2} minus 1×${n2}!`;
+        else hint = `${n1} Portionen à ${n2} Kekse`;
+
+        bridge.innerHTML = `
+          <span>☀️ ${hint}</span>
+          <span class="font-num" style="background:white; padding:2px 8px; border-radius:8px; font-weight:800;">${n1} × ${n2} = ${tot}</span>
+        `;
+
+        mdSteps.push({ phase: 'start', packed: 0, hl: null, desc: 'Backblech vorbereitet' });
+        for (let g = 1; g <= n1; g++) {
+          mdSteps.push({ phase: 'outline', packed: g - 1, hl: g, desc: `Portion ${g} umrandet` });
+          mdSteps.push({ phase: 'pack', packed: g, hl: null, desc: `Portion ${g} serviert!` });
+        }
+      }
+
+      mdIdx = 0;
+      renderMDCookies();
+      renderMDGrid();
+      renderMDLine();
+    }
+
+    function renderMDCookies() {
+      const n1 = parseInt(document.getElementById('mdA').value, 10);
+      const op = document.getElementById('mdOp').value;
+      const n2 = parseInt(document.getElementById('mdB').value, 10);
+      const tot = op === '/' ? n1 : n1 * n2;
+      const groupSize = n2;
+      const cur = mdSteps[mdIdx];
+
+      const tray = document.getElementById('mdCookiesTray');
+      const plates = document.getElementById('mdPlatesContainer');
+      tray.innerHTML = '';
+      plates.innerHTML = '';
+
+      const packedCookies = cur.packed * groupSize;
+
+      for (let i = 1; i <= tot; i++) {
+        const c = document.createElement('div');
+        c.style.width = '28px'; c.style.height = '28px';
+        c.style.borderRadius = '50%';
+        c.style.display = 'flex'; c.style.alignItems = 'center'; c.style.justifyContent = 'center';
+        c.style.fontSize = '14px';
+
+        const gIdx = Math.ceil(i / groupSize);
+
+        if (i <= packedCookies) {
+          c.style.opacity = '0.15';
+          c.textContent = '🍪';
+        } else if (cur.hl && gIdx === cur.hl) {
+          c.style.background = '#f59e0b';
+          c.style.boxShadow = '0 0 0 3px #fde68a';
+          c.textContent = '🍪';
+        } else if (cur.hl === 'rem' && i > Math.floor(tot / groupSize) * groupSize) {
+          c.style.background = '#e11d48';
+          c.style.boxShadow = '0 0 0 3px #fecdd3';
+          c.textContent = '🍪';
+        } else if (cur.remP && i > Math.floor(tot / groupSize) * groupSize) {
+          c.style.opacity = '0.15';
+          c.textContent = '🍪';
+        } else {
+          c.textContent = '🍪';
+        }
+        tray.appendChild(c);
+      }
+
+      document.getElementById('mdTrayStatus').textContent = cur.desc;
+
+      // Teller
+      for (let p = 1; p <= cur.packed; p++) {
+        const pl = document.createElement('div');
+        pl.style.background = 'white'; pl.style.border = '2px solid #fde68a'; pl.style.borderRadius = '14px'; pl.style.padding = '6px';
+        pl.style.display = 'flex'; pl.style.flexDirection = 'column'; pl.style.alignItems = 'center';
+        let k = ''; for (let x = 0; x < groupSize; x++) k += '🍪';
+        pl.innerHTML = `<span style="font-size:10px; font-weight:800; color:#78350f;">Teller ${p}</span><span style="font-size:12px;">${k}</span>`;
+        plates.appendChild(pl);
+      }
+
+      if (cur.remP) {
+        const remC = tot % groupSize;
+        const rm = document.createElement('div');
+        rm.style.background = '#ffe4e6'; rm.style.border = '2px solid #fecdd3'; rm.style.borderRadius = '14px'; rm.style.padding = '6px';
+        let k = ''; for (let x = 0; x < remC; x++) k += '🍪';
+        rm.innerHTML = `<span style="font-size:10px; font-weight:800; color:#9f1239;">🥣 Rest-Schale</span><span style="font-size:12px;">${k}</span>`;
+        plates.appendChild(rm);
+      }
+
+      document.getElementById('mdPlateCountTxt').textContent = `${cur.packed} Teller`;
+    }
+
+    function renderMDGrid() {
+      const cont = document.getElementById('mdGridContainer');
+      const n1 = parseInt(document.getElementById('mdA').value, 10);
+      const op = document.getElementById('mdOp').value;
+      const n2 = parseInt(document.getElementById('mdB').value, 10);
+      const rows = op === '/' ? Math.ceil(n1 / n2) : n1;
+      const cols = n2;
+      const lim = op === '/' ? n1 : n1 * n2;
+
+      let h = `<div style="display:grid; grid-template-columns:repeat(${cols}, 24px); gap:4px;">`;
+      let count = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          count++;
+          if (count <= lim) {
+            const isSun = (r < 5);
+            h += `<div style="width:24px; height:24px; border-radius:6px; background:${isSun ? '#fde047' : '#bae6fd'}; border:1px solid ${isSun ? '#eab308' : '#7dd3fc'}; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800;">●</div>`;
+          } else {
+            h += `<div></div>`;
+          }
+        }
+      }
+      h += `</div>`;
+      cont.innerHTML = h;
+    }
+
+    function renderMDLine() {
+      const canvas = document.getElementById('mdCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+      const lineY = h - 45;
+
+      ctx.beginPath();
+      ctx.moveTo(30, lineY); ctx.lineTo(w - 30, lineY);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 3; ctx.stroke();
+
+      const n1 = parseInt(document.getElementById('mdA').value, 10);
+      const op = document.getElementById('mdOp').value;
+      const n2 = parseInt(document.getElementById('mdB').value, 10);
+      const maxVal = Math.max(20, op === '/' ? n1 : n1 * n2);
+
+      function gx(v) { return 40 + (v / maxVal) * (w - 80); }
+
+      for (let i = 0; i <= maxVal; i += Math.max(1, Math.round(maxVal / 10))) {
+        const x = gx(i);
+        ctx.beginPath(); ctx.moveTo(x, lineY - 5); ctx.lineTo(x, lineY + 5);
+        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = '#475569'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(i, x, lineY + 18);
+      }
+
+      const cur = mdSteps[mdIdx];
+      const packed = cur ? cur.packed : 0;
+      for (let p = 1; p <= packed; p++) {
+        const x1 = gx((p - 1) * n2);
+        const x2 = gx(p * n2);
+        ctx.beginPath(); ctx.moveTo(x1, lineY);
+        ctx.quadraticCurveTo((x1 + x2) / 2, lineY - 45, x2, lineY);
+        ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2.5; ctx.stroke();
+      }
+    }
+
+    function stepMD(dir) {
+      const next = mdIdx + dir;
+      if (next >= 0 && next < mdSteps.length) {
+        mdIdx = next;
+        playTone(450 + mdIdx * 35, 'sine', 0.04);
+        renderMDCookies();
+        renderMDLine();
+      }
+    }
+
+    function toggleMDPlay() {
+      mdPlaying = !mdPlaying;
+      document.getElementById('mdPlayTxt').textContent = mdPlaying ? 'Stopp' : 'Vollanimation';
+      if (mdPlaying) {
+        if (mdIdx >= mdSteps.length - 1) mdIdx = 0;
+        const spd = parseInt(document.getElementById('mdSpeed').value, 10);
+        mdTimer = setInterval(() => {
+          if (mdIdx < mdSteps.length - 1) stepMD(1);
+          else toggleMDPlay();
+        }, spd);
+      } else {
+        clearInterval(mdTimer);
+      }
+    }
+
+    function switchMDSub(id) {
+      ['cookies', 'grid', 'line'].forEach(x => {
+        document.getElementById(`mdSec-${x}`).classList.add('hidden');
+        document.getElementById(`mdSubTab-${x}`).className = 'btn btn-secondary';
+      });
+      document.getElementById(`mdSec-${id}`).classList.remove('hidden');
+      document.getElementById(`mdSubTab-${id}`).className = 'btn btn-primary';
+      if (id === 'line') setTimeout(renderMDLine, 40);
+    }
+
+    function randomMD() {
+      const op = document.getElementById('mdOp').value;
+      if (op === '/') {
+        document.getElementById('mdB').value = Math.floor(Math.random() * 5) + 3;
+        document.getElementById('mdA').value = Math.floor(Math.random() * 25) + 12;
+      } else {
+        document.getElementById('mdA').value = Math.floor(Math.random() * 6) + 2;
+        document.getElementById('mdB').value = Math.floor(Math.random() * 6) + 2;
+      }
+      calcMDSteps();
+    }
+
+    // =========================================================
+    // INITIALISIERUNG BEI LADEN
+    // =========================================================
+    window.onload = function() {
+      initClock();
+      initMoney();
+      calcPMSteps();
+      calcMDSteps();
+    };
+  </script>
+</body>
+</html>
