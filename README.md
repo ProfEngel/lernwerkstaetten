@@ -13,7 +13,7 @@ Eine Lernwerkstatt für die 2.–3. Klasse mit vier Bereichen:
 - **Plus & Minus:** Rechenwege mit Hundertertafel, Säckchen und Rechenleiste nachvollziehen
 - **Mal & Geteilt:** Aufgaben mit anschaulichen Darstellungen wie Backblech, Punktefeld und Zahlenstrahl lösen
 
-Die Seite ist für Tablets und kleinere Bildschirme gestaltet. Sie benötigt keine Installation und läuft direkt im Browser. Ton kann ein- und ausgeschaltet werden. Die Offline-Funktion hängt vom Browser und davon ab, ob die Seite zuvor online geladen wurde.
+Die Seite ist für Tablets und kleinere Bildschirme gestaltet. Sie benötigt keine Installation und läuft direkt im Browser. Ton kann ein- und ausgeschaltet werden. Eine verlässliche Offline-Nutzung ist derzeit nicht gewährleistet.
 
 ## Aufrufen
 
@@ -32,3 +32,4 @@ Neue Materialien können als eigene Unterordner (zum Beispiel `lesen/` oder `sac
 ## Veröffentlichung
 
 GitHub Actions veröffentlicht den Inhalt des Hauptbranches automatisch mit GitHub Pages. Die Workflow-Datei liegt unter `.github/workflows/pages.yml`.
+
