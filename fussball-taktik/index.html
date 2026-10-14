@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>TSV Plattenhardt – Taktiktafel PWA</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#e52421">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TSV Taktik">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23e52421'/><circle cx='256' cy='256' r='180' fill='%23ffffff'/><circle cx='256' cy='256' r='140' fill='%230a1f14'/><text x='50%25' y='55%25' font-size='120' font-weight='bold' fill='%23ffffff' text-anchor='middle' font-family='Arial'>6</text></svg>">
+
+<style>
+* { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0d131a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+#app { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+/* ── Header ── */
+header {
+  background: linear-gradient(90deg, #18222d 0%, #11171f 100%);
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e52421;
+  height: 50px;
+  z-index: 20;
+  flex-shrink: 0;
+}
+.badge { display: flex; align-items: center; gap: 8px; }
+.crest { width: 32px; height: 32px; background: #e52421; border: 2px solid #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 10px; color: #fff; box-shadow: 0 2px 6px rgba(229,36,33,0.5); }
+.title-group h1 { font-size: 14px; font-weight: 800; letter-spacing: 0.4px; }
+.title-group span { font-size: 10px; color: #a0aec0; }
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+.mode-switch { display: flex; background: #080c10; border-radius: 20px; padding: 3px; border: 1px solid #2d3748; }
+.mode-btn { padding: 4px 12px; font-size: 11px; font-weight: 700; border-radius: 16px; border: none; background: transparent; color: #a0aec0; cursor: pointer; transition: all 0.2s; }
+.mode-btn.active { background: #e52421; color: #fff; box-shadow: 0 2px 8px rgba(229,36,33,0.4); }
+
+/* help button */
+.help-btn { width: 30px; height: 30px; border-radius: 50%; background: #1e3a5f; border: 1.5px solid #3b82f6; color: #93c5fd; font-size: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.help-btn:active { transform: scale(0.92); }
+
+/* ── Main ── */
+#main-content { display: flex; flex: 1; position: relative; overflow: hidden; }
+#pitch-container { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #0a1710; padding: 6px; }
+#pitch-svg { width: 100%; height: 100%; max-height: 96vh; touch-action: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.6)); }
+
+/* ── Sidebar ── */
+#sidebar { width: 310px; background: #141c24; border-left: 1px solid #24303c; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 10px; gap: 8px; flex-shrink: 0; }
+@media (orientation: portrait) {
+  #main-content { flex-direction: column; }
+  #sidebar { width: 100%; height: 280px; border-left: none; border-top: 1px solid #24303c; }
+}
+
+/* ── Cards / Buttons ── */
+.card { background: #1c2631; border-radius: 10px; padding: 9px; border: 1px solid #2a394a; }
+.card-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.btn { padding: 7px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; border: 1px solid #3b4d61; background: #23303e; color: #f1f5f9; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-align: center; line-height: 1.3; }
+.btn:active { transform: scale(0.96); }
+.btn.primary { background: #e52421; border-color: #ff4d4a; color: white; }
+.btn.big-kid { padding: 11px; font-size: 12px; grid-column: span 2; border-radius: 12px; font-weight: 900; }
+.btn.green { background: #15803d; border-color: #22c55e; }
+.btn.blue { background: #1d4ed8; border-color: #3b82f6; }
+.btn.amber { background: #b45309; border-color: #f59e0b; }
+.btn.active-toggle { background: #7c3aed; border-color: #a78bfa; }
+.btn.span2 { grid-column: span 2; }
+.btn.freeplay { background: #0f766e; border-color: #2dd4bf; grid-column: span 2; font-size: 12px; padding: 10px; }
+
+/* ── Status Banner ── */
+#status-banner {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(15,23,42,0.92); border: 1.5px solid #38bdf8;
+  padding: 6px 16px; border-radius: 22px; font-size: 11px; font-weight: 700; color: #f8fafc;
+  pointer-events: none; backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  z-index: 15; text-align: center; max-width: 80%;
+}
+#status-banner.warning { border-color: #ef4444; color: #fca5a5; }
+#status-banner.success { border-color: #22c55e; color: #86efac; }
+
+/* ── Free Play overlay ── */
+#freeplay-overlay {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(15,23,42,0.9); border: 1.5px solid #2dd4bf;
+  padding: 7px 18px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  color: #99f6e4; backdrop-filter: blur(6px);
+  z-index: 15; text-align: center; pointer-events: none;
+  display: none;
+}
+
+/* ── Help Modal ── */
+#help-modal {
+  display: none;
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(5,10,20,0.88); backdrop-filter: blur(10px);
+  align-items: center; justify-content: center;
+}
+#help-modal.open { display: flex; }
+.help-box {
+  background: #141c28; border: 1.5px solid #3b82f6; border-radius: 18px;
+  width: min(94vw, 720px); max-height: 92vh; overflow-y: auto;
+  padding: 24px; position: relative;
+}
+.help-box h2 { font-size: 18px; font-weight: 900; color: #38bdf8; margin-bottom: 16px; }
+.help-section { margin-bottom: 18px; }
+.help-section h3 { font-size: 13px; font-weight: 800; color: #facc15; margin-bottom: 8px; border-left: 3px solid #facc15; padding-left: 8px; }
+.help-section p, .help-section li { font-size: 12px; line-height: 1.7; color: #cbd5e1; }
+.help-section ul { padding-left: 16px; }
+.help-section .rule-box { background: #1e2d42; border-radius: 10px; padding: 10px 14px; margin-top: 8px; border: 1px solid #2a3f5a; }
+.help-close { position: absolute; top: 14px; right: 16px; background: #e52421; border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+.help-tag { display: inline-block; background: #1e3a5f; color: #93c5fd; border-radius: 6px; padding: 2px 8px; font-size: 10px; font-weight: 700; margin: 2px; }
+.help-tag.red { background: #4a1010; color: #fca5a5; }
+.help-tag.green { background: #0d3320; color: #86efac; }
+.help-tag.amber { background: #3d2400; color: #fcd34d; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══ HEADER ═══ -->
+  <header>
+    <div class="badge">
+      <div class="crest">TSV</div>
+      <div class="title-group">
+        <h1>TSV Plattenhardt</h1>
+        <span>Juniorinnen-Taktikboard • PWA v2</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="mode-switch">
+        <button id="btn-mode-kids" class="mode-btn active" onclick="setMode('kids')">👧 Kids</button>
+        <button id="btn-mode-coach" class="mode-btn" onclick="setMode('coach')">📋 Trainer</button>
+      </div>
+      <button class="help-btn" onclick="openHelp()" title="Hilfe & Erklärungen">?</button>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN ═══ -->
+  <div id="main-content">
+    <div id="status-banner">Tippe auf eine Spielerin zum Ziehen oder wähle eine Spielsituation!</div>
+    <div id="freeplay-overlay">⚽ FREISPIEL: Klicke eine eigene Spielerin → dann ein Ziel</div>
+
+    <!-- PITCH -->
+    <div id="pitch-container">
+      <svg id="pitch-svg" viewBox="0 0 1000 660">
+        <defs>
+          <linearGradient id="grass" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#144d28"/>
+            <stop offset="100%" stop-color="#0f3d1f"/>
+          </linearGradient>
+          <!-- Glow filters -->
+          <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <filter id="glow-yellow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <filter id="glow-blue" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <!-- Arrow markers -->
+          <marker id="arrow-yellow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#facc15"/>
+          </marker>
+          <marker id="arrow-white" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#ffffff"/>
+          </marker>
+          <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#22c55e"/>
+          </marker>
+          <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#ef4444"/>
+          </marker>
+        </defs>
+
+        <!-- Rasen -->
+        <rect width="1000" height="660" rx="16" fill="url(#grass)"/>
+        <!-- Streifen -->
+        <g opacity="0.10">
+          <rect x="50"  y="30" width="100" height="600" fill="#fff"/>
+          <rect x="250" y="30" width="100" height="600" fill="#fff"/>
+          <rect x="450" y="30" width="100" height="600" fill="#fff"/>
+          <rect x="650" y="30" width="100" height="600" fill="#fff"/>
+          <rect x="850" y="30" width="100" height="600" fill="#fff"/>
+        </g>
+
+        <!-- Spielfeldlinien -->
+        <rect x="50" y="30" width="900" height="600" fill="none" stroke="#fff" stroke-width="3" opacity="0.85"/>
+        <line x1="500" y1="30" x2="500" y2="630" stroke="#fff" stroke-width="3" opacity="0.85"/>
+        <circle cx="500" cy="330" r="75" fill="none" stroke="#fff" stroke-width="3" opacity="0.85"/>
+        <circle cx="500" cy="330" r="4" fill="#fff"/>
+        <!-- 9er-Begrenzung -->
+        <g opacity="0.35" stroke="#facc15" stroke-dasharray="8 6" stroke-width="2">
+          <line x1="160" y1="30" x2="160" y2="630"/>
+          <line x1="840" y1="30" x2="840" y2="630"/>
+        </g>
+        <!-- Strafräume Links -->
+        <rect x="50"  y="160" width="140" height="340" fill="none" stroke="#fff" stroke-width="3" opacity="0.85"/>
+        <rect x="50"  y="240" width="50"  height="180" fill="none" stroke="#fff" stroke-width="2" opacity="0.8"/>
+        <circle cx="150" cy="330" r="3" fill="#fff"/>
+        <!-- Strafräume Rechts -->
+        <rect x="810" y="160" width="140" height="340" fill="none" stroke="#fff" stroke-width="3" opacity="0.85"/>
+        <rect x="900" y="240" width="50"  height="180" fill="none" stroke="#fff" stroke-width="2" opacity="0.8"/>
+        <circle cx="850" cy="330" r="3" fill="#fff"/>
+
+        <!-- Dynamic layers (draw order matters) -->
+        <g id="layer-cones"></g>
+        <g id="layer-zones"></g>
+        <g id="layer-offside"></g>
+        <g id="layer-tactics"></g>
+        <g id="layer-players"></g>
+        <g id="layer-bubbles"></g>
+        <g id="layer-freeplay"></g>
+      </svg>
+    </div>
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside id="sidebar">
+
+      <!-- KIDS PANEL -->
+      <div id="panel-kids">
+        <div class="card">
+          <div class="card-title">🚨 Die 2 goldenen Regeln</div>
+          <div class="btn-grid">
+            <button class="btn big-kid green" onclick="simMakeWide()">🟢 WIR HABEN DEN BALL!<br><span style="font-size:10px;font-weight:normal;">Mach dich GROSS! Freilaufen & Anspielbar sein</span></button>
+            <button class="btn big-kid primary" onclick="simMakeCompact()">🔴 GEGNER HAT DEN BALL!<br><span style="font-size:10px;font-weight:normal;">Mach dich ENG! Mitte zumachen & helfen!</span></button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🗣️ Rufen & Vororientieren</div>
+          <div class="btn-grid">
+            <button class="btn blue" onclick="simCommunication('ruecken')">👀 "Gegner im Rücken!"</button>
+            <button class="btn blue" onclick="simCommunication('zeit')">⏱️ "Du hast Zeit!"</button>
+            <button class="btn amber" onclick="simCommunication('leo')">📢 "Leo! / Meiner!"</button>
+            <button class="btn amber" onclick="simCommunication('schulter')">🔄 Erst schauen, dann annehmen</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚽ Freies Spielen</div>
+          <button class="btn freeplay" onclick="toggleFreePlay()">🎮 Freispiel-Modus (selbst passen)</button>
+        </div>
+      </div>
+
+      <!-- COACH PANEL -->
+      <div id="panel-coach" style="display:none;">
+        <div class="card">
+          <div class="card-title">📐 Formation & System</div>
+          <div class="btn-grid">
+            <button class="btn primary" onclick="setFormation('3131')">9er: 3-1-3-1</button>
+            <button class="btn" onclick="setFormation('332')">9er: 3-3-2</button>
+            <button class="btn" onclick="setFormation('433')">11er: 4-3-3</button>
+            <button class="btn" onclick="setFormation('4231')">11er: 4-2-3-1</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🧠 Taktische Kernabläufe</div>
+          <div class="btn-grid">
+            <button class="btn green span2" onclick="simAlwaysFindThe6()">⬡ IMMER DIE 6 SUCHEN!<br><small>Kurzer Pass → Schaltzentrale → Verlagerung</small></button>
+            <button class="btn" onclick="simShift('left')">← Verschieben Links</button>
+            <button class="btn" onclick="simShift('right')">Verschieben Rechts →</button>
+            <button class="btn amber" onclick="simErrorLV()">⚠️ Fehler: LV rennt blind vor</button>
+            <button class="btn" onclick="simPressHigh()">⬆️ Hohes Pressing</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚽ Freies Spielen</div>
+          <button class="btn freeplay" onclick="toggleFreePlay()">🎮 Freispiel-Modus (selbst passen)</button>
+        </div>
+      </div>
+
+      <!-- OVERLAY TOGGLES (always visible) -->
+      <div class="card" style="margin-top:auto;">
+        <div class="card-title">👁️ Einblendungen</div>
+        <div class="btn-grid">
+          <button class="btn" id="btn-zones" onclick="toggleZones()">◉ Wirkungskreise</button>
+          <button class="btn" id="btn-offside" onclick="toggleOffside()">🔵 Abseits-Linie</button>
+          <button class="btn" id="btn-cones" onclick="toggleCones()">🔺 Deckungskegel</button>
+          <button class="btn" id="btn-coverage" onclick="toggleCoverageLines()">🔗 Deckungslinien</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚙️ Spielfeld-Tools</div>
+        <div class="btn-grid">
+          <button class="btn" onclick="resetToInitial()">🔄 Grundposition</button>
+          <button class="btn primary" onclick="clearDrawings()">🧹 Zeichnungen löschen</button>
+        </div>
+      </div>
+
+    </aside>
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ═══ HELP MODAL ═══ -->
+<div id="help-modal">
+  <div class="help-box">
+    <button class="help-close" onclick="closeHelp()">✕</button>
+    <h2>📖 Taktiktafel – Hilfe & Erklärungen</h2>
+
+    <div class="help-section">
+      <h3>🎮 Steuerung & Bedienung</h3>
+      <div class="rule-box">
+        <ul>
+          <li><strong>Spielerin/Ball ziehen:</strong> Direkt auf dem Spielfeld antippen und per Drag & Drop verschieben.</li>
+          <li><strong>Freispiel-Modus:</strong> Aktivieren → eigene Spielerin (Rot) antippen → Ziel antippen. Die App prüft automatisch Abseits und Deckung.</li>
+          <li><strong>Modus-Wechsel:</strong> Oben zwischen <em>Kids</em> (einfache Regeln) und <em>Trainer</em> (Taktikdetails) wechseln.</li>
+          <li><strong>Einblendungen:</strong> Wirkungskreise, Abseits-Linie, Deckungskegel und Deckungslinien können unabhängig ein/ausgeschaltet werden.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🔵 Abseits-Linie</h3>
+      <div class="rule-box">
+        <p>Die <strong>blaue gestrichelte Linie</strong> markiert die Position des vorletzten Gegners (zweitletzter Verteidiger inkl. Torwart). Eine Spielerin steht im Abseits, wenn sie:</p>
+        <ul style="margin-top:6px;">
+          <li>Sich in der gegnerischen Hälfte befindet, UND</li>
+          <li>Zum Zeitpunkt der Ballabgabe näher am gegnerischen Tor ist als der vorletzte Gegner.</li>
+        </ul>
+        <p style="margin-top:6px;color:#fcd34d;">💡 Im Freispiel-Modus werden Pässe zu abseits stehenden Spielerinnen automatisch <strong>blockiert</strong> und rot markiert.</p>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🔺 Deckungskegel</h3>
+      <div class="rule-box">
+        <p>Zeigt den <strong>Sichtwinkel und Deckungsbereich</strong> jedes Gegners als halbtransparenten Kegel. Je kleiner der Abstand, desto enger die Deckung. Ist eine eigene Spielerin im dunklen Kernbereich → <span class="help-tag red">gedeckt</span>. Im Freispiel werden Pässe in gedeckte Spielerinnen <strong>als riskant eingestuft</strong> und mit Warnung angezeigt.</p>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🟢 Goldene Regel 1: Groß machen (Ballbesitz)</h3>
+      <div class="rule-box">
+        <p>Wenn wir den Ball haben: <strong>Breite machen, Tiefe suchen, anspielbar sein!</strong></p>
+        <ul style="margin-top:6px;">
+          <li>Außenspielerinnen gehen an die Linie → schaffen Breite</li>
+          <li>Stürmerin bindet die IV des Gegners</li>
+          <li>Die <strong>6</strong> bleibt zentral anspielbar (Schaltzentrale)</li>
+          <li>Dreiecke bilden → immer zwei Anspielstationen haben</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🔴 Goldene Regel 2: Eng machen (Ballverlust)</h3>
+      <div class="rule-box">
+        <p>Wenn der Gegner den Ball hat: <strong>Sofort kompakt werden, Mitte schützen!</strong></p>
+        <ul style="margin-top:6px;">
+          <li>Außenspielerinnen rücken ein (Abstand ca. 5m zur Mittellinie)</li>
+          <li>Kette schließt sich → keine Lücken im Zentrum</li>
+          <li>Pressing: erst am Ball Druck machen, <em>dann</em> hinterherlaufen</li>
+          <li>Niemals einzeln pressen → immer mit Sicherung</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>⬡ Die 6 – Schaltzentrale</h3>
+      <div class="rule-box">
+        <p>Die Nummer 6 (ZDM) ist das Herzstück des Spiels:</p>
+        <ul style="margin-top:6px;">
+          <li><strong>Immer anspielbar</strong> bleiben – nie hinter Gegnern verstecken</li>
+          <li><strong>Drehen und verlagern</strong> – kurz annehmen, Linie wechseln</li>
+          <li><strong>Tempo rausnehmen</strong> oder <strong>Tempo machen</strong> – je nach Situation</li>
+          <li>Sie verbindet Abwehr und Angriff</li>
+        </ul>
+        <p style="margin-top:6px;color:#fcd34d;">💡 Die 6 leuchtet mit goldenem Ring – sie ist die wichtigste Passoption!</p>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🗣️ Kommunikation auf dem Platz</h3>
+      <div class="rule-box">
+        <ul>
+          <li><span class="help-tag">"LEO!"</span> – Ich nehme den Ball! (verhindert Kollisionen)</li>
+          <li><span class="help-tag">"Du hast Zeit!"</span> – Kein Gegner in der Nähe, ruhig aufdrehen</li>
+          <li><span class="help-tag">"Gegner im Rücken!"</span> – Klatsch direkt zurück, nicht drehen</li>
+          <li><span class="help-tag">"Mann auf!"</span> – Angreifer kommt, sofort sichern</li>
+          <li><span class="help-tag amber">"Schulterblick"</span> – Vor dem Ballanfordern schauen, wo Raum ist</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>⚠️ Häufige Taktikfehler</h3>
+      <div class="rule-box">
+        <ul>
+          <li><strong>LV rennt blind vor:</strong> Riesiges Loch links hinten → Gegner kontern durch</li>
+          <li><strong>Ball-Watching:</strong> Nur auf den Ball schauen, nicht laufen → Gegner läuft frei</li>
+          <li><strong>Alle zum Ball:</strong> Keine Staffelung → beim Ballverlust sofort auseinandergezogen</li>
+          <li><strong>Querpass in Deckung:</strong> Immer prüfen ob Empfängerin frei ist!</li>
+          <li><strong>Abseits durch spätes Loslaufen:</strong> Auf die Abseits-Linie achten → rechtzeitig starten</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>📐 Formationen erklärt</h3>
+      <div class="rule-box">
+        <p><strong>9er-Feld (D-Jugend):</strong></p>
+        <ul style="margin-top:4px;">
+          <li><span class="help-tag green">3-1-3-1 (Basis)</span> – Drei Verteidigerinnen, eine Sechserin, drei Mittelfeldspielerinnen, eine Stürmerin. Gut ausgewogen.</li>
+          <li><span class="help-tag green">3-3-2</span> – Zwei Stürmerinnen, mehr Offensivdruck.</li>
+        </ul>
+        <p style="margin-top:8px;"><strong>11er-Feld (C-Jugend aufwärts):</strong></p>
+        <ul style="margin-top:4px;">
+          <li><span class="help-tag">4-3-3</span> – Klassisch, Breite mit drei Stürmerinnen.</li>
+          <li><span class="help-tag">4-2-3-1</span> – Doppel-Sechs schützt die Abwehr, 10er als Freigeist.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>📱 App als PWA installieren</h3>
+      <div class="rule-box">
+        <ul>
+          <li><strong>iPhone/iPad (Safari):</strong> Teilen → "Zum Home-Bildschirm" → Die App öffnet sich ohne Browser-Adressleiste im Vollbild.</li>
+          <li><strong>Android (Chrome):</strong> Menü (⋮) → "App installieren" oder Banner antippen.</li>
+          <li><strong>Offline-Modus:</strong> Einmal geladen, funktioniert die App auch ohne Internet auf dem Sportplatz! ✅</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<script>
+// ═══ PWA Registration ═══
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW:', e));
+  });
+}
+
+// ═══ SVG Layers ═══
+const svg          = document.getElementById('pitch-svg');
+const layerPlayers = document.getElementById('layer-players');
+const layerZones   = document.getElementById('layer-zones');
+const layerTactics = document.getElementById('layer-tactics');
+const layerBubbles = document.getElementById('layer-bubbles');
+const layerOffside = document.getElementById('layer-offside');
+const layerCones   = document.getElementById('layer-cones');
+const layerFreeplay= document.getElementById('layer-freeplay');
+const banner       = document.getElementById('status-banner');
+const fpOverlay    = document.getElementById('freeplay-overlay');
+
+// ═══ State ═══
+let showZones     = false;
+let showOffside   = false;
+let showCones     = false;
+let showCovLines  = false;
+let freePlayMode  = false;
+let fpSelected    = null;   // currently selected player in free-play
+let currentMode   = 'kids';
+let animRunning   = false;
+
+// ═══ Player Database ═══
+const initialPlayers = [
+  // TSV Plattenhardt (Rot) – 3-1-3-1
+  { id:'tsv-1',  team:'tsv', num:'1',  role:'TW',  x:80,  y:330, is6:false },
+  { id:'tsv-2',  team:'tsv', num:'2',  role:'LV',  x:220, y:150, is6:false },
+  { id:'tsv-4',  team:'tsv', num:'4',  role:'IV',  x:190, y:330, is6:false },
+  { id:'tsv-3',  team:'tsv', num:'3',  role:'RV',  x:220, y:510, is6:false },
+  { id:'tsv-6',  team:'tsv', num:'6',  role:'ZDM', x:340, y:330, is6:true  },
+  { id:'tsv-7',  team:'tsv', num:'7',  role:'LM',  x:440, y:160, is6:false },
+  { id:'tsv-10', team:'tsv', num:'10', role:'ZOM', x:450, y:330, is6:false },
+  { id:'tsv-11', team:'tsv', num:'11', role:'RM',  x:440, y:500, is6:false },
+  { id:'tsv-9',  team:'tsv', num:'9',  role:'ST',  x:520, y:330, is6:false },
+  // Gegner (Dunkelgrau)
+  { id:'geg-1',  team:'geg', num:'1',  role:'TW',  x:920, y:330, is6:false },
+  { id:'geg-2',  team:'geg', num:'2',  role:'RV',  x:760, y:160, is6:false },
+  { id:'geg-4',  team:'geg', num:'4',  role:'IV',  x:790, y:330, is6:false },
+  { id:'geg-3',  team:'geg', num:'3',  role:'LV',  x:760, y:500, is6:false },
+  { id:'geg-6',  team:'geg', num:'6',  role:'DM',  x:670, y:330, is6:false },
+  { id:'geg-7',  team:'geg', num:'7',  role:'RM',  x:600, y:180, is6:false },
+  { id:'geg-10', team:'geg', num:'10', role:'ZM',  x:620, y:330, is6:false },
+  { id:'geg-11', team:'geg', num:'11', role:'LM',  x:600, y:480, is6:false },
+  { id:'geg-9',  team:'geg', num:'9',  role:'ST',  x:540, y:330, is6:false },
+  // Ball
+  { id:'ball',   team:'ball', num:'⚽', role:'', x:360, y:330, is6:false }
+];
+
+let players = JSON.parse(JSON.stringify(initialPlayers));
+
+// ──────────────────────────────────────────────────────────
+// OFFSIDE LOGIC
+// ──────────────────────────────────────────────────────────
+/**
+ * Returns the x-coordinate of the offside line.
+ * Offside line = x of the 2nd-to-last defender (from left).
+ * TSV attacks left→right, so we look at opponents sorted by x ascending,
+ * take index [1] (second closest to TSV goal).
+ */
+function getOffsideX() {
+  const defenders = players
+    .filter(p => p.team === 'geg')
+    .map(p => p.x)
+    .sort((a, b) => a - b); // ascending = closer to TSV goal on left
+  // The offside line is the second-to-last defender (second smallest x)
+  // In standard football rules: 2nd last opponent from the goal being attacked
+  if (defenders.length >= 2) return defenders[1];
+  if (defenders.length === 1) return defenders[0];
+  return 500;
+}
+
+/**
+ * Is a player in an offside position (when a pass is played)?
+ * Offside if: in opp half (x > 500), AND x > offsideX, AND not the ball
+ */
+function isOffside(p) {
+  if (p.team !== 'tsv' || p.id === 'tsv-1') return false; // GK never offside
+  const ox = getOffsideX();
+  return p.x > 500 && p.x > ox;
+}
+
+// ──────────────────────────────────────────────────────────
+// COVERAGE / MARKING LOGIC
+// ──────────────────────────────────────────────────────────
+const MARKING_RADIUS = 55; // pixels in SVG units
+
+function isCoveredByOpponent(p) {
+  if (p.team !== 'tsv') return false;
+  return players.some(opp => {
+    if (opp.team !== 'geg') return false;
+    const dx = opp.x - p.x;
+    const dy = opp.y - p.y;
+    return Math.sqrt(dx*dx + dy*dy) < MARKING_RADIUS;
+  });
+}
+
+// ──────────────────────────────────────────────────────────
+// FREE PASS EVALUATION
+// ──────────────────────────────────────────────────────────
+function evaluatePass(fromP, toP) {
+  const results = {
+    blocked: false,
+    reason: '',
+    warning: false,
+    warnReason: ''
+  };
+  if (isOffside(toP)) {
+    results.blocked = true;
+    results.reason = `⛔ ABSEITS! Nr.${toP.num} (${toP.role}) steht hinter der Abseits-Linie!`;
+    return results;
+  }
+  if (isCoveredByOpponent(toP)) {
+    results.warning = true;
+    results.warnReason = `⚠️ Nr.${toP.num} (${toP.role}) ist gedeckt! Riskanter Pass!`;
+  }
+  return results;
+}
+
+// ──────────────────────────────────────────────────────────
+// RENDERING
+// ──────────────────────────────────────────────────────────
+function renderPlayers() {
+  layerPlayers.innerHTML = '';
+  layerZones.innerHTML   = '';
+  layerOffside.innerHTML = '';
+  layerCones.innerHTML   = '';
+
+  // Offside line
+  if (showOffside) {
+    const ox = getOffsideX();
+    const line = mkEl('line');
+    setAttrs(line, { x1: ox, y1: 30, x2: ox, y2: 630,
+      stroke: '#38bdf8', 'stroke-width': 2.5,
+      'stroke-dasharray': '10 6', opacity: 0.85 });
+    layerOffside.appendChild(line);
+
+    const lbl = mkEl('text');
+    setAttrs(lbl, { x: ox + 5, y: 50, 'font-size': 11, 'font-weight': 800, fill: '#38bdf8', opacity: 0.9 });
+    lbl.textContent = 'ABSEITS';
+    layerOffside.appendChild(lbl);
+
+    // shade offside zone
+    const shade = mkEl('rect');
+    setAttrs(shade, { x: ox, y: 30, width: 950 - ox, height: 600,
+      fill: 'rgba(56,189,248,0.07)', 'pointer-events': 'none' });
+    layerOffside.appendChild(shade);
+  }
+
+  // Coverage cones for each opponent
+  if (showCones) {
+    players.filter(p => p.team === 'geg' && p.role !== 'TW').forEach(opp => {
+      // Cone pointing towards own goal (left, towards TSV side)
+      const coneLen = 140;
+      const halfAngle = 28; // degrees half-angle
+      // Direction: opponent looks toward TSV goal (leftward: angle = 180°)
+      const baseAngle = 180; // degrees
+      const spread = halfAngle * (Math.PI / 180);
+      const base = baseAngle * (Math.PI / 180);
+      const a1 = base - spread;
+      const a2 = base + spread;
+      const px1 = opp.x + coneLen * Math.cos(a1);
+      const py1 = opp.y + coneLen * Math.sin(a1);
+      const px2 = opp.x + coneLen * Math.cos(a2);
+      const py2 = opp.y + coneLen * Math.sin(a2);
+
+      const cone = mkEl('path');
+      cone.setAttribute('d', `M ${opp.x} ${opp.y} L ${px1} ${py1} A ${coneLen} ${coneLen} 0 0 1 ${px2} ${py2} Z`);
+      cone.setAttribute('fill', 'rgba(239,68,68,0.18)');
+      cone.setAttribute('stroke', '#ef4444');
+      cone.setAttribute('stroke-width', '1');
+      cone.setAttribute('opacity', '0.85');
+      cone.setAttribute('pointer-events', 'none');
+      layerCones.appendChild(cone);
+
+      // Marking radius circle
+      const circ = mkEl('circle');
+      setAttrs(circ, { cx: opp.x, cy: opp.y, r: MARKING_RADIUS,
+        fill: 'none', stroke: '#ef4444',
+        'stroke-width': 1, 'stroke-dasharray': '4 4', opacity: 0.4,
+        'pointer-events': 'none' });
+      layerCones.appendChild(circ);
+    });
+  }
+
+  // Coverage lines (optional)
+  if (showCovLines) {
+    players.filter(p => p.team === 'tsv').forEach(tp => {
+      if (isCoveredByOpponent(tp)) {
+        const opp = players.find(o => {
+          if (o.team !== 'geg') return false;
+          const dx = o.x - tp.x; const dy = o.y - tp.y;
+          return Math.sqrt(dx*dx+dy*dy) < MARKING_RADIUS;
+        });
+        if (opp) {
+          const l = mkEl('line');
+          setAttrs(l, { x1: tp.x, y1: tp.y, x2: opp.x, y2: opp.y,
+            stroke: '#f97316', 'stroke-width': 2, 'stroke-dasharray': '5 4',
+            opacity: 0.7, 'pointer-events': 'none' });
+          layerCones.appendChild(l);
+        }
+      }
+    });
+  }
+
+  // Players
+  players.forEach(p => {
+    if (p.team === 'ball') {
+      const g = mkEl('g');
+      g.setAttribute('transform', `translate(${p.x},${p.y})`);
+      g.id = p.id;
+      g.innerHTML = `
+        <circle r="14" fill="#fff" stroke="#111" stroke-width="2.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"/>
+        <circle r="5" fill="#111"/>
+      `;
+      enableDrag(g, p);
+      layerPlayers.appendChild(g);
+      return;
+    }
+
+    // Wirkungskreise
+    if (showZones) {
+      const z = mkEl('circle');
+      setAttrs(z, {
+        cx: p.x, cy: p.y,
+        r: p.is6 ? 85 : 60,
+        fill: p.team === 'tsv' ? 'rgba(229,36,33,0.12)' : 'rgba(100,116,139,0.12)',
+        stroke: p.team === 'tsv' ? '#e52421' : '#64748b',
+        'stroke-dasharray': '4 4', 'stroke-width': 1.5
+      });
+      layerZones.appendChild(z);
+    }
+
+    const isTsv = p.team === 'tsv';
+    const mainColor = isTsv ? '#e52421' : '#334155';
+    const covered = isCoveredByOpponent(p) && showCovLines;
+    const offside = isOffside(p) && showOffside;
+
+    let extras = '';
+    if (p.is6) {
+      extras += `<circle r="27" fill="none" stroke="#facc15" stroke-width="3" opacity="0.9"><animate attributeName="r" values="25;30;25" dur="2s" repeatCount="indefinite"/></circle>`;
+    }
+    if (offside) {
+      extras += `<circle r="24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5 3" opacity="0.9"/>`;
+    }
+    if (covered && isTsv) {
+      extras += `<circle r="24" fill="none" stroke="#f97316" stroke-width="2" opacity="0.8"/>`;
+    }
+
+    const g = mkEl('g');
+    g.setAttribute('transform', `translate(${p.x},${p.y})`);
+    g.id = p.id;
+    g.innerHTML = `
+      ${extras}
+      <circle r="20" fill="${mainColor}" stroke="#fff" stroke-width="2.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+      <text text-anchor="middle" y="6" font-size="14" font-weight="900" fill="#fff" pointer-events="none">${p.num}</text>
+      <rect x="-18" y="24" width="36" height="15" rx="4" fill="rgba(15,23,42,0.85)"/>
+      <text text-anchor="middle" y="35" font-size="9" font-weight="800" fill="#f8fafc" pointer-events="none">${p.role}</text>
+    `;
+
+    // Free-play highlight
+    if (freePlayMode && isTsv && fpSelected === p.id) {
+      const sel = mkEl('circle');
+      setAttrs(sel, { r: 26, fill: 'none', stroke: '#2dd4bf', 'stroke-width': 3, opacity: 1 });
+      g.insertBefore(sel, g.firstChild);
+    }
+
+    if (!freePlayMode) {
+      enableDrag(g, p);
+    } else {
+      g.style.cursor = 'pointer';
+      g.addEventListener('pointerdown', e => handleFreePlayClick(e, p));
+    }
+
+    layerPlayers.appendChild(g);
+  });
+}
+
+// ──────────────────────────────────────────────────────────
+// DRAG & DROP
+// ──────────────────────────────────────────────────────────
+function enableDrag(element, playerObj) {
+  let dragging = false;
+  element.addEventListener('pointerdown', e => {
+    dragging = true;
+    element.setPointerCapture(e.pointerId);
+    e.stopPropagation();
+  });
+  element.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const pt = toSVGPoint(e.clientX, e.clientY);
+    playerObj.x = clamp(pt.x, 55, 945);
+    playerObj.y = clamp(pt.y, 35, 625);
+    renderPlayers();
+    if (showOffside) renderPlayers(); // refresh offside after drag
+  });
+  element.addEventListener('pointerup', e => {
+    dragging = false;
+    try { element.releasePointerCapture(e.pointerId); } catch(_){}
+    if (showOffside || showCones) renderPlayers();
+  });
+  element.addEventListener('pointercancel', () => { dragging = false; });
+}
+
+// ──────────────────────────────────────────────────────────
+// FREE PLAY MODE
+// ──────────────────────────────────────────────────────────
+function toggleFreePlay() {
+  freePlayMode = !freePlayMode;
+  fpSelected = null;
+  layerFreeplay.innerHTML = '';
+  fpOverlay.style.display = freePlayMode ? 'block' : 'none';
+  const btns = document.querySelectorAll('.btn.freeplay');
+  btns.forEach(b => b.style.background = freePlayMode ? '#0d5c57' : '');
+  clearDrawings();
+  renderPlayers();
+  setStatus(freePlayMode
+    ? '🎮 FREISPIEL: Rote Spielerin antippen → Zielort antippen'
+    : 'Freispiel-Modus beendet.');
+}
+
+function handleFreePlayClick(e, p) {
+  e.stopPropagation();
+  if (!freePlayMode) return;
+
+  if (p.team === 'tsv') {
+    // Select as passer
+    fpSelected = p.id;
+    layerFreeplay.innerHTML = '';
+    renderPlayers();
+    setStatus(`✅ ${p.num} (${p.role}) ausgewählt – wohin soll der Pass gehen?`);
+    return;
+  }
+
+  if (p.team === 'geg' && fpSelected) {
+    // Try passing to covered opponent position? – warn
+  }
+}
+
+// Click on pitch = pass target (free position or to a player)
+svg.addEventListener('click', e => {
+  if (!freePlayMode || !fpSelected) return;
+
+  const passer = players.find(p => p.id === fpSelected);
+  if (!passer) return;
+
+  const target = toSVGPoint(e.clientX, e.clientY);
+
+  // Find if clicking on a TSV player
+  const clickedPlayer = players.find(p => {
+    const dx = p.x - target.x; const dy = p.y - target.y;
+    return p.team === 'tsv' && p.id !== fpSelected && Math.sqrt(dx*dx+dy*dy) < 22;
+  });
+
+  layerFreeplay.innerHTML = '';
+  layerTactics.innerHTML = '';
+  layerBubbles.innerHTML = '';
+
+  if (clickedPlayer) {
+    // Pass to specific player → evaluate
+    const result = evaluatePass(passer, clickedPlayer);
+    if (result.blocked) {
+      // Draw red blocked pass
+      drawArrow(passer.x, passer.y, clickedPlayer.x, clickedPlayer.y, '#ef4444', 'arrow-red', true);
+      drawBlockX(clickedPlayer.x, clickedPlayer.y);
+      setStatus(result.reason, 'warning');
+      showSpeechBubble(clickedPlayer.id, '⛔ ABSEITS!', 3000);
+      fpSelected = null;
+      renderPlayers();
+    } else if (result.warning) {
+      drawArrow(passer.x, passer.y, clickedPlayer.x, clickedPlayer.y, '#f97316', 'arrow-yellow', true);
+      setStatus(result.warnReason, 'warning');
+      showSpeechBubble(clickedPlayer.id, '⚠️ Riskant!', 2500);
+      // Move ball there with warning
+      setTimeout(() => {
+        moveBallTo(clickedPlayer.x, clickedPlayer.y);
+        fpSelected = clickedPlayer.id;
+        renderPlayers();
+        setStatus(`⚽ ${clickedPlayer.num} hat den Ball – trotz Deckung! Was jetzt?`);
+      }, 600);
+    } else {
+      // Good pass
+      drawArrow(passer.x, passer.y, clickedPlayer.x, clickedPlayer.y, '#22c55e', 'arrow-green', true);
+      showSpeechBubble(clickedPlayer.id, '✅ Frei!', 2500);
+      setTimeout(() => {
+        moveBallTo(clickedPlayer.x, clickedPlayer.y);
+        fpSelected = clickedPlayer.id;
+        renderPlayers();
+        setStatus(`⚽ ${clickedPlayer.num} (${clickedPlayer.role}) hat den Ball!`, 'success');
+      }, 500);
+    }
+  } else {
+    // Pass to free space
+    const inOffsideZone = showOffside && target.x > getOffsideX() && target.x > 500;
+    if (inOffsideZone) {
+      drawArrow(passer.x, passer.y, target.x, target.y, '#ef4444', 'arrow-red', true);
+      setStatus('⛔ Pass in die Abseitszone! Kein Mitspieler kann den Ball annehmen.', 'warning');
+      drawBlockX(target.x, target.y);
+    } else {
+      drawArrow(passer.x, passer.y, target.x, target.y, '#facc15', 'arrow-yellow', true);
+      moveBallTo(target.x, target.y);
+      setStatus('⚽ Ball in freien Raum gespielt. Laufweg fehlt!');
+    }
+    fpSelected = null;
+    renderPlayers();
+  }
+});
+
+function moveBallTo(x, y) {
+  const ball = players.find(p => p.id === 'ball');
+  if (ball) { ball.x = x; ball.y = y; }
+}
+
+function drawBlockX(x, y) {
+  const g = mkEl('g');
+  g.innerHTML = `
+    <circle cx="${x}" cy="${y}" r="18" fill="rgba(239,68,68,0.3)" stroke="#ef4444" stroke-width="2"/>
+    <line x1="${x-10}" y1="${y-10}" x2="${x+10}" y2="${y+10}" stroke="#ef4444" stroke-width="3"/>
+    <line x1="${x+10}" y1="${y-10}" x2="${x-10}" y2="${y+10}" stroke="#ef4444" stroke-width="3"/>
+  `;
+  layerFreeplay.appendChild(g);
+}
+
+// ──────────────────────────────────────────────────────────
+// ANIMATIONS
+// ──────────────────────────────────────────────────────────
+function animateTo(targetCoords, duration = 800, onDone) {
+  if (animRunning) return;
+  animRunning = true;
+  const t0 = performance.now();
+  const starts = players.map(p => ({ x: p.x, y: p.y }));
+  function step(now) {
+    const prog = Math.min((now - t0) / duration, 1);
+    const ease = prog * (2 - prog);
+    players.forEach((p, i) => {
+      const tgt = targetCoords.find(t => t.id === p.id);
+      if (tgt) {
+        p.x = starts[i].x + (tgt.x - starts[i].x) * ease;
+        p.y = starts[i].y + (tgt.y - starts[i].y) * ease;
+      }
+    });
+    renderPlayers();
+    if (prog < 1) { requestAnimationFrame(step); }
+    else { animRunning = false; if (onDone) onDone(); }
+  }
+  requestAnimationFrame(step);
+}
+
+// ──────────────────────────────────────────────────────────
+// SIMULATIONS
+// ──────────────────────────────────────────────────────────
+function simMakeWide() {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus('🟢 BALL GEWONNEN! → Alle auffächern, Passwege anbieten!', 'success');
+  animateTo([
+    { id:'tsv-4',  x:170, y:330 },
+    { id:'tsv-2',  x:250, y: 90 },
+    { id:'tsv-3',  x:250, y:570 },
+    { id:'tsv-6',  x:330, y:330 },
+    { id:'tsv-7',  x:510, y: 95 },
+    { id:'tsv-10', x:490, y:330 },
+    { id:'tsv-11', x:510, y:565 },
+    { id:'tsv-9',  x:640, y:330 },
+    { id:'ball',   x:185, y:330 }
+  ], 800, () => {
+    showSpeechBubble('tsv-2',  'Ich bin frei!',  2500);
+    showSpeechBubble('tsv-3',  'Linie offen!',   2500);
+    showSpeechBubble('tsv-6',  'Zu mir!',        2500);
+    showSpeechBubble('tsv-11', 'Raum rechts!',   2500);
+  });
+}
+
+function simMakeCompact() {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus('🔴 BALLVERLUST! → Sofort Zentrum verdichten!', 'warning');
+  animateTo([
+    { id:'tsv-4',  x:200, y:330 },
+    { id:'tsv-2',  x:235, y:240 },
+    { id:'tsv-3',  x:235, y:420 },
+    { id:'tsv-6',  x:290, y:330 },
+    { id:'tsv-7',  x:360, y:220 },
+    { id:'tsv-10', x:375, y:330 },
+    { id:'tsv-11', x:360, y:440 },
+    { id:'tsv-9',  x:430, y:330 },
+    { id:'geg-10', x:420, y:330 },
+    { id:'ball',   x:430, y:330 }
+  ], 800, () => {
+    showSpeechBubble('tsv-6', 'Mitte zu!', 2500);
+    showSpeechBubble('tsv-10','Eng bleiben!', 2500);
+  });
+}
+
+function simAlwaysFindThe6() {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus('⬡ Die 6 suchen → Verlagerung!');
+
+  animateTo([
+    { id:'tsv-4', x:180, y:330 },
+    { id:'tsv-6', x:330, y:330 },
+    { id:'ball',  x:165, y:330 }
+  ], 600, () => {
+    drawArrow(180, 330, 330, 330, '#facc15', 'arrow-yellow');
+    showSpeechBubble('tsv-6', 'Dreh auf!', 2000);
+    setTimeout(() => {
+      clearDrawings();
+      animateTo([
+        { id:'tsv-7', x:490, y:100 },
+        { id:'tsv-6', x:330, y:330 },
+        { id:'ball',  x:480, y:105 }
+      ], 700, () => {
+        drawArrow(330, 330, 480, 105, '#22c55e', 'arrow-green');
+        showSpeechBubble('tsv-7', 'Danke! Tempo!', 2500);
+        setTimeout(() => {
+          clearDrawings();
+          animateTo([
+            { id:'tsv-7',  x:490, y:100 },
+            { id:'tsv-9',  x:680, y:270 },
+            { id:'geg-4',  x:790, y:320 },
+            { id:'ball',   x:680, y:270 }
+          ], 700, () => {
+            drawArrow(490, 100, 680, 270, '#22c55e', 'arrow-green');
+            showSpeechBubble('tsv-9', 'Tor! 🎉', 2500);
+            setStatus('✅ Perfekter Spielzug! IV → 6 → Verlagerung → Abschluss!', 'success');
+          });
+        }, 1400);
+      });
+    }, 1200);
+  });
+}
+
+function simCommunication(type) {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  if (type === 'ruecken') {
+    setStatus('🗣️ "Gegner im Rücken!" – Direkt zurückspielen, nicht drehen!');
+    const p10 = players.find(p=>p.id==='tsv-10');
+    const geg6 = players.find(p=>p.id==='geg-6');
+    if(p10) p10.x = 420;
+    if(geg6) geg6.x = 445;
+    renderPlayers();
+    showSpeechBubble('tsv-6', '⚠️ Gegner im Rücken! Klatsch!', 3500);
+    drawArrow(330,330, 420, 330, '#f97316', 'arrow-yellow');
+  } else if (type === 'zeit') {
+    setStatus('🗣️ "Du hast Zeit!" – Ermöglicht ruhiges Aufdrehen!', 'success');
+    showSpeechBubble('tsv-4', 'Du hast Zeit! Dreh auf!', 3000);
+  } else if (type === 'leo') {
+    setStatus('📢 "Leo!" – Verhindert Doppelbelegung auf den gleichen Ball!');
+    showSpeechBubble('tsv-2', 'LEO! MEINER!', 3000);
+  } else if (type === 'schulter') {
+    setStatus('👀 Vororientierung: Erst Schulterblick, dann Ball fordern!');
+    showSpeechBubble('tsv-6', 'Schulterblick...', 1500);
+    setTimeout(() => showSpeechBubble('tsv-6', 'Jetzt: Zu mir!', 2500), 1600);
+  }
+}
+
+function simErrorLV() {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus('⚠️ LV stürmt blind vor → Riesiges Loch hinten links!', 'warning');
+  animateTo([
+    { id:'tsv-2', x:540, y:460 },
+    { id:'ball',  x:555, y:460 }
+  ], 900, () => {
+    const zone = mkEl('rect');
+    setAttrs(zone, { x:145, y:70, width:200, height:200,
+      fill:'rgba(239,68,68,0.3)', stroke:'#ef4444',
+      'stroke-dasharray':'6 6', 'stroke-width':2 });
+    layerTactics.appendChild(zone);
+    const txt = mkEl('text');
+    setAttrs(txt, { x:245, y:175, 'text-anchor':'middle', fill:'#fecaca',
+      'font-weight':900, 'font-size':12 });
+    txt.textContent = 'GEFAHRENZONE!';
+    layerTactics.appendChild(txt);
+    // Show opponent running into the hole
+    animateTo([{ id:'geg-7', x:200, y:160 }], 800, () => {
+      showSpeechBubble('geg-7', '⚡ Konter!', 3000);
+      drawArrow(200,160, 150, 330, '#ef4444', 'arrow-red');
+    });
+  });
+}
+
+function simShift(side) {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  const yOffset = side === 'left' ? -110 : 110;
+  setStatus(`↔️ VERSCHIEBEN nach ${side === 'left' ? 'Links' : 'Rechts'}`);
+  const targets = players.map(p => {
+    if (p.team === 'tsv' && p.role !== 'TW') {
+      return { id: p.id, x: p.x, y: clamp(p.y + yOffset, 80, 580) };
+    }
+    return { id: p.id, x: p.x, y: p.y };
+  });
+  animateTo(targets);
+}
+
+function simPressHigh() {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus('⬆️ HOHES PRESSING: Alle nach vorne, Gegner unter Druck!');
+  animateTo([
+    { id:'tsv-9',  x:780, y:330 },
+    { id:'tsv-7',  x:690, y:180 },
+    { id:'tsv-11', x:690, y:480 },
+    { id:'tsv-10', x:660, y:330 },
+    { id:'tsv-6',  x:550, y:330 },
+    { id:'tsv-2',  x:430, y:150 },
+    { id:'tsv-3',  x:430, y:510 },
+    { id:'tsv-4',  x:380, y:330 }
+  ], 900, () => {
+    showSpeechBubble('tsv-9',  'Presse!',   2000);
+    showSpeechBubble('tsv-10', 'Abschneiden!', 2500);
+    setStatus('⬆️ Hohes Pressing aktiv – Vorsicht vor Kontern!', 'warning');
+  });
+}
+
+// ──────────────────────────────────────────────────────────
+// FORMATIONS
+// ──────────────────────────────────────────────────────────
+const formations = {
+  '3131': null, // = initial
+  '332': [
+    { id:'tsv-1', x:80,  y:330 },
+    { id:'tsv-2', x:210, y:145 },
+    { id:'tsv-4', x:185, y:330 },
+    { id:'tsv-3', x:210, y:515 },
+    { id:'tsv-6', x:350, y:145 },
+    { id:'tsv-7', x:350, y:330 },
+    { id:'tsv-10',x:350, y:515 },
+    { id:'tsv-11',x:480, y:210 },
+    { id:'tsv-9', x:480, y:450 },
+  ],
+  '433': [
+    { id:'tsv-1', x:80,  y:330 },
+    { id:'tsv-2', x:210, y:130 },
+    { id:'tsv-4', x:200, y:265 },
+    { id:'tsv-3', x:200, y:395 },
+    { id:'tsv-11',x:210, y:530 },
+    { id:'tsv-6', x:360, y:220 },
+    { id:'tsv-10',x:360, y:330 },
+    { id:'tsv-7', x:360, y:440 },
+    { id:'tsv-9', x:500, y:180 },
+    { id:'tsv-2', x:500, y:330 }, // overwrites for 4-3-3 — use extra slot
+    { id:'tsv-11',x:500, y:480 },
+  ],
+  '4231': [
+    { id:'tsv-1', x:80,  y:330 },
+    { id:'tsv-2', x:205, y:130 },
+    { id:'tsv-4', x:195, y:265 },
+    { id:'tsv-3', x:195, y:395 },
+    { id:'tsv-11',x:205, y:530 },
+    { id:'tsv-6', x:330, y:265 },
+    { id:'tsv-7', x:330, y:395 },
+    { id:'tsv-10',x:440, y:180 },
+    { id:'tsv-9', x:440, y:330 },
+    { id:'tsv-2', x:440, y:480 }, // RM
+    { id:'tsv-11',x:520, y:330 }, // ST
+  ]
+};
+
+function setFormation(fmt) {
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  if (fmt === '3131' || !formations[fmt]) {
+    resetToInitial();
+    setStatus('Formation: 3-1-3-1 (TSV Mädchen-Standard)');
+    return;
+  }
+  const tgt = formations[fmt];
+  animateTo(tgt);
+  setStatus(`Formation: ${fmt.replace('','').split('').join('-')}`);
+}
+
+// ──────────────────────────────────────────────────────────
+// TOGGLE OVERLAYS
+// ──────────────────────────────────────────────────────────
+function toggleZones() {
+  showZones = !showZones;
+  styleToggle('btn-zones', showZones);
+  renderPlayers();
+}
+function toggleOffside() {
+  showOffside = !showOffside;
+  styleToggle('btn-offside', showOffside);
+  renderPlayers();
+}
+function toggleCones() {
+  showCones = !showCones;
+  styleToggle('btn-cones', showCones);
+  renderPlayers();
+}
+function toggleCoverageLines() {
+  showCovLines = !showCovLines;
+  styleToggle('btn-coverage', showCovLines);
+  renderPlayers();
+}
+function styleToggle(id, on) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.toggle('active-toggle', on);
+}
+
+// ──────────────────────────────────────────────────────────
+// MODE
+// ──────────────────────────────────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-mode-kids').classList.toggle('active', mode==='kids');
+  document.getElementById('btn-mode-coach').classList.toggle('active', mode==='coach');
+  document.getElementById('panel-kids').style.display  = mode==='kids'  ? 'block' : 'none';
+  document.getElementById('panel-coach').style.display = mode==='coach' ? 'block' : 'none';
+  if (freePlayMode) toggleFreePlay();
+  clearDrawings();
+  setStatus(mode==='kids'
+    ? '👧 Kids-Modus: Einfache Regeln & Kommunikation!'
+    : '📋 Trainer-Modus: Detaillierte Taktikmuster');
+}
+
+// ──────────────────────────────────────────────────────────
+// UTILITIES
+// ──────────────────────────────────────────────────────────
+function mkEl(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+function setAttrs(el, attrs) {
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+}
+function toSVGPoint(cx, cy) {
+  const pt = svg.createSVGPoint();
+  pt.x = cx; pt.y = cy;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function setStatus(text, type = '') {
+  banner.textContent = text;
+  banner.className = type ? type : '';
+}
+
+function drawArrow(x1, y1, x2, y2, color, markerId, addToFreeplay = false) {
+  const line = mkEl('line');
+  setAttrs(line, {
+    x1, y1, x2, y2,
+    stroke: color, 'stroke-width': 3,
+    'stroke-dasharray': '9 6',
+    'marker-end': `url(#${markerId})`
+  });
+  (addToFreeplay ? layerFreeplay : layerTactics).appendChild(line);
+}
+
+function showSpeechBubble(playerId, text, duration = 3000) {
+  const p = players.find(x => x.id === playerId);
+  if (!p) return;
+  const g = mkEl('g');
+  g.setAttribute('transform', `translate(${p.x},${p.y - 38})`);
+  const w = Math.max(80, text.length * 7);
+  g.innerHTML = `
+    <rect x="${-w/2}" y="-22" width="${w}" height="22" rx="8"
+      fill="#facc15" stroke="#111" stroke-width="1.5"
+      filter="drop-shadow(0 2px 5px rgba(0,0,0,0.4))"/>
+    <text x="0" y="-6" text-anchor="middle" font-size="10" font-weight="900" fill="#000">${text}</text>
+  `;
+  layerBubbles.appendChild(g);
+  setTimeout(() => g.remove(), duration);
+}
+
+function clearDrawings() {
+  layerTactics.innerHTML = '';
+  layerBubbles.innerHTML = '';
+  layerFreeplay.innerHTML = '';
+  banner.className = '';
+}
+
+function resetToInitial() {
+  if (freePlayMode) toggleFreePlay();
+  players = JSON.parse(JSON.stringify(initialPlayers));
+  clearDrawings();
+  renderPlayers();
+  setStatus('Spielfeld zurückgesetzt auf Grundaufstellung.');
+}
+
+// ──────────────────────────────────────────────────────────
+// HELP MODAL
+// ──────────────────────────────────────────────────────────
+function openHelp()  { document.getElementById('help-modal').classList.add('open');    }
+function closeHelp() { document.getElementById('help-modal').classList.remove('open'); }
+
+// ──────────────────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────────────────
+renderPlayers();
+</script>
+</body>
+</html>
