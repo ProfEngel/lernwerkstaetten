@@ -616,7 +616,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lesewerkstatt-offline-v1';
+        const CACHE_NAME = 'lesewerkstatt-offline-v2';
         const ASSETS = [
           './lesen.html',
           './manifest-lese.json',
@@ -780,16 +780,22 @@
         ],
         pyramids: [
           [
-            "Der Hund",
-            "Der brave Hund",
-            "Der brave Hund rennt.",
-            "Der brave Hund rennt zum Ball."
+            "Mimi sieht",
+            "Mimi sieht eine Maus.",
+            "Mimi sieht eine Maus im Nest.",
+            "Mimi sieht eine Maus im Nest am Baum."
           ],
           [
-            "Die Katze",
-            "Die weiße Katze",
-            "Die weiße Katze schläft.",
-            "Die weiße Katze schläft im Korb."
+            "Der Ball rollt",
+            "Der Ball rollt ins Tor.",
+            "Der Ball rollt ins Tor von Ben.",
+            "Der Ball rollt ins Tor von Ben und Tom."
+          ],
+          [
+            "Die Eule sitzt",
+            "Die Eule sitzt auf dem Ast.",
+            "Die Eule sitzt auf dem Ast im Wald.",
+            "Die Eule sitzt auf dem Ast im Wald bei Nacht."
           ]
         ],
         stories: [
@@ -846,16 +852,22 @@
         ],
         pyramids: [
           [
-            "Ein Frosch",
-            "Ein grüner Frosch",
-            "Ein grüner Frosch hüpft",
-            "Ein grüner Frosch hüpft in den Teich."
+            "Der Frosch hüpft",
+            "Der Frosch hüpft in den Teich.",
+            "Der Frosch hüpft in den Teich und quakt laut.",
+            "Der Frosch hüpft in den Teich und quakt laut nach dem Regen."
           ],
           [
-            "Der Drache",
-            "Der bunte Drache",
-            "Der bunte Drache fliegt hoch",
-            "Der bunte Drache fliegt hoch in den Wind."
+            "Leo packt",
+            "Leo packt seinen roten Koffer.",
+            "Leo packt seinen roten Koffer für den Ausflug.",
+            "Leo packt seinen roten Koffer für den Ausflug in den Wald."
+          ],
+          [
+            "Die Schnecke kriecht",
+            "Die Schnecke kriecht über das grüne Blatt.",
+            "Die Schnecke kriecht über das grüne Blatt zum großen Pilz.",
+            "Die Schnecke kriecht über das grüne Blatt zum großen Pilz im Garten."
           ]
         ],
         stories: [
@@ -905,10 +917,22 @@
         ],
         pyramids: [
           [
-            "Ein altes Schloss",
-            "Ein altes Schloss im Nebel",
-            "Ein altes Schloss steht im Nebel.",
-            "Ein altes Schloss steht im tiefen Nebel auf dem Berg."
+            "Jonas repariert",
+            "Jonas repariert sein blaues Fahrrad.",
+            "Jonas repariert sein blaues Fahrrad im Hof.",
+            "Jonas repariert sein blaues Fahrrad im Hof vor dem Gewitter."
+          ],
+          [
+            "Das alte Schloss steht",
+            "Das alte Schloss steht oben auf dem Berg.",
+            "Das alte Schloss steht oben auf dem Berg im dichten Nebel.",
+            "Das alte Schloss steht oben auf dem Berg im dichten Nebel voller Geheimnisse."
+          ],
+          [
+            "Die Zauberin öffnet",
+            "Die Zauberin öffnet das schwere Buch.",
+            "Die Zauberin öffnet das schwere Buch mit der goldenen Schrift.",
+            "Die Zauberin öffnet das schwere Buch mit der goldenen Schrift am Fenster."
           ]
         ],
         stories: [
@@ -952,10 +976,22 @@
         ],
         pyramids: [
           [
-            "Das alte Teleskop",
-            "Das alte Teleskop im Turm",
-            "Das alte Teleskop im Turm zeigt Sterne.",
-            "Das alte Teleskop im Turm zeigt die funkelnden Sterne der fernen Galaxie."
+            "Das Teleskop zeigt",
+            "Das Teleskop zeigt die funkelnden Sterne.",
+            "Das Teleskop zeigt die funkelnden Sterne am Nachthimmel.",
+            "Das Teleskop zeigt die funkelnden Sterne am Nachthimmel der fernen Galaxie."
+          ],
+          [
+            "Die Forscher entdecken",
+            "Die Forscher entdecken eine alte Pyramide.",
+            "Die Forscher entdecken eine alte Pyramide tief im Dschungel.",
+            "Die Forscher entdecken eine alte Pyramide tief im Dschungel mit einer geheimen Tür."
+          ],
+          [
+            "Das Raumschiff fliegt",
+            "Das Raumschiff fliegt mit hoher Geschwindigkeit.",
+            "Das Raumschiff fliegt mit hoher Geschwindigkeit durch das Weltall.",
+            "Das Raumschiff fliegt mit hoher Geschwindigkeit durch das Weltall zum roten Planeten."
           ]
         ],
         stories: [
@@ -1293,8 +1329,22 @@
 
       for (let i = 0; i < pyramidStepIdx; i++) {
         const div = document.createElement('div');
-        div.className = 'pyramid-row' + (i === pyramidStepIdx - 1 ? ' active' : '');
-        div.textContent = rows[i];
+        const isActive = (i === pyramidStepIdx - 1);
+        div.className = 'pyramid-row' + (isActive ? ' active' : '');
+
+        if (i === 0) {
+          div.innerHTML = `<span style="font-weight:900; color:${isActive ? '#3730a3' : '#1e293b'};">${rows[0]}</span>`;
+        } else {
+          const prev = rows[i - 1].replace(/\.$/, '').trim();
+          const cur = rows[i];
+          if (cur.startsWith(prev)) {
+            const prefix = prev;
+            const suffix = cur.slice(prev.length).trim();
+            div.innerHTML = `<span style="color:${isActive ? '#1e1b4b' : '#475569'};">${prefix}</span> <span style="color:${isActive ? '#4338ca' : '#2563eb'}; font-weight:900; background:${isActive ? 'rgba(99,102,241,0.18)' : '#f1f5f9'}; padding:2px 8px; border-radius:8px; border: 1px solid ${isActive ? '#818cf8' : '#e2e8f0'};">${suffix}</span>`;
+          } else {
+            div.textContent = cur;
+          }
+        }
         cont.appendChild(div);
       }
     }
