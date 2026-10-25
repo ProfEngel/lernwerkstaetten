@@ -121,14 +121,14 @@
         border-color: #ef4444;
         box-shadow: 0 0 16px rgba(239, 68, 68, 0.65);
       }
-      45% {
+      50% {
         opacity: 1;
         transform: scale(1.02) translateY(0);
         border-color: #ef4444;
-        box-shadow: 0 0 18px rgba(239, 68, 68, 0.75);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.75);
       }
-      70% {
-        opacity: 0.92;
+      75% {
+        opacity: 0.9;
         transform: scale(1.06) translateY(-10px);
         border-color: #ef4444;
       }
@@ -145,14 +145,14 @@
         border-color: #f59e0b;
         box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
       }
-      45% {
+      50% {
         opacity: 1;
         transform: scale(1.03) rotate(1deg);
         border-color: #ea580c;
-        box-shadow: 0 0 18px rgba(234, 88, 12, 0.7);
+        box-shadow: 0 0 20px rgba(234, 88, 12, 0.75);
       }
-      70% {
-        opacity: 0.92;
+      75% {
+        opacity: 0.9;
         transform: scale(1.1) rotate(2deg) translateY(-8px);
         border-color: #ea580c;
       }
@@ -163,13 +163,13 @@
       }
     }
     .marble-sack-removed {
-      animation: sackFlyOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: sackFlyOut 4.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border-color: #ef4444 !important;
       background: #fee2e2 !important;
       position: relative;
     }
     .marble-sack-burst {
-      animation: sackBurst 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: sackBurst 4.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border-color: #ea580c !important;
       background: #fff7ed !important;
       position: relative;
@@ -181,18 +181,18 @@
         transform: scale(1) translateY(0);
         filter: drop-shadow(0 0 8px rgba(239,68,68,0.75));
       }
-      45% {
+      50% {
         opacity: 1;
         transform: scale(1.04) translateY(0);
-        filter: drop-shadow(0 0 12px rgba(239,68,68,0.85));
+        filter: drop-shadow(0 0 14px rgba(239,68,68,0.85));
       }
-      70% {
-        opacity: 0.92;
+      75% {
+        opacity: 0.9;
         transform: scale(1.12) translateY(-10px);
       }
       100% {
         opacity: 0;
-        transform: scale(0.75) translateY(-30px);
+        transform: scale(0.75) translateY(-32px);
         pointer-events: none;
       }
     }
@@ -215,18 +215,18 @@
         transform: scale(1);
         filter: drop-shadow(0 0 8px rgba(245,158,11,0.75));
       }
-      45% {
+      50% {
         opacity: 1;
         transform: scale(1.04);
-        filter: drop-shadow(0 0 12px rgba(234,88,12,0.85));
+        filter: drop-shadow(0 0 14px rgba(234,88,12,0.85));
       }
-      70% {
-        opacity: 0.92;
+      75% {
+        opacity: 0.9;
         transform: scale(1.12) rotate(3deg) translateY(-8px);
       }
       100% {
         opacity: 0;
-        transform: scale(0.7) translateY(-28px);
+        transform: scale(0.7) translateY(-30px);
         pointer-events: none;
       }
     }
@@ -235,11 +235,11 @@
         opacity: 1;
         transform: scale(1) translateY(0);
       }
-      45% {
+      50% {
         opacity: 1;
         transform: scale(1.2) translateY(0);
       }
-      70% {
+      75% {
         opacity: 0.9;
         transform: scale(1.25) translateY(-8px);
       }
@@ -250,19 +250,19 @@
       }
     }
     .marble-removed {
-      animation: marbleFlyOut 3.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: marbleFlyOut 3.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #b91c1c 100%) !important;
       box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
     }
     .pot-token-removed {
-      animation: tokenFloatOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: tokenFloatOut 4.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border: 2px dashed #ef4444 !important;
       background: #fee2e2 !important;
       color: #991b1b !important;
       box-shadow: 0 0 12px rgba(239, 68, 68, 0.55) !important;
     }
     .pot-token-unbundled {
-      animation: tokenUnbundleOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: tokenUnbundleOut 4.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border: 2px dashed #ea580c !important;
       background: #fff7ed !important;
       color: #c2410c !important;
@@ -1218,9 +1218,11 @@
             </button>
             <button onclick="stepPM(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+          <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #64748b;">
             <span>Tempo:</span>
-            <input type="range" id="pmSpeed" min="600" max="2600" value="1300" style="width: 90px; accent-color: #f59e0b;">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">🐢 langsam</span>
+            <input type="range" id="pmSpeed" min="1" max="10" value="3" style="width: 80px; accent-color: #f59e0b; cursor: pointer;" title="Tempo: langsam bis schnell">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">schnell 🐇</span>
           </div>
         </div>
 
@@ -1313,9 +1315,11 @@
             </button>
             <button onclick="stepMD(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+          <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #64748b;">
             <span>Tempo:</span>
-            <input type="range" id="mdSpeed" min="200" max="1400" value="700" style="width: 90px; accent-color: #f59e0b;">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">🐢 langsam</span>
+            <input type="range" id="mdSpeed" min="1" max="10" value="4" style="width: 80px; accent-color: #f59e0b; cursor: pointer;" title="Tempo: langsam bis schnell">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">schnell 🐇</span>
           </div>
         </div>
 
@@ -1468,9 +1472,11 @@
             </button>
             <button onclick="stepTH(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+          <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #64748b;">
             <span>Tempo:</span>
-            <input type="range" id="thSpeed" min="700" max="3000" value="1500" style="width: 90px; accent-color: #f59e0b;">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">🐢 langsam</span>
+            <input type="range" id="thSpeed" min="1" max="10" value="3" style="width: 80px; accent-color: #f59e0b; cursor: pointer;" title="Tempo: langsam bis schnell">
+            <span style="font-size: 10px; color: #64748b; font-weight: 700;">schnell 🐇</span>
           </div>
         </div>
 
@@ -1486,7 +1492,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v10';
+        const CACHE_NAME = 'lernwerkstatt-offline-v11';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -2594,21 +2600,33 @@
       }
     }
 
+    // Globales didaktisches Tempo: 1 (sehr langsam) bis 10 (schnell)
+    function getStepDelay(sliderId, isRemovalStep) {
+      const el = document.getElementById(sliderId);
+      const val = el ? parseInt(el.value, 10) : 3;
+      // 1: 4800ms, 2: 4000ms, 3: 3200ms, 4: 2500ms, 5: 1900ms, 6: 1400ms, 7: 1000ms, 8: 800ms, 9: 650ms, 10: 500ms
+      const delays = [4800, 4000, 3200, 2500, 1900, 1400, 1000, 800, 650, 500];
+      const idx = Math.max(0, Math.min(9, (val || 3) - 1));
+      let d = delays[idx];
+      if (isRemovalStep) {
+        // Bei Entnahme / Entbündelung extra viel Zeit (mindestens 4,5s)
+        d = Math.max(d * 1.5, 4500);
+      }
+      return d;
+    }
     function playNextPMStep() {
       if (!pmPlaying) return;
       if (pmIdx < pmSteps.length - 1) {
         stepPM(1);
-        let delay = parseInt(document.getElementById('pmSpeed').value, 10);
         const cur = pmSteps[pmIdx];
         const prev = pmSteps[pmIdx - 1];
+        let isRemoval = false;
         if (prev && cur) {
           const curTens = Math.floor((cur.val % 100) / 10);
           const prevTens = Math.floor((prev.val % 100) / 10);
-          if (prevTens > curTens) {
-            // Zehner-Säckchen entnommen oder aufgeplatzt: Ruhige 3,8s Pause, damit Kinder es sehen & verstehen!
-            delay = Math.max(delay * 2.2, 3800);
-          }
+          if (prevTens > curTens) isRemoval = true;
         }
+        const delay = getStepDelay('pmSpeed', isRemoval);
         pmTimer = setTimeout(playNextPMStep, delay);
       } else {
         togglePMPlay();
@@ -2620,7 +2638,7 @@
       document.getElementById('pmPlayTxt').textContent = pmPlaying ? 'Stopp' : 'Vollanimation';
       if (pmPlaying) {
         if (pmIdx >= pmSteps.length - 1) pmIdx = 0;
-        const spd = parseInt(document.getElementById('pmSpeed').value, 10);
+        const spd = getStepDelay('pmSpeed', false);
         pmTimer = setTimeout(playNextPMStep, spd);
       } else {
         clearTimeout(pmTimer);
@@ -2859,18 +2877,26 @@
       }
     }
 
+    function playNextMDStep() {
+      if (!mdPlaying) return;
+      if (mdIdx < mdSteps.length - 1) {
+        stepMD(1);
+        const delay = getStepDelay('mdSpeed', false);
+        mdTimer = setTimeout(playNextMDStep, delay);
+      } else {
+        toggleMDPlay();
+      }
+    }
+
     function toggleMDPlay() {
       mdPlaying = !mdPlaying;
       document.getElementById('mdPlayTxt').textContent = mdPlaying ? 'Stopp' : 'Vollanimation';
       if (mdPlaying) {
         if (mdIdx >= mdSteps.length - 1) mdIdx = 0;
-        const spd = parseInt(document.getElementById('mdSpeed').value, 10);
-        mdTimer = setInterval(() => {
-          if (mdIdx < mdSteps.length - 1) stepMD(1);
-          else toggleMDPlay();
-        }, spd);
+        const spd = getStepDelay('mdSpeed', false);
+        mdTimer = setTimeout(playNextMDStep, spd);
       } else {
-        clearInterval(mdTimer);
+        clearTimeout(mdTimer);
       }
     }
 
@@ -3235,25 +3261,25 @@
       document.getElementById('thBadgeH').textContent = `H: ${hCount}`;
       let hValHtml = `Wert: ${hCount * 100}`;
       if (removedH > 0) {
-        hValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedH * 100} abgezogen ❌)</span>`;
+        hValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 4.0s forwards;">(−${removedH * 100} abgezogen ❌)</span>`;
       } else if (unbundledH > 0) {
-        hValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 3.5s forwards;">(🔓 1 H entbündelt ➔ 10 Z)</span>`;
+        hValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 4.0s forwards;">(🔓 1 H entbündelt ➔ 10 Z)</span>`;
       }
       document.getElementById('thValH').innerHTML = hValHtml;
 
       document.getElementById('thBadgeZ').textContent = `Z: ${zCount}`;
       let zValHtml = `Wert: ${zCount * 10}`;
       if (removedZ > 0) {
-        zValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedZ * 10} abgezogen ❌)</span>`;
+        zValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 4.0s forwards;">(−${removedZ * 10} abgezogen ❌)</span>`;
       } else if (unbundledZ > 0) {
-        zValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 3.5s forwards;">(🔓 1 Z entbündelt ➔ 10 E)</span>`;
+        zValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 4.0s forwards;">(🔓 1 Z entbündelt ➔ 10 E)</span>`;
       }
       document.getElementById('thValZ').innerHTML = zValHtml;
 
       document.getElementById('thBadgeE').textContent = `E: ${eCount}`;
       let eValHtml = `Wert: ${eCount}`;
       if (removedE > 0) {
-        eValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedE} abgezogen ❌)</span>`;
+        eValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 4.0s forwards;">(−${removedE} abgezogen ❌)</span>`;
       }
       document.getElementById('thValE').innerHTML = eValHtml;
 
@@ -3716,12 +3742,9 @@
       if (!thPlaying) return;
       if (thIdx < thSteps.length - 1) {
         stepTH(1);
-        let delay = parseInt(document.getElementById('thSpeed').value, 10);
         const cur = thSteps[thIdx];
-        if (cur && (cur.removedH > 0 || cur.removedZ > 0 || cur.removedE > 0 || cur.unbundledH > 0 || cur.unbundledZ > 0)) {
-          // Entnahme- oder Entbündelungsschritt: Ruhige 3,8s Pause, damit Kinder es sehen & verstehen!
-          delay = Math.max(delay * 2.2, 3800);
-        }
+        const isRemoval = !!(cur && (cur.removedH > 0 || cur.removedZ > 0 || cur.removedE > 0 || cur.unbundledH > 0 || cur.unbundledZ > 0));
+        const delay = getStepDelay('thSpeed', isRemoval);
         thTimer = setTimeout(playNextTHStep, delay);
       } else {
         toggleTHPlay();
@@ -3734,7 +3757,7 @@
       if (thPlaying) {
         if (thIdx >= thSteps.length - 1) thIdx = 0;
         renderTHStepView();
-        const spd = parseInt(document.getElementById('thSpeed').value, 10);
+        const spd = getStepDelay('thSpeed', false);
         thTimer = setTimeout(playNextTHStep, spd);
       } else {
         clearTimeout(thTimer);
