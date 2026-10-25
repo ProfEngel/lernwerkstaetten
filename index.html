@@ -824,12 +824,14 @@
         
         <!-- 100er Tafel mit markant gefärbten Zehnersprüngen -->
         <div id="pmSec-100" style="width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b;">
-            <span>🐸 Frosch hüpft über die Tafel:</span>
-            <div style="display: flex; gap: 8px;">
-              <span>🟡 Einer</span>
-              <span>🟠 Zehner-Stopp</span>
-              <span>🟣 Zehner-Sprung</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #64748b; flex-wrap: wrap; gap: 4px;">
+            <span>🐸 Frosch-Pfad (Schritte bleiben bunt markiert):</span>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 6px; border: 1px solid #bae6fd;">📍 Start</span>
+              <span style="background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 6px; border: 1px solid #facc15;">🟡 Einer</span>
+              <span style="background: #fed7aa; color: #9a3412; padding: 2px 6px; border-radius: 6px; border: 1px solid #ea580c;">🟠 Zehner-Stopp</span>
+              <span style="background: #fbcfe8; color: #9d174d; padding: 2px 6px; border-radius: 6px; border: 1px solid #f472b6;">🌸 Übergang</span>
+              <span style="background: #c7d2fe; color: #3730a3; padding: 2px 6px; border-radius: 6px; border: 1px solid #818cf8;">🟣 Zehner-Sprung</span>
             </div>
           </div>
           <div id="pmHundredBoard" class="hundred-grid" style="background: #f8fafc; padding: 8px; border-radius: 14px; border: 2px solid #cbd5e1;"></div>
@@ -1062,12 +1064,14 @@
             <div id="thHundredSelectors" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b;">
-            <span>🐸 Frosch hüpft durch die Tausendertafel:</span>
-            <div style="display: flex; gap: 8px;">
-              <span>🔵 Hunderter</span>
-              <span>🔴 Zehner</span>
-              <span>🟢 Einer</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #64748b; flex-wrap: wrap; gap: 4px;">
+            <span>🐸 Frosch-Pfad (Schritte bleiben in allen Feldern bunt markiert):</span>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 6px; border: 1px solid #bae6fd;">📍 Start</span>
+              <span style="background: #bfdbfe; color: #1e40af; padding: 2px 6px; border-radius: 6px; border: 1px solid #1d4ed8;">🔵 Hunderter</span>
+              <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 6px; border: 1px solid #dc2626;">🔴 Zehner</span>
+              <span style="background: #fed7aa; color: #9a3412; padding: 2px 6px; border-radius: 6px; border: 1px solid #ea580c;">🟠 Stopp</span>
+              <span style="background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 6px; border: 1px solid #16a34a;">🟢 Einer</span>
             </div>
           </div>
 
@@ -1112,7 +1116,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v3';
+        const CACHE_NAME = 'lernwerkstatt-offline-v4';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -1869,6 +1873,7 @@
     // MODUL 3: PLUS & MINUS LOGIK (ZEHNERÜBERGANG)
     // =========================================================
     let pmSteps = [];
+    let pmPathMap = {};
     let pmIdx = 0;
     let pmPlaying = false;
     let pmTimer = null;
@@ -1879,10 +1884,12 @@
       const b = parseInt(document.getElementById('pmB').value, 10);
 
       pmSteps = [];
+      pmPathMap = {};
       const onesB = b % 10;
       const tensB = Math.floor(b / 10) * 10;
 
       pmSteps.push({ val: a, type: 'start' });
+      pmPathMap[a] = 'start';
 
       if (op === '-') {
         const onesA = a % 10;
@@ -1890,25 +1897,71 @@
         const rem = onesB - onesA;
 
         if (onesA > 0 && onesB > onesA) {
-          for (let i = 1; i <= onesA; i++) pmSteps.push({ val: a - i, type: i === onesA ? 'stop' : 'one' });
-          for (let i = 1; i <= rem; i++) pmSteps.push({ val: stopTen - i, type: 'love' });
+          for (let i = 1; i <= onesA; i++) {
+            const v = a - i;
+            const t = (i === onesA ? 'stop' : 'one');
+            pmSteps.push({ val: v, type: t });
+            pmPathMap[v] = t;
+          }
+          for (let i = 1; i <= rem; i++) {
+            const v = stopTen - i;
+            pmSteps.push({ val: v, type: 'love' });
+            pmPathMap[v] = 'love';
+          }
           let c = stopTen - rem;
-          for (let t = 0; t < tensB / 10; t++) { c -= 10; pmSteps.push({ val: c, type: 'ten' }); }
+          for (let t = 0; t < tensB / 10; t++) {
+            c -= 10;
+            pmSteps.push({ val: c, type: 'ten' });
+            pmPathMap[c] = 'ten';
+          }
         } else {
-          pmSteps.push({ val: a - onesB, type: 'one' });
-          pmSteps.push({ val: a - b, type: 'ten' });
+          for (let i = 1; i <= onesB; i++) {
+            const v = a - i;
+            const t = (v % 10 === 0) ? 'stop' : 'one';
+            pmSteps.push({ val: v, type: t });
+            pmPathMap[v] = t;
+          }
+          let c = a - onesB;
+          for (let t = 0; t < tensB / 10; t++) {
+            c -= 10;
+            pmSteps.push({ val: c, type: 'ten' });
+            pmPathMap[c] = 'ten';
+          }
         }
       } else {
         const dist = (10 - (a % 10)) % 10;
         const rem = onesB - dist;
         if (dist > 0 && onesB > dist) {
-          for (let i = 1; i <= dist; i++) pmSteps.push({ val: a + i, type: i === dist ? 'stop' : 'one' });
-          for (let i = 1; i <= rem; i++) pmSteps.push({ val: a + dist + i, type: 'love' });
+          for (let i = 1; i <= dist; i++) {
+            const v = a + i;
+            const t = (i === dist ? 'stop' : 'one');
+            pmSteps.push({ val: v, type: t });
+            pmPathMap[v] = t;
+          }
+          for (let i = 1; i <= rem; i++) {
+            const v = a + dist + i;
+            pmSteps.push({ val: v, type: 'love' });
+            pmPathMap[v] = 'love';
+          }
           let c = a + dist + rem;
-          for (let t = 0; t < tensB / 10; t++) { c += 10; pmSteps.push({ val: c, type: 'ten' }); }
+          for (let t = 0; t < tensB / 10; t++) {
+            c += 10;
+            pmSteps.push({ val: c, type: 'ten' });
+            pmPathMap[c] = 'ten';
+          }
         } else {
-          pmSteps.push({ val: a + onesB, type: 'one' });
-          pmSteps.push({ val: a + b, type: 'ten' });
+          for (let i = 1; i <= onesB; i++) {
+            const v = a + i;
+            const t = (v % 10 === 0) ? 'stop' : 'one';
+            pmSteps.push({ val: v, type: t });
+            pmPathMap[v] = t;
+          }
+          let c = a + onesB;
+          for (let t = 0; t < tensB / 10; t++) {
+            c += 10;
+            pmSteps.push({ val: c, type: 'ten' });
+            pmPathMap[c] = 'ten';
+          }
         }
       }
 
@@ -1945,21 +1998,45 @@
       const board = document.getElementById('pmHundredBoard');
       board.innerHTML = '';
       const cur = pmSteps[pmIdx];
-      const visited = {};
-      for (let i = 0; i <= pmIdx; i++) visited[pmSteps[i].val] = pmSteps[i].type;
 
       for (let n = 1; n <= 100; n++) {
         const c = document.createElement('div');
         c.className = 'cell-100 font-num';
         c.textContent = n;
 
-        if (visited[n]) {
-          const t = visited[n];
-          if (t === 'start') { c.style.background = '#bae6fd'; c.style.borderColor = '#38bdf8'; }
-          else if (t === 'one') { c.style.background = '#fef08a'; c.style.borderColor = '#facc15'; }
-          else if (t === 'stop') { c.style.background = '#fbbf24'; c.style.borderColor = '#d97706'; }
-          else if (t === 'love') { c.style.background = '#fbcfe8'; c.style.borderColor = '#f472b6'; }
-          else if (t === 'ten') { c.style.background = '#c7d2fe'; c.style.borderColor = '#818cf8'; font_weight = '900'; }
+        if (pmPathMap[n]) {
+          const t = pmPathMap[n];
+          if (t === 'start') {
+            c.style.background = '#bae6fd';
+            c.style.borderColor = '#0284c7';
+            c.style.color = '#0369a1';
+            c.style.fontWeight = '900';
+            c.title = '📍 Startzahl ' + n;
+          } else if (t === 'one') {
+            c.style.background = '#fef08a';
+            c.style.borderColor = '#facc15';
+            c.style.color = '#854d0e';
+            c.style.fontWeight = '800';
+            c.title = '🟡 Einerschritt ' + n;
+          } else if (t === 'stop') {
+            c.style.background = '#fed7aa';
+            c.style.borderColor = '#ea580c';
+            c.style.color = '#9a3412';
+            c.style.fontWeight = '900';
+            c.title = '🟠 Zehner-Stopp ' + n;
+          } else if (t === 'love') {
+            c.style.background = '#fbcfe8';
+            c.style.borderColor = '#db2777';
+            c.style.color = '#9d174d';
+            c.style.fontWeight = '800';
+            c.title = '🌸 Übergangs-Einer ' + n;
+          } else if (t === 'ten') {
+            c.style.background = '#c7d2fe';
+            c.style.borderColor = '#6366f1';
+            c.style.color = '#3730a3';
+            c.style.fontWeight = '900';
+            c.title = '🟣 Zehner-Sprung ' + n;
+          }
         }
 
         if (cur && cur.val === n) {
@@ -1968,9 +2045,11 @@
           f.style.position = 'absolute';
           f.style.top = '-10px';
           f.style.fontSize = '14px';
+          f.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))';
           c.appendChild(f);
-          c.style.transform = 'scale(1.1)';
-          c.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+          c.style.transform = 'scale(1.15)';
+          c.style.boxShadow = '0 3px 10px rgba(234, 88, 12, 0.4)';
+          c.style.zIndex = '10';
         }
         board.appendChild(c);
       }
@@ -2367,6 +2446,7 @@
     // MODUL 5: RECHNEN BIS 1000 (TÖPFE, TAUSENDERTAFEL & NUGGETS)
     // =========================================================
     let thSteps = [];
+    let thPathMap = {};
     let thIdx = 0;
     let thTimer = null;
     let thPlaying = false;
@@ -2400,6 +2480,7 @@
       const op = document.getElementById('thOp').value;
 
       thSteps = [];
+      thPathMap = {};
       const hB = Math.floor(b / 100) * 100;
       const zB = Math.floor((b % 100) / 10) * 10;
       const eB = b % 10;
@@ -2415,11 +2496,16 @@
         cardTitle: '1. Ausgangszahl',
         delta: ''
       });
+      thPathMap[cur] = { type: 'start', desc: `📍 Startzahl ${cur}` };
 
       if (op === '+') {
         // Hunderter
         if (hB > 0) {
           const prev = cur;
+          for (let k = 1; k <= hB / 100; k++) {
+            const v = prev + k * 100;
+            thPathMap[v] = { type: 'hundred', desc: `🔵 Hundertersprung: +100 ➔ ${v}` };
+          }
           cur += hB;
           thSteps.push({
             num: cur,
@@ -2435,6 +2521,10 @@
         // Zehner
         if (zB > 0) {
           const prev = cur;
+          for (let k = 1; k <= zB / 10; k++) {
+            const v = prev + k * 10;
+            thPathMap[v] = { type: 'ten', desc: `🔴 Zehnersprung: +10 ➔ ${v}` };
+          }
           cur += zB;
           const prevZ = Math.floor((prev % 100) / 10);
           const addZ = zB / 10;
@@ -2454,6 +2544,11 @@
         // Einer
         if (eB > 0) {
           const prev = cur;
+          for (let k = 1; k <= eB; k++) {
+            const v = prev + k;
+            const isStop = (v % 10 === 0);
+            thPathMap[v] = { type: isStop ? 'stop' : 'one', desc: (isStop ? '🟠 Zehner-Stopp: ' : '🟢 Einerschritt: +1 ➔ ') + v };
+          }
           cur += eB;
           const prevE = prev % 10;
           const bundled = (prevE + eB >= 10);
@@ -2473,6 +2568,10 @@
         // Subtraktion
         if (hB > 0) {
           const prev = cur;
+          for (let k = 1; k <= hB / 100; k++) {
+            const v = Math.max(0, prev - k * 100);
+            thPathMap[v] = { type: 'hundred', desc: `🔵 Hundertersprung: −100 ➔ ${v}` };
+          }
           cur = Math.max(0, cur - hB);
           thSteps.push({
             num: cur,
@@ -2487,6 +2586,10 @@
         }
         if (zB > 0) {
           const prev = cur;
+          for (let k = 1; k <= zB / 10; k++) {
+            const v = Math.max(0, prev - k * 10);
+            thPathMap[v] = { type: 'ten', desc: `🔴 Zehnersprung: −10 ➔ ${v}` };
+          }
           const prevZ = Math.floor((prev % 100) / 10);
           const subZ = zB / 10;
           const unbundled = (prevZ < subZ);
@@ -2505,6 +2608,11 @@
         }
         if (eB > 0) {
           const prev = cur;
+          for (let k = 1; k <= eB; k++) {
+            const v = Math.max(0, prev - k);
+            const isStop = (v % 10 === 0);
+            thPathMap[v] = { type: isStop ? 'stop' : 'one', desc: (isStop ? '🟠 Zehner-Stopp: ' : '🟢 Einerschritt: −1 ➔ ') + v };
+          }
           const prevE = prev % 10;
           const unbundled = (prevE < eB);
           cur = Math.max(0, cur - eB);
@@ -2651,19 +2759,41 @@
         const btn = document.createElement('button');
         const isCurrentHundred = (thActiveHundred === h);
         const containsCurVal = (curVal >= s && curVal <= e);
-        const containsStartVal = (startVal >= s && startVal <= e);
+
+        // Check which path steps are inside this hundred
+        let hasStart = false, hasH = false, hasZ = false, hasE = false;
+        for (let num in thPathMap) {
+          const n = parseInt(num, 10);
+          if (n >= s && n <= e) {
+            const t = thPathMap[n].type;
+            if (t === 'start') hasStart = true;
+            else if (t === 'hundred') hasH = true;
+            else if (t === 'ten') hasZ = true;
+            else if (t === 'stop' || t === 'one') hasE = true;
+          }
+        }
+
+        const hasAnySteps = (hasStart || hasH || hasZ || hasE);
 
         btn.type = 'button';
         btn.className = isCurrentHundred ? 'btn btn-primary' : 'btn btn-secondary';
         btn.style.padding = '4px 6px';
         btn.style.fontSize = '10px';
         btn.style.position = 'relative';
+        if (!isCurrentHundred && hasAnySteps) {
+          btn.style.borderColor = '#93c5fd';
+          btn.style.background = '#f0f9ff';
+          btn.style.fontWeight = '800';
+        }
 
-        let badgeDot = '';
-        if (containsCurVal) badgeDot = ' 🐸';
-        else if (containsStartVal) badgeDot = ' 📍';
+        let badges = '';
+        if (hasStart) badges += ' 📍';
+        if (hasH) badges += ' 🔵';
+        if (hasZ) badges += ' 🔴';
+        if (hasE) badges += ' 🟢';
+        if (containsCurVal) badges += ' 🐸';
 
-        btn.innerHTML = `<span>${s}-${e}${badgeDot}</span>`;
+        btn.innerHTML = `<span>${s}-${e}${badges}</span>`;
         btn.onclick = () => selectTHHundred(h);
         selectors.appendChild(btn);
       }
@@ -2680,32 +2810,55 @@
         cell.className = 'cell-1000 font-num';
         cell.textContent = n;
 
-        const isStart = (n === startVal);
         const isCur = (n === curVal);
 
-        // Check if n was visited at any step up to thIdx
-        let wasVisited = false;
-        for (let i = 0; i <= thIdx; i++) {
-          if (thSteps[i] && thSteps[i].num === n) wasVisited = true;
+        // Check if n is on the calculation path
+        if (thPathMap[n]) {
+          const item = thPathMap[n];
+          const t = item.type;
+          if (t === 'start') {
+            cell.style.background = '#bae6fd';
+            cell.style.borderColor = '#0284c7';
+            cell.style.color = '#0369a1';
+            cell.style.fontWeight = '900';
+            cell.title = item.desc;
+          } else if (t === 'hundred') {
+            cell.style.background = '#bfdbfe';
+            cell.style.borderColor = '#1d4ed8';
+            cell.style.color = '#1e40af';
+            cell.style.fontWeight = '900';
+            cell.title = item.desc;
+          } else if (t === 'ten') {
+            cell.style.background = '#fee2e2';
+            cell.style.borderColor = '#dc2626';
+            cell.style.color = '#991b1b';
+            cell.style.fontWeight = '900';
+            cell.title = item.desc;
+          } else if (t === 'stop') {
+            cell.style.background = '#fed7aa';
+            cell.style.borderColor = '#ea580c';
+            cell.style.color = '#9a3412';
+            cell.style.fontWeight = '900';
+            cell.title = item.desc;
+          } else if (t === 'one') {
+            cell.style.background = '#dcfce7';
+            cell.style.borderColor = '#16a34a';
+            cell.style.color = '#166534';
+            cell.style.fontWeight = '900';
+            cell.title = item.desc;
+          }
+        } else {
+          cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
         }
 
         if (isCur) {
-          cell.style.background = '#fef08a';
-          cell.style.border = '2.5px solid #ca8a04';
-          cell.style.color = '#713f12';
-          cell.style.fontWeight = '900';
-          cell.innerHTML = `<span style="position: absolute; top: -7px; left: 2px; font-size: 10px;">🐸</span>${n}`;
-        } else if (isStart) {
-          cell.style.background = '#fed7aa';
-          cell.style.border = '2px solid #ea580c';
-          cell.style.color = '#9a3412';
-        } else if (wasVisited) {
-          cell.style.background = '#e0f2fe';
-          cell.style.border = '1.5px solid #0284c7';
-          cell.style.color = '#0369a1';
+          cell.style.borderColor = '#ea580c';
+          cell.style.transform = 'scale(1.15)';
+          cell.style.boxShadow = '0 3px 10px rgba(234, 88, 12, 0.4)';
+          cell.style.zIndex = '10';
+          cell.innerHTML = `<span style="position: absolute; top: -7px; left: 2px; font-size: 11px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">🐸</span>${n}`;
         }
 
-        cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
         board.appendChild(cell);
       }
     }
