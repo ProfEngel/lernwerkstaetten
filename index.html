@@ -896,9 +896,14 @@
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <div>
             <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Zifferblatt-Ansicht:</span>
-            <button id="clkSectorToggleBtn" onclick="toggleClockSectors()" class="btn btn-secondary" style="width: 100%; margin-top: 4px; border: 1.5px solid #cbd5e1;">
-              🎨 Farbige Stundenräume: AN
-            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px;">
+              <button id="clkSectorToggleBtn" onclick="toggleClockSectors()" class="btn btn-secondary" style="border: 1.5px solid #cbd5e1; font-size: 11.5px; padding: 7px 6px;">
+                🎨 Stundenräume: AN
+              </button>
+              <button id="clkMinutesToggleBtn" onclick="toggleClockMinutes()" class="btn btn-secondary" style="border: 1.5px solid #cbd5e1; font-size: 11.5px; padding: 7px 6px;">
+                ⏱️ Minuten anzeigen: AUS
+              </button>
+            </div>
           </div>
 
           <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px;">
@@ -1496,7 +1501,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v13';
+        const CACHE_NAME = 'lernwerkstatt-offline-v14';
         const ASSETS = [
           './',
           './index.html',
@@ -1717,6 +1722,22 @@
       return `${60 - m} Minuten vor ${nextH12}`;
     }
 
+    let clkShowMinutes = false;
+
+    function toggleClockMinutes() {
+      clkShowMinutes = !clkShowMinutes;
+      const btn = document.getElementById('clkMinutesToggleBtn');
+      if (btn) {
+        btn.textContent = clkShowMinutes ? '⏱️ Minuten anzeigen: AN' : '⏱️ Minuten anzeigen: AUS';
+        btn.style.borderColor = clkShowMinutes ? '#0284c7' : '#cbd5e1';
+        btn.style.background = clkShowMinutes ? '#e0f2fe' : '#ffffff';
+        btn.style.color = clkShowMinutes ? '#0369a1' : '#475569';
+        btn.style.fontWeight = clkShowMinutes ? '800' : '700';
+      }
+      drawClock();
+      playTone(clkShowMinutes ? 650 : 500, 'sine', 0.06);
+    }
+
     function drawClock() {
       clkSvg.innerHTML = "";
 
@@ -1744,31 +1765,83 @@
         }
       }
 
-      // Teilstriche & Zahlen
+      // Teilstriche & Zahlen (mit dynamischer Minuten-Hervorhebung)
+      const curExactMin = Math.round(clkCurrentMin % 60 + 60) % 60;
+      const activeFiveMin = (Math.round(curExactMin / 5) * 5) % 60;
+
       for (let m = 0; m < 60; m++) {
         const rad = (m * 6 - 90) * Math.PI / 180;
         const isFive = m % 5 === 0;
-        const len = isFive ? 12 : 5;
+        const isCurExact = (m === curExactMin);
+        const len = isFive ? (clkShowMinutes ? 7 : 12) : 4.5;
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", clkCx + (clkR - 8) * Math.cos(rad));
-        line.setAttribute("y1", clkCy + (clkR - 8) * Math.sin(rad));
-        line.setAttribute("x2", clkCx + (clkR - 8 - len) * Math.cos(rad));
-        line.setAttribute("y2", clkCy + (clkR - 8 - len) * Math.sin(rad));
-        line.setAttribute("stroke", isFive ? "#1e293b" : "#94a3b8");
-        line.setAttribute("stroke-width", isFive ? "3" : "1.2");
+        line.setAttribute("x1", clkCx + (clkR - 6) * Math.cos(rad));
+        line.setAttribute("y1", clkCy + (clkR - 6) * Math.sin(rad));
+        line.setAttribute("x2", clkCx + (clkR - 6 - len) * Math.cos(rad));
+        line.setAttribute("y2", clkCy + (clkR - 6 - len) * Math.sin(rad));
+        if (clkShowMinutes && isCurExact) {
+          line.setAttribute("stroke", "#0284c7");
+          line.setAttribute("stroke-width", "3.5");
+        } else {
+          line.setAttribute("stroke", isFive ? "#1e293b" : "#94a3b8");
+          line.setAttribute("stroke-width", isFive ? "2.5" : "1.2");
+        }
         clkSvg.appendChild(line);
 
         if (isFive) {
           const val = m === 0 ? 12 : m / 5;
+          const hrR = clkShowMinutes ? 98 : 114;
           const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          txt.setAttribute("x", clkCx + (clkR - 28) * Math.cos(rad));
-          txt.setAttribute("y", clkCy + (clkR - 28) * Math.sin(rad) + 6);
-          txt.setAttribute("font-size", "17");
+          txt.setAttribute("x", clkCx + hrR * Math.cos(rad));
+          txt.setAttribute("y", clkCy + hrR * Math.sin(rad) + (clkShowMinutes ? 5.5 : 6));
+          txt.setAttribute("font-size", clkShowMinutes ? "16" : "17");
           txt.setAttribute("font-weight", "800");
           txt.setAttribute("text-anchor", "middle");
           txt.setAttribute("fill", "#0f172a");
           txt.textContent = val;
           clkSvg.appendChild(txt);
+
+          if (clkShowMinutes) {
+            const isBadgeActive = (m === activeFiveMin);
+            const minVal = m === 0 ? "60" : (m < 10 ? "0" + m : "" + m);
+            const minR = 124;
+            const mx = clkCx + minR * Math.cos(rad);
+            const my = clkCy + minR * Math.sin(rad) + 3.5;
+
+            const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            if (isBadgeActive) {
+              // Hervorgehobene aktuelle Minute
+              bg.setAttribute("x", (mx - 13).toFixed(1));
+              bg.setAttribute("y", (my - 11).toFixed(1));
+              bg.setAttribute("width", "26");
+              bg.setAttribute("height", "16");
+              bg.setAttribute("rx", "5");
+              bg.setAttribute("fill", "#0284c7");
+              bg.setAttribute("stroke", "#0369a1");
+              bg.setAttribute("stroke-width", "2");
+              bg.setAttribute("filter", "drop-shadow(0 2px 6px rgba(2,132,199,0.5))");
+            } else {
+              bg.setAttribute("x", (mx - 11).toFixed(1));
+              bg.setAttribute("y", (my - 9.5).toFixed(1));
+              bg.setAttribute("width", "22");
+              bg.setAttribute("height", "13");
+              bg.setAttribute("rx", "4");
+              bg.setAttribute("fill", "#e0f2fe");
+              bg.setAttribute("stroke", "#38bdf8");
+              bg.setAttribute("stroke-width", "1");
+            }
+            clkSvg.appendChild(bg);
+
+            const minTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            minTxt.setAttribute("x", mx.toFixed(1));
+            minTxt.setAttribute("y", isBadgeActive ? (my + 1).toFixed(1) : my.toFixed(1));
+            minTxt.setAttribute("font-size", isBadgeActive ? "10.5" : "9");
+            minTxt.setAttribute("font-weight", "900");
+            minTxt.setAttribute("text-anchor", "middle");
+            minTxt.setAttribute("fill", isBadgeActive ? "#ffffff" : "#0284c7");
+            minTxt.textContent = minVal;
+            clkSvg.appendChild(minTxt);
+          }
         }
       }
 
@@ -1778,8 +1851,8 @@
       const hHand = document.createElementNS("http://www.w3.org/2000/svg", "line");
       hHand.setAttribute("x1", clkCx - 12 * Math.cos(hRad));
       hHand.setAttribute("y1", clkCy - 12 * Math.sin(hRad));
-      hHand.setAttribute("x2", clkCx + 64 * Math.cos(hRad));
-      hHand.setAttribute("y2", clkCy + 64 * Math.sin(hRad));
+      hHand.setAttribute("x2", clkCx + (clkShowMinutes ? 58 : 64) * Math.cos(hRad));
+      hHand.setAttribute("y2", clkCy + (clkShowMinutes ? 58 : 64) * Math.sin(hRad));
       hHand.setAttribute("stroke", "#e11d48");
       hHand.setAttribute("stroke-width", "8");
       hHand.setAttribute("stroke-linecap", "round");
@@ -4208,13 +4281,34 @@
     // =========================================================
     // HELPER: MINI-CLOCK SVG BUILDER
     // =========================================================
-    function makeMiniClockSVG(h, m, size = 110) {
+    function getSvgSectorPath(cx, cy, r, sDeg, eDeg) {
+      const sRad = sDeg * Math.PI / 180;
+      const eRad = eDeg * Math.PI / 180;
+      const x1 = cx + r * Math.cos(sRad);
+      const y1 = cy + r * Math.sin(sRad);
+      const x2 = cx + r * Math.cos(eRad);
+      const y2 = cy + r * Math.sin(eRad);
+      let diff = eDeg - sDeg;
+      while (diff < 0) diff += 360;
+      const largeArc = diff > 180 ? 1 : 0;
+      return `M ${cx} ${cy} L ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z`;
+    }
+
+    function makeMiniClockSVG(h, m, size = 110, opts = {}) {
       const cx = size / 2, cy = size / 2, r = (size / 2) - 6;
       const hDeg = ((h % 12) + m / 60) * 30 - 90;
       const mDeg = m * 6 - 90;
       const hRad = hDeg * Math.PI / 180;
       const mRad = mDeg * Math.PI / 180;
       
+      let sectorSvg = '';
+      if (opts.sector) {
+        const sDeg = opts.sector.startMin * 6 - 90;
+        const eDeg = opts.sector.endMin * 6 - 90;
+        const pathD = getSvgSectorPath(cx, cy, r - 2, sDeg, eDeg);
+        sectorSvg = `<path d="${pathD}" fill="${opts.sector.color || 'rgba(34,197,94,0.25)'}" stroke="${opts.sector.stroke || 'none'}"/>`;
+      }
+
       let ticks = '';
       for (let i = 0; i < 12; i++) {
         const deg = (i * 30 - 90) * Math.PI / 180;
@@ -4236,6 +4330,7 @@
 
       return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1));">
         <circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+        ${sectorSvg}
         ${ticks}
         <line x1="${cx}" y1="${cy}" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#e11d48" stroke-width="4" stroke-linecap="round"/>
         <line x1="${cx}" y1="${cy}" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round"/>
@@ -4248,9 +4343,11 @@
     }
 
     // =========================================================
-    // QUIZ 1: LERN-UHR (5 ÜBUNGS-NUGGETS)
+    // QUIZ 1: LERN-UHR (5 DIDAKTISCHE ÜBUNGS-NUGGETS)
     // =========================================================
     let clkQuizData = [];
+    let clkQuizRotMin = 720;
+    let clkQuizRotDragging = false;
 
     function initClockQuiz() {
       newClockQuiz();
@@ -4258,92 +4355,89 @@
 
     function newClockQuiz() {
       clkQuizData = [];
-      const types = ['read', 'forward', 'duration', 'backward', 'colloquial'];
-      
-      // 1. Uhrzeit ablesen
+
+      // Nugget 1: Uhrzeit ablesen (Uhrzeit sagen)
       const h1 = Math.floor(Math.random() * 12) + 1;
-      const m1 = [0, 15, 30, 45, 10, 20, 40, 50][Math.floor(Math.random() * 8)];
+      const m1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55][Math.floor(Math.random() * 12)];
       clkQuizData.push({
         id: 0,
-        type: 'read',
-        h: h1,
-        m: m1,
+        type: 'read_direct',
         title: 'Uhrzeit an der Uhr ablesen',
         question: 'Wie viel Uhr zeigt diese Uhr?',
         svg: makeMiniClockSVG(h1, m1, 115),
         ansH: h1,
         ansM: m1,
-        stepDesc: `Der kurze rote Zeiger steht bei ${h1}. Der lange blaue Minutenzeiger steht bei ${m1} Minuten. Umgangssprachlich: „${getGermanColloquialTime(h1 * 60 + m1)}“.`
+        stepDesc: `Der kurze rote Stundenzeiger steht bei ${h1}. Der lange blaue Minutenzeiger zeigt auf ${m1} Minuten ➔ Genau ${pad2(h1)}:${pad2(m1)} Uhr (oder ${pad2((h1 % 12) + 12)}:${pad2(m1)} Uhr).`
       });
 
-      // 2. Zeitspanne vorwärts
-      const h2 = Math.floor(Math.random() * 10) + 8;
-      const m2 = [0, 15, 30][Math.floor(Math.random() * 3)];
-      const del2 = [15, 30, 45, 60, 75][Math.floor(Math.random() * 5)];
-      const tot2 = h2 * 60 + m2 + del2;
-      const endH2 = Math.floor(tot2 / 60) % 24;
-      const endM2 = tot2 % 60;
+      // Nugget 2: X Minuten NACH der vollen Stunde
+      const h2 = Math.floor(Math.random() * 12) + 1;
+      const m2 = [5, 10, 15, 20, 25][Math.floor(Math.random() * 5)];
       clkQuizData.push({
         id: 1,
-        type: 'forward',
-        title: 'Zeitspanne in die Zukunft berechnen',
-        question: `Es ist ${pad2(h2)}:${pad2(m2)} Uhr. Das Training dauert ${del2} Minuten. Wann ist es zu Ende?`,
-        ansH: endH2,
-        ansM: endM2,
-        stepDesc: `Startzeit: ${pad2(h2)}:${pad2(m2)} Uhr + ${del2} Minuten = ${pad2(endH2)}:${pad2(endM2)} Uhr.`
+        type: 'after_hour',
+        title: 'Minuten nach der vollen Stunde',
+        question: 'Wie viele Minuten NACH welcher vollen Stunde zeigt die Uhr?',
+        svg: makeMiniClockSVG(h2, m2, 115, { sector: { startMin: 0, endMin: m2, color: 'rgba(2, 132, 199, 0.22)' } }),
+        ansM: m2,
+        ansH: h2,
+        stepDesc: `Der blaue Minutenzeiger ist ${m2} Minuten nach der ${h2} gewandert ➔ Es ist genau ${m2} Minuten nach ${h2} Uhr (digital: ${pad2(h2)}:${pad2(m2)} Uhr).`
       });
 
-      // 3. Dauer berechnen (Minuten)
-      const h3 = Math.floor(Math.random() * 6) + 13;
-      const m3 = [10, 15, 20, 30][Math.floor(Math.random() * 4)];
-      const del3 = [20, 25, 35, 45, 50][Math.floor(Math.random() * 5)];
-      const tot3 = h3 * 60 + m3 + del3;
-      const endH3 = Math.floor(tot3 / 60) % 24;
-      const endM3 = tot3 % 60;
+      // Nugget 3: X Minuten VOR der vollen Stunde
+      const h3 = Math.floor(Math.random() * 12) + 1;
+      const m3 = [35, 40, 45, 50, 55][Math.floor(Math.random() * 5)];
+      const nextH3 = (h3 % 12) + 1;
+      const minBefore3 = 60 - m3;
       clkQuizData.push({
         id: 2,
-        type: 'duration',
-        title: 'Vergangene Minuten berechnen',
-        question: `Wie viele Minuten vergehen von ${pad2(h3)}:${pad2(m3)} Uhr bis ${pad2(endH3)}:${pad2(endM3)} Uhr?`,
-        ansMin: del3,
-        stepDesc: `Von ${pad2(h3)}:${pad2(m3)} bis zum nächsten vollen Zeitschritt und dann weiter: ${tot3} Min − ${h3*60+m3} Min = genau ${del3} Minuten.`
+        type: 'before_hour',
+        title: 'Minuten vor der vollen Stunde',
+        question: 'Wie viele Minuten VOR welcher vollen Stunde zeigt die Uhr?',
+        svg: makeMiniClockSVG(h3, m3, 115, { sector: { startMin: m3, endMin: 60, color: 'rgba(225, 29, 72, 0.22)' } }),
+        ansM: minBefore3,
+        ansH: nextH3,
+        stepDesc: `Es fehlen noch ${minBefore3} Minuten bis zur nächsten vollen Stunde (${nextH3}:00 Uhr) ➔ Es ist ${minBefore3} Minuten vor ${nextH3} Uhr (digital: ${pad2(h3)}:${pad2(m3)} Uhr).`
       });
 
-      // 4. Zeitspanne rückwärts
-      const h4 = Math.floor(Math.random() * 8) + 12;
-      const m4 = [30, 45, 50][Math.floor(Math.random() * 3)];
-      const del4 = [15, 20, 30, 45][Math.floor(Math.random() * 4)];
-      const tot4 = h4 * 60 + m4 - del4;
-      const startH4 = Math.floor(tot4 / 60) % 24;
-      const startM4 = tot4 % 60;
+      // Nugget 4: Wie viele Minuten bis zur nächsten vollen Stunde?
+      const h4 = Math.floor(Math.random() * 12) + 1;
+      const m4 = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55][Math.floor(Math.random() * 10)];
+      const nextH4 = (h4 % 12) + 1;
+      const rem4 = 60 - m4;
       clkQuizData.push({
         id: 3,
-        type: 'backward',
-        title: 'Zeitspanne rückwärts rechnen',
-        question: `Der Kuchen kommt um ${pad2(h4)}:${pad2(m4)} Uhr fertig aus dem Ofen. Er musste ${del4} Minuten backen. Wann wurde er hineingestellt?`,
-        ansH: startH4,
-        ansM: startM4,
-        stepDesc: `Endzeit: ${pad2(h4)}:${pad2(m4)} Uhr minus ${del4} Minuten = ${pad2(startH4)}:${pad2(startM4)} Uhr.`
+        type: 'until_next_hour',
+        title: 'Bis zur nächsten vollen Stunde',
+        nextH: nextH4,
+        question: `Die Uhr zeigt ${pad2(h4)}:${pad2(m4)} Uhr. Wie viele Minuten fehlen noch bis zur nächsten vollen Stunde (${pad2(nextH4)}:00 Uhr)?`,
+        svg: makeMiniClockSVG(h4, m4, 115, { sector: { startMin: m4, endMin: 60, color: 'rgba(34, 197, 94, 0.28)' } }),
+        ansMin: rem4,
+        stepDesc: `Eine volle Stunde hat 60 Minuten. Von ${pad2(m4)} bis 60 rechnet man: 60 − ${m4} = genau ${rem4} Minuten bis ${pad2(nextH4)}:00 Uhr.`
       });
 
-      // 5. Umgangssprache in Digitalzeit
-      const collItems = [
-        { phrase: 'Viertel vor 4 am Nachmittag', h: 15, m: 45 },
-        { phrase: 'Halb 8 am Morgen', h: 7, m: 30 },
-        { phrase: 'Viertel nach 2 am Nachmittag', h: 14, m: 15 },
-        { phrase: 'Zehn vor 6 am Abend', h: 17, m: 50 },
-        { phrase: 'Fünf nach halb 1 am Mittag', h: 12, m: 35 },
-        { phrase: 'Dreiviertel 5 am Nachmittag', h: 16, m: 45 }
-      ];
-      const pick5 = collItems[Math.floor(Math.random() * collItems.length)];
+      // Nugget 5: Uhrzeiger drehen: In X Minuten
+      const h5 = Math.floor(Math.random() * 10) + 1;
+      const m5 = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+      const del5 = [15, 20, 30, 45, 60, 75][Math.floor(Math.random() * 6)];
+      const tot5 = h5 * 60 + m5 + del5;
+      const targetH5 = Math.floor(tot5 / 60) % 24;
+      const targetH12_5 = targetH5 % 12 === 0 ? 12 : targetH5 % 12;
+      const targetM5 = tot5 % 60;
+
+      clkQuizRotMin = h5 * 60 + m5; // Startet bei der Startzeit
+
       clkQuizData.push({
         id: 4,
-        type: 'colloquial',
-        title: 'Umgangssprache verstehen',
-        question: `Welche digitale Uhrzeit ist „${pick5.phrase}“?`,
-        ansH: pick5.h,
-        ansM: pick5.m,
-        stepDesc: `„${pick5.phrase}“ bedeutet genau ${pad2(pick5.h)}:${pad2(pick5.m)} Uhr digital.`
+        type: 'rotate_clock',
+        title: 'Uhrzeiger drehen: Zeit in der Zukunft',
+        startH: h5,
+        startM: m5,
+        del: del5,
+        targetH: targetH12_5,
+        targetM: targetM5,
+        question: `Die linke Uhr zeigt ${pad2(h5)}:${pad2(m5)} Uhr. Drehe den Zeiger der rechten Uhr: Wie viel Uhr ist es in ${del5} Minuten?`,
+        stepDesc: `Startzeit war ${pad2(h5)}:${pad2(m5)} Uhr. Rechnet man ${del5} Minuten dazu: ${pad2(h5)}:${pad2(m5)} + ${del5} Min = genau **${pad2(targetH12_5)}:${pad2(targetM5)} Uhr**.`
       });
 
       renderClockQuiz();
@@ -4357,7 +4451,7 @@
         <div class="quiz-header">
           <div>
             <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Lern-Uhr</div>
-            <div style="font-size: 12px; color: #92400e;">Löse alle 5 Aufgaben, trage deine Werte ein und klicke auf „Prüfen & Lösen“!</div>
+            <div style="font-size: 12px; color: #92400e;">Löse alle 5 Aufgaben, stelle die Dreh-Uhr ein und klicke auf „Prüfen & Lösen“!</div>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="solveClockQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
@@ -4367,6 +4461,98 @@
       `;
 
       clkQuizData.forEach((q, idx) => {
+        let inputHtml = '';
+        let displayHtml = '';
+
+        if (q.type === 'read_direct') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>
+          `;
+          inputHtml = `
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+              <input type="number" id="clkInH-${idx}" class="quiz-input font-num" placeholder="HH" style="width: 60px;">
+              <span style="font-size: 18px; font-weight: 800; color: #94a3b8;">:</span>
+              <input type="number" id="clkInM-${idx}" class="quiz-input font-num" placeholder="MM" style="width: 60px;">
+              <span style="font-size: 14px; font-weight: 800; color: #475569;">Uhr</span>
+            </div>
+          `;
+        } else if (q.type === 'after_hour') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>
+          `;
+          inputHtml = `
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Es ist</span>
+              <input type="number" id="clkInM-${idx}" class="quiz-input font-num" placeholder="Min" style="width: 65px;">
+              <span style="font-size: 14px; font-weight: 800; color: #0284c7;">Minuten nach</span>
+              <input type="number" id="clkInH-${idx}" class="quiz-input font-num" placeholder="Std" style="width: 60px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Uhr</span>
+            </div>
+          `;
+        } else if (q.type === 'before_hour') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>
+          `;
+          inputHtml = `
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Es ist</span>
+              <input type="number" id="clkInM-${idx}" class="quiz-input font-num" placeholder="Min" style="width: 65px;">
+              <span style="font-size: 14px; font-weight: 800; color: #e11d48;">Minuten vor</span>
+              <input type="number" id="clkInH-${idx}" class="quiz-input font-num" placeholder="Std" style="width: 60px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Uhr</span>
+            </div>
+          `;
+        } else if (q.type === 'until_next_hour') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>
+          `;
+          inputHtml = `
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Es fehlen noch</span>
+              <input type="number" id="clkInMin-${idx}" class="quiz-input font-num" placeholder="0" style="width: 70px;">
+              <span style="font-size: 14px; font-weight: 800; color: #15803d;">Minuten bis ${pad2(q.nextH)}:00 Uhr</span>
+            </div>
+          `;
+        } else if (q.type === 'rotate_clock') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; margin: 8px 0;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <span style="font-size: 11px; font-weight: 800; color: #64748b;">Startzeit:</span>
+                ${makeMiniClockSVG(q.startH, q.startM, 105)}
+                <span class="font-num" style="font-size: 13px; font-weight: 800; color: #1e293b;">${pad2(q.startH)}:${pad2(q.startM)} Uhr</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <span style="font-size: 12px; font-weight: 900; color: #0284c7; background: #e0f2fe; padding: 4px 10px; border-radius: 999px; border: 1px solid #bae6fd;">➕ ${q.del} Min</span>
+                <span style="font-size: 20px; color: #0284c7;">➔</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; background: #ffffff; padding: 10px 14px; border-radius: 16px; border: 2px dashed #0284c7; box-shadow: 0 2px 8px rgba(2,132,199,0.08);">
+                <span style="font-size: 11px; font-weight: 800; color: #0369a1;">🎯 Hier drehen / einstellen:</span>
+                <svg id="clkQuizRotSvg" width="125" height="125" viewBox="0 0 125 125" style="touch-action: none; cursor: grab; user-select: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.08));"></svg>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span style="font-size: 12px; font-weight: 700; color: #64748b;">Eingestellt:</span>
+                  <span id="clkQuizRotTxt" class="font-num" style="font-size: 15px; font-weight: 900; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 8px;">--:-- Uhr</span>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" onclick="adjustQuizRotMin(-15)" class="btn btn-secondary" style="padding: 3px 6px; font-size: 11px;">−15m</button>
+                  <button type="button" onclick="adjustQuizRotMin(-5)" class="btn btn-secondary" style="padding: 3px 6px; font-size: 11px;">−5m</button>
+                  <button type="button" onclick="adjustQuizRotMin(5)" class="btn btn-secondary" style="padding: 3px 6px; font-size: 11px;">+5m</button>
+                  <button type="button" onclick="adjustQuizRotMin(15)" class="btn btn-secondary" style="padding: 3px 6px; font-size: 11px;">+15m</button>
+                </div>
+              </div>
+            </div>
+          `;
+          inputHtml = `
+            <div style="font-size: 12px; color: #64748b; font-weight: 700;">
+              Tippe/ziehe am Zifferblatt der rechten Uhr oder nutze die Schnelltasten darunter.
+            </div>
+          `;
+        }
+
         htmlStr += `
           <div class="quiz-nugget" id="clkNugget-${idx}">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -4375,22 +4561,10 @@
             </div>
             
             <div style="font-size: 14px; font-weight: 700; color: #1e293b; display: flex; flex-direction: column; gap: 8px;">
-              <div>${q.question}</div>
-              ${q.svg ? `<div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>` : ''}
+              ${displayHtml}
             </div>
 
-            <!-- Eingabebereich -->
-            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-              ${q.ansMin !== undefined ? `
-                <input type="number" id="clkInMin-${idx}" class="quiz-input font-num" placeholder="0" style="width: 80px;">
-                <span style="font-size: 14px; font-weight: 800; color: #475569;">Minuten</span>
-              ` : `
-                <input type="number" id="clkInH-${idx}" class="quiz-input font-num" placeholder="HH" style="width: 60px;">
-                <span style="font-size: 18px; font-weight: 800; color: #94a3b8;">:</span>
-                <input type="number" id="clkInM-${idx}" class="quiz-input font-num" placeholder="MM" style="width: 60px;">
-                <span style="font-size: 14px; font-weight: 800; color: #475569;">Uhr</span>
-              `}
-            </div>
+            ${inputHtml}
 
             <!-- Aufklappbarer Lösungsweg -->
             <div id="clkSolution-${idx}" class="quiz-step-box hidden">
@@ -4402,6 +4576,138 @@
       });
 
       cont.innerHTML = htmlStr;
+
+      // Interaktive Dreh-Uhr in Nugget 5 initialisieren
+      setTimeout(initQuizRotClock, 20);
+    }
+
+    function drawQuizRotClock() {
+      const svg = document.getElementById('clkQuizRotSvg');
+      if (!svg) return;
+      svg.innerHTML = '';
+      const size = 125, cx = size / 2, cy = size / 2, r = (size / 2) - 6;
+
+      const dial = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dial.setAttribute("cx", cx); dial.setAttribute("cy", cy); dial.setAttribute("r", r);
+      dial.setAttribute("fill", "#ffffff"); dial.setAttribute("stroke", "#0284c7"); dial.setAttribute("stroke-width", "3");
+      svg.appendChild(dial);
+
+      for (let i = 0; i < 12; i++) {
+        const deg = (i * 30 - 90) * Math.PI / 180;
+        const x1 = cx + (r - 2) * Math.cos(deg);
+        const y1 = cy + (r - 2) * Math.sin(deg);
+        const x2 = cx + (r - 7) * Math.cos(deg);
+        const y2 = cy + (r - 7) * Math.sin(deg);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1.toFixed(1)); line.setAttribute("y1", y1.toFixed(1));
+        line.setAttribute("x2", x2.toFixed(1)); line.setAttribute("y2", y2.toFixed(1));
+        line.setAttribute("stroke", "#334155"); line.setAttribute("stroke-width", "2");
+        svg.appendChild(line);
+
+        const num = i === 0 ? 12 : i;
+        const nx = cx + (r - 15) * Math.cos(deg);
+        const ny = cy + (r - 15) * Math.sin(deg) + 3.5;
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", nx.toFixed(1)); txt.setAttribute("y", ny.toFixed(1));
+        txt.setAttribute("font-size", "9.5"); txt.setAttribute("font-weight", "800");
+        txt.setAttribute("text-anchor", "middle"); txt.setAttribute("fill", "#1e293b");
+        txt.textContent = num;
+        svg.appendChild(txt);
+      }
+
+      const norm = ((Math.round(clkQuizRotMin) % 720) + 720) % 720;
+      let h = Math.floor(norm / 60);
+      if (h === 0) h = 12;
+      let m = norm % 60;
+
+      const hDeg = ((h % 12) + m / 60) * 30 - 90;
+      const mDeg = m * 6 - 90;
+      const hRad = hDeg * Math.PI / 180;
+      const mRad = mDeg * Math.PI / 180;
+
+      // Roter Stundenzeiger
+      const hLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      hLine.setAttribute("x1", cx); hLine.setAttribute("y1", cy);
+      hLine.setAttribute("x2", (cx + (r * 0.52) * Math.cos(hRad)).toFixed(1));
+      hLine.setAttribute("y2", (cy + (r * 0.52) * Math.sin(hRad)).toFixed(1));
+      hLine.setAttribute("stroke", "#e11d48"); hLine.setAttribute("stroke-width", "4.5");
+      hLine.setAttribute("stroke-linecap", "round");
+      svg.appendChild(hLine);
+
+      // Blauer Minutenzeiger
+      const mLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      mLine.setAttribute("x1", cx); mLine.setAttribute("y1", cy);
+      mLine.setAttribute("x2", (cx + (r * 0.76) * Math.cos(mRad)).toFixed(1));
+      mLine.setAttribute("y2", (cy + (r * 0.76) * Math.sin(mRad)).toFixed(1));
+      mLine.setAttribute("stroke", "#0284c7"); mLine.setAttribute("stroke-width", "3");
+      mLine.setAttribute("stroke-linecap", "round");
+      svg.appendChild(mLine);
+
+      // Pin
+      const pin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      pin.setAttribute("cx", cx); pin.setAttribute("cy", cy); pin.setAttribute("r", "4");
+      pin.setAttribute("fill", "#0f172a");
+      svg.appendChild(pin);
+
+      const txtEl = document.getElementById('clkQuizRotTxt');
+      if (txtEl) {
+        txtEl.textContent = `${pad2(h)}:${pad2(m)} Uhr`;
+      }
+    }
+
+    function adjustQuizRotMin(delta) {
+      clkQuizRotMin += delta;
+      drawQuizRotClock();
+      playTone(600, 'sine', 0.04);
+    }
+
+    function initQuizRotClock() {
+      drawQuizRotClock();
+      const svg = document.getElementById('clkQuizRotSvg');
+      if (!svg) return;
+
+      let lastAngle = null;
+
+      function updateAngleFromEvent(e) {
+        const rect = svg.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const x = e.clientX - cx;
+        const y = e.clientY - cy;
+        let deg = Math.atan2(y, x) * 180 / Math.PI + 90;
+        if (deg < 0) deg += 360;
+        return deg;
+      }
+
+      svg.onpointerdown = (e) => {
+        clkQuizRotDragging = true;
+        svg.setPointerCapture(e.pointerId);
+        lastAngle = updateAngleFromEvent(e);
+      };
+
+      svg.onpointermove = (e) => {
+        if (!clkQuizRotDragging || lastAngle === null) return;
+        const curAngle = updateAngleFromEvent(e);
+        let diff = curAngle - lastAngle;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        if (Math.abs(diff) >= 5) {
+          clkQuizRotMin += (diff / 6);
+          lastAngle = curAngle;
+          drawQuizRotClock();
+        }
+      };
+
+      svg.onpointerup = (e) => {
+        if (clkQuizRotDragging) {
+          clkQuizRotDragging = false;
+          clkQuizRotMin = Math.round(clkQuizRotMin / 5) * 5;
+          drawQuizRotClock();
+          playTone(650, 'sine', 0.05);
+          try { svg.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+      };
+      svg.onpointercancel = svg.onpointerup;
     }
 
     function solveClockQuiz() {
@@ -4413,15 +4719,29 @@
         sol.classList.remove('hidden');
 
         let isCorrect = false;
-        if (q.ansMin !== undefined) {
-          const userMin = parseInt(document.getElementById(`clkInMin-${idx}`).value, 10);
-          isCorrect = (userMin === q.ansMin);
-        } else {
+
+        if (q.type === 'read_direct') {
           const userH = parseInt(document.getElementById(`clkInH-${idx}`).value, 10);
           const userM = parseInt(document.getElementById(`clkInM-${idx}`).value, 10);
-          // Match 24h or 12h representation
           const hMatch = (userH === q.ansH) || (userH % 12 === q.ansH % 12);
           const mMatch = (userM === q.ansM);
+          isCorrect = (hMatch && mMatch);
+        } else if (q.type === 'after_hour' || q.type === 'before_hour') {
+          const userM = parseInt(document.getElementById(`clkInM-${idx}`).value, 10);
+          const userH = parseInt(document.getElementById(`clkInH-${idx}`).value, 10);
+          const hMatch = (userH === q.ansH) || (userH % 12 === q.ansH % 12);
+          const mMatch = (userM === q.ansM);
+          isCorrect = (hMatch && mMatch);
+        } else if (q.type === 'until_next_hour') {
+          const userMin = parseInt(document.getElementById(`clkInMin-${idx}`).value, 10);
+          isCorrect = (userMin === q.ansMin);
+        } else if (q.type === 'rotate_clock') {
+          const norm = ((Math.round(clkQuizRotMin) % 720) + 720) % 720;
+          let curH = Math.floor(norm / 60);
+          if (curH === 0) curH = 12;
+          let curM = norm % 60;
+          const hMatch = (curH === q.targetH) || (curH % 12 === q.targetH % 12);
+          const mMatch = (curM === q.targetM);
           isCorrect = (hMatch && mMatch);
         }
 
