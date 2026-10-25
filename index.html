@@ -80,8 +80,178 @@
     /* Navigation */
     .nav-bar {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    @media (max-width: 680px) {
+      .nav-bar {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      }
+    }
+
+    /* 1000er Töpfe */
+    .pot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .pot-card {
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
       gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .pot-card-h {
+      border: 2.5px solid #2563eb;
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    }
+    .pot-card-z {
+      border: 2.5px solid #dc2626;
+      background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+    }
+    .pot-card-e {
+      border: 2.5px solid #16a34a;
+      background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+    }
+    .pot-tokens-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 95px;
+      align-content: flex-start;
+      padding: 8px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 12px;
+      border: 1.5px dashed #cbd5e1;
+      overflow-y: auto;
+      max-height: 180px;
+    }
+    .pot-token-h {
+      width: 38px;
+      height: 38px;
+      background: #2563eb;
+      color: #ffffff;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+      border: 1.5px solid #1d4ed8;
+      transition: transform 0.2s;
+    }
+    .pot-token-z {
+      width: 15px;
+      height: 44px;
+      background: #dc2626;
+      color: #ffffff;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 800;
+      box-shadow: 0 2px 4px rgba(220,38,38,0.3);
+      border: 1.5px solid #b91c1c;
+      transition: transform 0.2s;
+    }
+    .pot-token-e {
+      width: 17px;
+      height: 17px;
+      background: #16a34a;
+      border-radius: 4px;
+      display: inline-flex;
+      box-shadow: 0 1.5px 3px rgba(22,163,74,0.3);
+      border: 1.5px solid #15803d;
+      transition: transform 0.2s;
+    }
+
+    /* 1000er Tafel Grid */
+    .thousand-grid {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 3px;
+    }
+    .cell-1000 {
+      aspect-ratio: 1.1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      position: relative;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .cell-1000 {
+        font-size: 9px;
+      }
+    }
+
+    /* 5 Übungs-Nuggets Komponenten */
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    .quiz-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+      border-radius: 18px;
+      padding: 12px 16px;
+    }
+    .quiz-nugget {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .quiz-nugget.correct {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+    .quiz-nugget.incorrect {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .quiz-input {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      padding: 6px 8px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      background: #ffffff;
+    }
+    .quiz-step-box {
+      background: #f8fafc;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #334155;
+      margin-top: 6px;
     }
 
     .nav-tab {
@@ -320,6 +490,9 @@
         <button id="tabBtn-multidiv" onclick="switchModule('multidiv')" class="nav-tab">
           <span>✖➗</span> <span>Mal & Geteilt</span>
         </button>
+        <button id="tabBtn-thousand" onclick="switchModule('thousand')" class="nav-tab">
+          <span>🏰</span> <span>Bis 1000</span>
+        </button>
       </nav>
     </header>
 
@@ -327,8 +500,18 @@
     <!-- ========================================================= -->
     <!-- MODUL 1: LERN-UHR MIT UMGANGSSPRACHE & SEKTOREN -->
     <!-- ========================================================= -->
-    <main id="mod-clock" class="card" style="display: flex; flex-direction: column; gap: 16px;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; align-items: center;">
+    <main id="mod-clock" class="card" style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Modus-Umschaltung Uhr -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 8px;">
+        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+          <button id="clkSubTab-explore" onclick="switchClockSub('explore')" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;">🕰️ Uhr einstellen & lernen</button>
+          <button id="clkSubTab-quiz" onclick="switchClockSub('quiz')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">🎯 5 Übungs-Nuggets</button>
+        </div>
+      </div>
+
+      <!-- Bereich 1: Interaktive Uhr -->
+      <div id="clkSec-explore" style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; align-items: center;">
         
         <!-- Uhr-Grafik, Digitalanzeige & Umgangssprach-Sprechblase -->
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
@@ -401,6 +584,12 @@
         </div>
 
       </div>
+      </div>
+
+      <!-- Bereich 2: 5 Übungs-Nuggets Lern-Uhr -->
+      <div id="clkSec-quiz" class="hidden">
+        <div class="quiz-container" id="clkQuizContainer"></div>
+      </div>
     </main>
 
 
@@ -408,7 +597,16 @@
     <!-- MODUL 2: EURO & CENT KAUFLADEN -->
     <!-- ========================================================= -->
     <main id="mod-money" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
-      
+      <!-- Modus-Umschaltung Geld -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 8px;">
+        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+          <button id="mnySubTab-shop" onclick="switchMoneySub('shop')" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;">🏪 Kaufladen & Kasse</button>
+          <button id="mnySubTab-quiz" onclick="switchMoneySub('quiz')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">🎯 5 Übungs-Nuggets</button>
+        </div>
+      </div>
+
+      <!-- Bereich 1: Kaufladen -->
+      <div id="mnySec-shop" style="display: flex; flex-direction: column; gap: 14px;">
       <!-- Spiel- und Schwierigkeits-Leiste -->
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; background: #fffbeb; padding: 8px 12px; border-radius: 16px; border: 1.5px solid #fde68a;">
         <div style="display: flex; align-items: center; gap: 6px;">
@@ -583,6 +781,12 @@
         </div>
 
       </div>
+      </div>
+
+      <!-- Bereich 2: 5 Übungs-Nuggets Geld -->
+      <div id="mnySec-quiz" class="hidden">
+        <div class="quiz-container" id="mnyQuizContainer"></div>
+      </div>
     </main>
 
 
@@ -608,6 +812,7 @@
           <button id="pmSubTab-100" onclick="switchPMSub('100')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🔢 100er-Tafel</button>
           <button id="pmSubTab-bags" onclick="switchPMSub('bags')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎒 Säckchen & Murmeln</button>
           <button id="pmSubTab-line" onclick="switchPMSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Rechenleiste</button>
+          <button id="pmSubTab-quiz" onclick="switchPMSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
         </div>
       </div>
 
@@ -643,6 +848,11 @@
         <div id="pmSec-line" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 6px;">
           <span style="font-size: 12px; font-weight: 800; color: #64748b;">Zahlenstrahl mit Sprungbögen:</span>
           <canvas id="pmCanvas" width="840" height="180" style="width: 100%; background: #f8fafc; border-radius: 14px; border: 1.5px solid #cbd5e1;"></canvas>
+        </div>
+
+        <!-- 5 Übungs-Nuggets Plus & Minus 100 -->
+        <div id="pmSec-quiz" class="hidden" style="width: 100%;">
+          <div class="quiz-container" id="pmQuizContainer"></div>
         </div>
 
         <!-- Steuerung Animation -->
@@ -691,6 +901,7 @@
             <button id="mdSubTab-cookies" onclick="switchMDSub('cookies')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🍪 Backblech</button>
             <button id="mdSubTab-grid" onclick="switchMDSub('grid')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🟦 Punktefeld</button>
             <button id="mdSubTab-line" onclick="switchMDSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Zahlenstrahl</button>
+            <button id="mdSubTab-quiz" onclick="switchMDSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
           </div>
         </div>
       </div>
@@ -734,6 +945,11 @@
           <canvas id="mdCanvas" width="840" height="180" style="width: 100%; background: #f8fafc; border-radius: 14px; border: 1.5px solid #cbd5e1;"></canvas>
         </div>
 
+        <!-- 5 Übungs-Nuggets Mal & Geteilt -->
+        <div id="mdSec-quiz" class="hidden" style="width: 100%;">
+          <div class="quiz-container" id="mdQuizContainer"></div>
+        </div>
+
         <!-- Animation Controls -->
         <div style="margin-top: 6px; padding-top: 10px; border-top: 1.5px solid #f1f5f9; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
           <div style="display: flex; gap: 6px;">
@@ -752,6 +968,141 @@
       </div>
     </main>
 
+
+    <!-- ========================================================= -->
+    <!-- MODUL 5: RECHNEN BIS 1000 (TÖPFE, TAUSENDERTAFEL & NUGGETS) -->
+    <!-- ========================================================= -->
+    <main id="mod-thousand" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Eingabezeile 1000er -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #fffbeb; padding: 10px 14px; border-radius: 18px; border: 1.5px solid #fde68a;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" id="thA" value="468" min="0" max="999" class="font-num" style="width: 68px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <select id="thOp" style="font-size: 18px; font-weight: 800; padding: 6px 10px; border: 2px solid #cbd5e1; border-radius: 12px; background: white;">
+            <option value="+">+</option>
+            <option value="-">−</option>
+          </select>
+          <input type="number" id="thB" value="275" min="1" max="999" class="font-num" style="width: 68px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border: 2px solid #cbd5e1; border-radius: 12px;">
+          <button onclick="calcTHSteps()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">Rechnung laden</button>
+          <button onclick="randomTH()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Zufall</button>
+        </div>
+
+        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+          <button id="thSubTab-pots" onclick="switchTHSub('pots')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🏺 Töpfe (H-Z-E)</button>
+          <button id="thSubTab-grid" onclick="switchTHSub('grid')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🔢 Tausendertafel</button>
+          <button id="thSubTab-line" onclick="switchTHSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Zahlenstrahl</button>
+          <button id="thSubTab-quiz" onclick="switchTHSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
+        </div>
+      </div>
+
+      <!-- 4 Didaktische Formelkarten bis 1000 -->
+      <div id="thStepCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;"></div>
+
+      <!-- Anschauungsflächen 1000 -->
+      <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        
+        <!-- Ansicht 1: 100er, 10er & 1er Töpfe -->
+        <div id="thSec-pots" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- 3 Stellenwert-Töpfe nebeneinander -->
+          <div class="pot-grid">
+            <!-- 100er-Topf (Blau) -->
+            <div class="pot-card pot-card-h">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 800; color: #1e40af;">🔵 100er-Topf</span>
+                <span id="thBadgeH" class="font-num" style="background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">H: 0</span>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #3b82f6;" id="thValH">Wert: 0</div>
+              <div id="thTokensH" class="pot-tokens-area"></div>
+            </div>
+
+            <!-- 10er-Topf (Rot) -->
+            <div class="pot-card pot-card-z">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 800; color: #991b1b;">🔴 10er-Topf</span>
+                <span id="thBadgeZ" class="font-num" style="background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">Z: 0</span>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #ef4444;" id="thValZ">Wert: 0</div>
+              <div id="thTokensZ" class="pot-tokens-area"></div>
+            </div>
+
+            <!-- 1er-Topf (Grün) -->
+            <div class="pot-card pot-card-e">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 800; color: #166534;">🟢 1er-Topf</span>
+                <span id="thBadgeE" class="font-num" style="background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">E: 0</span>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #22c55e;" id="thValE">Wert: 0</div>
+              <div id="thTokensE" class="pot-tokens-area"></div>
+            </div>
+          </div>
+
+          <!-- Stellenwert-Zerlegung & Bündelungs-Hinweis -->
+          <div id="thPotFormula" style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 10px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #334155;">
+            <span>🏺 Zerlegung: <span id="thFormulaTxt" class="font-num" style="color: #b45309;">400 + 60 + 8 = 468</span></span>
+            <span id="thPotTotalBadge" class="font-num" style="background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 10px; border: 1px solid #fde68a; font-size: 15px;">Wert: 468</span>
+          </div>
+
+          <!-- Didaktische Aktions- & Übergangs-Box -->
+          <div id="thPotAction" style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 10px 14px; font-size: 12px; font-weight: 700; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+            <span>💡</span> <span id="thPotActionTxt">Ausgangszahl 468 in die 3 Töpfe einsortiert.</span>
+          </div>
+
+        </div>
+
+        <!-- Ansicht 2: Tausendertafel (10 Hunderterfelder) -->
+        <div id="thSec-grid" class="hidden" style="width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #475569;">
+              <span>🔢 Wähle ein Hunderter-Feld der Tausendertafel:</span>
+              <span id="thActiveHundredTxt" class="font-num" style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 8px;">Feld 401–500</span>
+            </div>
+            
+            <!-- 10 Hunderter-Buttons (1-100 bis 901-1000) -->
+            <div id="thHundredSelectors" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b;">
+            <span>🐸 Frosch hüpft durch die Tausendertafel:</span>
+            <div style="display: flex; gap: 8px;">
+              <span>🔵 Hunderter</span>
+              <span>🔴 Zehner</span>
+              <span>🟢 Einer</span>
+            </div>
+          </div>
+
+          <div id="thThousandBoard" class="thousand-grid" style="background: #f8fafc; padding: 8px; border-radius: 14px; border: 2px solid #cbd5e1;"></div>
+        </div>
+
+        <!-- Ansicht 3: Zahlenstrahl bis 1000 -->
+        <div id="thSec-line" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #64748b;">Zahlenstrahl 0 bis 1000 mit Sprungbögen:</span>
+          <canvas id="thCanvas" width="840" height="180" style="width: 100%; background: #f8fafc; border-radius: 14px; border: 1.5px solid #cbd5e1;"></canvas>
+        </div>
+
+        <!-- Ansicht 4: 5 Übungs-Nuggets Bis 1000 -->
+        <div id="thSec-quiz" class="hidden" style="width: 100%;">
+          <div class="quiz-container" id="thQuizContainer"></div>
+        </div>
+
+        <!-- Steuerung Animation (für Töpfe, Tafel, Leiste) -->
+        <div id="thAnimControls" style="width: 100%; margin-top: 4px; padding-top: 10px; border-top: 1.5px solid #f1f5f9; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
+            <button onclick="stepTH(-1)" class="btn btn-secondary" style="font-size: 12px;">◀ Schritt zurück</button>
+            <button id="thPlayBtn" onclick="toggleTHPlay()" class="btn btn-primary" style="font-size: 12px;">
+              <span>🎬</span> <span id="thPlayTxt">Vollanimation</span>
+            </button>
+            <button onclick="stepTH(1)" class="btn btn-secondary" style="font-size: 12px;">Schritt vor ▶</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
+            <span>Tempo:</span>
+            <input type="range" id="thSpeed" min="300" max="1800" value="800" style="width: 90px; accent-color: #f59e0b;">
+          </div>
+        </div>
+
+      </div>
+    </main>
+
   </div>
 
 
@@ -761,7 +1112,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v2';
+        const CACHE_NAME = 'lernwerkstatt-offline-v3';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -876,15 +1227,20 @@
     // NAVIGATION & GLOBALE STERNE
     // =========================================================
     function switchModule(id) {
-      ['clock', 'money', 'plusminus', 'multidiv'].forEach(m => {
-        document.getElementById(`mod-${m}`).classList.add('hidden');
-        document.getElementById(`tabBtn-${m}`).classList.remove('active');
+      ['clock', 'money', 'plusminus', 'multidiv', 'thousand'].forEach(m => {
+        const el = document.getElementById(`mod-${m}`);
+        const tab = document.getElementById(`tabBtn-${m}`);
+        if (el) el.classList.add('hidden');
+        if (tab) tab.classList.remove('active');
       });
-      document.getElementById(`mod-${id}`).classList.remove('hidden');
-      document.getElementById(`tabBtn-${id}`).classList.add('active');
+      const activeEl = document.getElementById(`mod-${id}`);
+      const activeTab = document.getElementById(`tabBtn-${id}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeTab) activeTab.classList.add('active');
 
       if (id === 'plusminus') setTimeout(renderPMLine, 40);
       if (id === 'multidiv') setTimeout(renderMDLine, 40);
+      if (id === 'thousand') setTimeout(renderTHLine, 40);
     }
 
     function addStars(n) {
@@ -1704,12 +2060,16 @@
     }
 
     function switchPMSub(id) {
-      ['100', 'bags', 'line'].forEach(x => {
-        document.getElementById(`pmSec-${x}`).classList.add('hidden');
-        document.getElementById(`pmSubTab-${x}`).className = 'btn btn-secondary';
+      ['100', 'bags', 'line', 'quiz'].forEach(x => {
+        const sec = document.getElementById(`pmSec-${x}`);
+        const btn = document.getElementById(`pmSubTab-${x}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) btn.className = 'btn btn-secondary';
       });
-      document.getElementById(`pmSec-${id}`).classList.remove('hidden');
-      document.getElementById(`pmSubTab-${id}`).className = 'btn btn-primary';
+      const activeSec = document.getElementById(`pmSec-${id}`);
+      const activeBtn = document.getElementById(`pmSubTab-${id}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = 'btn btn-primary';
       if (id === 'line') setTimeout(renderPMLine, 40);
     }
 
@@ -1947,12 +2307,16 @@
     }
 
     function switchMDSub(id) {
-      ['cookies', 'grid', 'line'].forEach(x => {
-        document.getElementById(`mdSec-${x}`).classList.add('hidden');
-        document.getElementById(`mdSubTab-${x}`).className = 'btn btn-secondary';
+      ['cookies', 'grid', 'line', 'quiz'].forEach(x => {
+        const sec = document.getElementById(`mdSec-${x}`);
+        const btn = document.getElementById(`mdSubTab-${x}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) btn.className = 'btn btn-secondary';
       });
-      document.getElementById(`mdSec-${id}`).classList.remove('hidden');
-      document.getElementById(`mdSubTab-${id}`).className = 'btn btn-primary';
+      const activeSec = document.getElementById(`mdSec-${id}`);
+      const activeBtn = document.getElementById(`mdSubTab-${id}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = 'btn btn-primary';
       if (id === 'line') setTimeout(renderMDLine, 40);
     }
 
@@ -1969,6 +2333,1321 @@
     }
 
     // =========================================================
+    // MODUS-SWITCHER UHR & GELD
+    // =========================================================
+    function switchClockSub(sub) {
+      if (sub === 'explore') {
+        document.getElementById('clkSec-explore').classList.remove('hidden');
+        document.getElementById('clkSec-quiz').classList.add('hidden');
+        document.getElementById('clkSubTab-explore').className = 'btn btn-primary';
+        document.getElementById('clkSubTab-quiz').className = 'btn btn-secondary';
+      } else {
+        document.getElementById('clkSec-explore').classList.add('hidden');
+        document.getElementById('clkSec-quiz').classList.remove('hidden');
+        document.getElementById('clkSubTab-explore').className = 'btn btn-secondary';
+        document.getElementById('clkSubTab-quiz').className = 'btn btn-primary';
+      }
+    }
+
+    function switchMoneySub(sub) {
+      if (sub === 'shop') {
+        document.getElementById('mnySec-shop').classList.remove('hidden');
+        document.getElementById('mnySec-quiz').classList.add('hidden');
+        document.getElementById('mnySubTab-shop').className = 'btn btn-primary';
+        document.getElementById('mnySubTab-quiz').className = 'btn btn-secondary';
+      } else {
+        document.getElementById('mnySec-shop').classList.add('hidden');
+        document.getElementById('mnySec-quiz').classList.remove('hidden');
+        document.getElementById('mnySubTab-shop').className = 'btn btn-secondary';
+        document.getElementById('mnySubTab-quiz').className = 'btn btn-primary';
+      }
+    }
+
+    // =========================================================
+    // MODUL 5: RECHNEN BIS 1000 (TÖPFE, TAUSENDERTAFEL & NUGGETS)
+    // =========================================================
+    let thSteps = [];
+    let thIdx = 0;
+    let thTimer = null;
+    let thPlaying = false;
+    let thActiveHundred = 4; // 0: 1-100, 1: 101-200, ... 4: 401-500
+
+    function switchTHSub(id) {
+      ['pots', 'grid', 'line', 'quiz'].forEach(x => {
+        const sec = document.getElementById(`thSec-${x}`);
+        const btn = document.getElementById(`thSubTab-${x}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) btn.className = 'btn btn-secondary';
+      });
+      const activeSec = document.getElementById(`thSec-${id}`);
+      const activeBtn = document.getElementById(`thSubTab-${id}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = 'btn btn-primary';
+
+      const animControls = document.getElementById('thAnimControls');
+      if (animControls) {
+        if (id === 'quiz') animControls.classList.add('hidden');
+        else animControls.classList.remove('hidden');
+      }
+
+      if (id === 'line') setTimeout(renderTHLine, 40);
+      if (id === 'grid') renderTHBoard();
+    }
+
+    function calcTHSteps() {
+      const a = parseInt(document.getElementById('thA').value, 10) || 0;
+      const b = parseInt(document.getElementById('thB').value, 10) || 0;
+      const op = document.getElementById('thOp').value;
+
+      thSteps = [];
+      const hB = Math.floor(b / 100) * 100;
+      const zB = Math.floor((b % 100) / 10) * 10;
+      const eB = b % 10;
+
+      let cur = a;
+      thSteps.push({
+        num: cur,
+        desc: `Start: ${cur}`,
+        h: Math.floor(cur / 100),
+        z: Math.floor((cur % 100) / 10),
+        e: cur % 10,
+        action: `Ausgangszahl ${cur} in die 3 Töpfe einsortiert: ${Math.floor(cur/100)} Hunderter, ${Math.floor((cur%100)/10)} Zehner, ${cur%10} Einer.`,
+        cardTitle: '1. Ausgangszahl',
+        delta: ''
+      });
+
+      if (op === '+') {
+        // Hunderter
+        if (hB > 0) {
+          const prev = cur;
+          cur += hB;
+          thSteps.push({
+            num: cur,
+            desc: `${prev} + ${hB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🔵 Hunderter-Schritt: +${hB / 100} Hunderter (${hB}) in den 100er-Topf gelegt.`,
+            cardTitle: '2. Hunderter addieren',
+            delta: `+${hB}`
+          });
+        }
+        // Zehner
+        if (zB > 0) {
+          const prev = cur;
+          cur += zB;
+          const prevZ = Math.floor((prev % 100) / 10);
+          const addZ = zB / 10;
+          const bundled = (prevZ + addZ >= 10);
+          thSteps.push({
+            num: cur,
+            desc: `${prev} + ${zB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🔴 Zehner-Schritt: +${addZ} Zehner (${zB}) in den 10er-Topf gelegt.` +
+                    (bundled ? ' 🔄 Übertrag: 10 Zehner voll! Zu 1 neuem Hunderter im 100er-Topf gebündelt!' : ''),
+            cardTitle: '3. Zehner addieren',
+            delta: `+${zB}`
+          });
+        }
+        // Einer
+        if (eB > 0) {
+          const prev = cur;
+          cur += eB;
+          const prevE = prev % 10;
+          const bundled = (prevE + eB >= 10);
+          thSteps.push({
+            num: cur,
+            desc: `${prev} + ${eB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🟢 Einer-Schritt: +${eB} Einer in den 1er-Topf gelegt.` +
+                    (bundled ? ' 🔄 Übertrag: 10 Einer voll! Zu 1 neuem Zehner im 10er-Topf gebündelt!' : ''),
+            cardTitle: '4. Einer addieren',
+            delta: `+${eB}`
+          });
+        }
+      } else {
+        // Subtraktion
+        if (hB > 0) {
+          const prev = cur;
+          cur = Math.max(0, cur - hB);
+          thSteps.push({
+            num: cur,
+            desc: `${prev} − ${hB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🔵 Hunderter-Schritt: −${hB / 100} Hunderter (${hB}) aus dem 100er-Topf genommen.`,
+            cardTitle: '2. Hunderter abziehen',
+            delta: `−${hB}`
+          });
+        }
+        if (zB > 0) {
+          const prev = cur;
+          const prevZ = Math.floor((prev % 100) / 10);
+          const subZ = zB / 10;
+          const unbundled = (prevZ < subZ);
+          cur = Math.max(0, cur - zB);
+          thSteps.push({
+            num: cur,
+            desc: `${prev} − ${zB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🔴 Zehner-Schritt: −${subZ} Zehner (${zB}) abgezogen.` +
+                    (unbundled ? ' 🔓 Entbündelt: 1 Hunderter wurde vorher in 10 Zehner gewechselt!' : ''),
+            cardTitle: '3. Zehner abziehen',
+            delta: `−${zB}`
+          });
+        }
+        if (eB > 0) {
+          const prev = cur;
+          const prevE = prev % 10;
+          const unbundled = (prevE < eB);
+          cur = Math.max(0, cur - eB);
+          thSteps.push({
+            num: cur,
+            desc: `${prev} − ${eB} = ${cur}`,
+            h: Math.floor(cur / 100),
+            z: Math.floor((cur % 100) / 10),
+            e: cur % 10,
+            action: `🟢 Einer-Schritt: −${eB} Einer abgezogen.` +
+                    (unbundled ? ' 🔓 Entbündelt: 1 Zehner wurde vorher in 10 Einer gewechselt!' : ''),
+            cardTitle: '4. Einer abziehen',
+            delta: `−${eB}`
+          });
+        }
+      }
+
+      thIdx = 0;
+      updateActiveHundredForCurrentStep();
+      renderTHCards();
+      renderTHPots();
+      renderTHBoard();
+      renderTHLine();
+    }
+
+    function updateActiveHundredForCurrentStep() {
+      const step = thSteps[thIdx] || thSteps[0];
+      if (step) {
+        const val = Math.max(1, Math.min(1000, step.num));
+        thActiveHundred = Math.min(9, Math.floor((val - 1) / 100));
+      }
+    }
+
+    function renderTHCards() {
+      const cont = document.getElementById('thStepCards');
+      if (!cont) return;
+      cont.innerHTML = '';
+      thSteps.forEach((st, i) => {
+        const isActive = (i === thIdx);
+        const card = document.createElement('div');
+        card.style.background = isActive ? '#fffbeb' : '#ffffff';
+        card.style.border = isActive ? '2px solid #f59e0b' : '1.5px solid #e2e8f0';
+        card.style.borderRadius = '14px';
+        card.style.padding = '8px 12px';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '2px';
+        card.style.boxShadow = isActive ? '0 4px 12px rgba(245,158,11,0.2)' : 'none';
+        card.style.cursor = 'pointer';
+        card.onclick = () => { thIdx = i; renderTHStepView(); };
+
+        card.innerHTML = `
+          <span style="font-size: 11px; font-weight: 800; color: ${isActive ? '#b45309' : '#64748b'};">${st.cardTitle}</span>
+          <span class="font-num" style="font-size: 15px; font-weight: 800; color: #1e293b;">${st.desc}</span>
+        `;
+        cont.appendChild(card);
+      });
+    }
+
+    function renderTHPots() {
+      const step = thSteps[thIdx] || thSteps[0];
+      if (!step) return;
+
+      const hCount = step.h;
+      const zCount = step.z;
+      const eCount = step.e;
+
+      // Badges
+      document.getElementById('thBadgeH').textContent = `H: ${hCount}`;
+      document.getElementById('thValH').textContent = `Wert: ${hCount * 100}`;
+      document.getElementById('thBadgeZ').textContent = `Z: ${zCount}`;
+      document.getElementById('thValZ').textContent = `Wert: ${zCount * 10}`;
+      document.getElementById('thBadgeE').textContent = `E: ${eCount}`;
+      document.getElementById('thValE').textContent = `Wert: ${eCount}`;
+
+      // Formula bar
+      document.getElementById('thFormulaTxt').textContent = `${hCount * 100} + ${zCount * 10} + ${eCount} = ${step.num}`;
+      document.getElementById('thPotTotalBadge').textContent = `Wert: ${step.num}`;
+
+      // Action banner
+      document.getElementById('thPotActionTxt').textContent = step.action;
+
+      // Tokens in 100er-Topf (Blue tiles)
+      const tokH = document.getElementById('thTokensH');
+      tokH.innerHTML = '';
+      for (let i = 0; i < hCount; i++) {
+        const t = document.createElement('div');
+        t.className = 'pot-token-h font-num';
+        t.textContent = '100';
+        t.title = 'Hunderter-Platte (100)';
+        tokH.appendChild(t);
+      }
+      if (hCount === 0) {
+        tokH.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Topf ist leer (0 Hunderter)</span>';
+      }
+
+      // Tokens in 10er-Topf (Red bars)
+      const tokZ = document.getElementById('thTokensZ');
+      tokZ.innerHTML = '';
+      for (let i = 0; i < zCount; i++) {
+        const t = document.createElement('div');
+        t.className = 'pot-token-z font-num';
+        t.textContent = '10';
+        t.title = 'Zehner-Stange (10)';
+        tokZ.appendChild(t);
+      }
+      if (zCount === 0) {
+        tokZ.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Topf ist leer (0 Zehner)</span>';
+      }
+
+      // Tokens in 1er-Topf (Green cubes)
+      const tokE = document.getElementById('thTokensE');
+      tokE.innerHTML = '';
+      for (let i = 0; i < eCount; i++) {
+        const t = document.createElement('div');
+        t.className = 'pot-token-e';
+        t.title = 'Einer-Würfel (1)';
+        tokE.appendChild(t);
+      }
+      if (eCount === 0) {
+        tokE.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Topf ist leer (0 Einer)</span>';
+      }
+    }
+
+    function selectTHHundred(hIndex) {
+      thActiveHundred = hIndex;
+      renderTHBoard();
+    }
+
+    function renderTHBoard() {
+      const selectors = document.getElementById('thHundredSelectors');
+      const board = document.getElementById('thThousandBoard');
+      if (!selectors || !board) return;
+
+      const step = thSteps[thIdx] || thSteps[0];
+      const curVal = step ? step.num : 0;
+      const startVal = thSteps[0] ? thSteps[0].num : 0;
+
+      // Render 10 Hundred-Buttons
+      selectors.innerHTML = '';
+      for (let h = 0; h < 10; h++) {
+        const s = h * 100 + 1;
+        const e = (h + 1) * 100;
+        const btn = document.createElement('button');
+        const isCurrentHundred = (thActiveHundred === h);
+        const containsCurVal = (curVal >= s && curVal <= e);
+        const containsStartVal = (startVal >= s && startVal <= e);
+
+        btn.type = 'button';
+        btn.className = isCurrentHundred ? 'btn btn-primary' : 'btn btn-secondary';
+        btn.style.padding = '4px 6px';
+        btn.style.fontSize = '10px';
+        btn.style.position = 'relative';
+
+        let badgeDot = '';
+        if (containsCurVal) badgeDot = ' 🐸';
+        else if (containsStartVal) badgeDot = ' 📍';
+
+        btn.innerHTML = `<span>${s}-${e}${badgeDot}</span>`;
+        btn.onclick = () => selectTHHundred(h);
+        selectors.appendChild(btn);
+      }
+
+      // Active Hundred Title
+      const actStart = thActiveHundred * 100 + 1;
+      const actEnd = (thActiveHundred + 1) * 100;
+      document.getElementById('thActiveHundredTxt').textContent = `Hunderter-Feld: ${actStart} – ${actEnd}`;
+
+      // Render 100 Cells for this hundred
+      board.innerHTML = '';
+      for (let n = actStart; n <= actEnd; n++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell-1000 font-num';
+        cell.textContent = n;
+
+        const isStart = (n === startVal);
+        const isCur = (n === curVal);
+
+        // Check if n was visited at any step up to thIdx
+        let wasVisited = false;
+        for (let i = 0; i <= thIdx; i++) {
+          if (thSteps[i] && thSteps[i].num === n) wasVisited = true;
+        }
+
+        if (isCur) {
+          cell.style.background = '#fef08a';
+          cell.style.border = '2.5px solid #ca8a04';
+          cell.style.color = '#713f12';
+          cell.style.fontWeight = '900';
+          cell.innerHTML = `<span style="position: absolute; top: -7px; left: 2px; font-size: 10px;">🐸</span>${n}`;
+        } else if (isStart) {
+          cell.style.background = '#fed7aa';
+          cell.style.border = '2px solid #ea580c';
+          cell.style.color = '#9a3412';
+        } else if (wasVisited) {
+          cell.style.background = '#e0f2fe';
+          cell.style.border = '1.5px solid #0284c7';
+          cell.style.color = '#0369a1';
+        }
+
+        cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
+        board.appendChild(cell);
+      }
+    }
+
+    function renderTHLine() {
+      const cvs = document.getElementById('thCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const padL = 40;
+      const padR = 40;
+      const yBase = 125;
+      const lineLen = w - padL - padR;
+
+      function getX(val) {
+        const clamped = Math.max(0, Math.min(1000, val));
+        return padL + (clamped / 1000) * lineLen;
+      }
+
+      // Draw baseline 0 to 1000
+      ctx.beginPath();
+      ctx.moveTo(padL, yBase);
+      ctx.lineTo(w - padR, yBase);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Major ticks (every 100) & Minor ticks
+      for (let v = 0; v <= 1000; v += 50) {
+        const x = getX(v);
+        const isMajor = (v % 100 === 0);
+        ctx.beginPath();
+        ctx.moveTo(x, yBase - (isMajor ? 10 : 5));
+        ctx.lineTo(x, yBase + (isMajor ? 10 : 5));
+        ctx.strokeStyle = isMajor ? '#1e293b' : '#94a3b8';
+        ctx.lineWidth = isMajor ? 2.5 : 1.2;
+        ctx.stroke();
+
+        if (isMajor) {
+          ctx.fillStyle = '#475569';
+          ctx.font = 'bold 11px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(v.toString(), x, yBase + 24);
+        }
+      }
+
+      // Draw Jump Arcs up to thIdx
+      for (let i = 1; i <= thIdx; i++) {
+        if (!thSteps[i]) continue;
+        const x1 = getX(thSteps[i-1].num);
+        const x2 = getX(thSteps[i].num);
+        const diff = Math.abs(thSteps[i].num - thSteps[i-1].num);
+        const arcH = Math.min(75, Math.max(25, 20 + Math.sqrt(diff) * 2.2));
+        const midX = (x1 + x2) / 2;
+        const peakY = yBase - arcH;
+
+        // Color based on step type
+        let col = '#2563eb';
+        if (i === 2) col = '#dc2626';
+        if (i === 3) col = '#16a34a';
+
+        ctx.beginPath();
+        ctx.moveTo(x1, yBase);
+        ctx.quadraticCurveTo(midX, peakY - 10, x2, yBase);
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Label on Arc
+        ctx.fillStyle = col;
+        ctx.font = 'bold 12px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(thSteps[i].delta || '', midX, peakY - 14);
+
+        // Dot at intermediate stop
+        ctx.beginPath();
+        ctx.arc(x1, yBase, 4, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.fill();
+      }
+
+      // Active Stop Marker
+      if (thSteps[thIdx]) {
+        const curX = getX(thSteps[thIdx].num);
+        ctx.beginPath();
+        ctx.arc(curX, yBase, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#f59e0b';
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 2.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // Frog / Label above
+        ctx.fillStyle = '#92400e';
+        ctx.font = 'bold 13px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`🐸 ${thSteps[thIdx].num}`, curX, yBase - 18);
+      }
+    }
+
+    function renderTHStepView() {
+      updateActiveHundredForCurrentStep();
+      renderTHCards();
+      renderTHPots();
+      renderTHBoard();
+      renderTHLine();
+    }
+
+    function stepTH(dir) {
+      const next = thIdx + dir;
+      if (next >= 0 && next < thSteps.length) {
+        thIdx = next;
+        playTone(380 + thIdx * 45, 'sine', 0.05);
+        renderTHStepView();
+      }
+    }
+
+    function toggleTHPlay() {
+      thPlaying = !thPlaying;
+      document.getElementById('thPlayTxt').textContent = thPlaying ? 'Stopp' : 'Vollanimation';
+      if (thPlaying) {
+        if (thIdx >= thSteps.length - 1) thIdx = 0;
+        renderTHStepView();
+        const spd = parseInt(document.getElementById('thSpeed').value, 10);
+        thTimer = setInterval(() => {
+          if (thIdx < thSteps.length - 1) stepTH(1);
+          else toggleTHPlay();
+        }, spd);
+      } else {
+        clearInterval(thTimer);
+      }
+    }
+
+    function randomTH() {
+      const isPlus = Math.random() > 0.45;
+      document.getElementById('thOp').value = isPlus ? '+' : '-';
+      if (isPlus) {
+        const a = Math.floor(Math.random() * 650) + 100;
+        const b = Math.floor(Math.random() * (990 - a)) + 20;
+        document.getElementById('thA').value = a;
+        document.getElementById('thB').value = b;
+      } else {
+        const a = Math.floor(Math.random() * 700) + 250;
+        const b = Math.floor(Math.random() * (a - 50)) + 30;
+        document.getElementById('thA').value = a;
+        document.getElementById('thB').value = b;
+      }
+      calcTHSteps();
+    }
+
+    // =========================================================
+    // HELPER: MINI-CLOCK SVG BUILDER
+    // =========================================================
+    function makeMiniClockSVG(h, m, size = 110) {
+      const cx = size / 2, cy = size / 2, r = (size / 2) - 6;
+      const hDeg = ((h % 12) + m / 60) * 30 - 90;
+      const mDeg = m * 6 - 90;
+      const hRad = hDeg * Math.PI / 180;
+      const mRad = mDeg * Math.PI / 180;
+      
+      let ticks = '';
+      for (let i = 0; i < 12; i++) {
+        const deg = (i * 30 - 90) * Math.PI / 180;
+        const x1 = cx + (r - 2) * Math.cos(deg);
+        const y1 = cy + (r - 2) * Math.sin(deg);
+        const x2 = cx + (r - 8) * Math.cos(deg);
+        const y2 = cy + (r - 8) * Math.sin(deg);
+        ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#334155" stroke-width="2"/>`;
+        const num = i === 0 ? 12 : i;
+        const nx = cx + (r - 16) * Math.cos(deg);
+        const ny = cy + (r - 16) * Math.sin(deg) + 3.5;
+        ticks += `<text x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" font-size="9" font-weight="800" text-anchor="middle" fill="#1e293b">${num}</text>`;
+      }
+
+      const hx = cx + (r * 0.52) * Math.cos(hRad);
+      const hy = cy + (r * 0.52) * Math.sin(hRad);
+      const mx = cx + (r * 0.76) * Math.cos(mRad);
+      const my = cy + (r * 0.76) * Math.sin(mRad);
+
+      return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1));">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+        ${ticks}
+        <line x1="${cx}" y1="${cy}" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#e11d48" stroke-width="4" stroke-linecap="round"/>
+        <line x1="${cx}" y1="${cy}" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="${cy}" r="4" fill="#0f172a"/>
+      </svg>`;
+    }
+
+    function pad2(n) {
+      return n < 10 ? '0' + n : '' + n;
+    }
+
+    // =========================================================
+    // QUIZ 1: LERN-UHR (5 ÜBUNGS-NUGGETS)
+    // =========================================================
+    let clkQuizData = [];
+
+    function initClockQuiz() {
+      newClockQuiz();
+    }
+
+    function newClockQuiz() {
+      clkQuizData = [];
+      const types = ['read', 'forward', 'duration', 'backward', 'colloquial'];
+      
+      // 1. Uhrzeit ablesen
+      const h1 = Math.floor(Math.random() * 12) + 1;
+      const m1 = [0, 15, 30, 45, 10, 20, 40, 50][Math.floor(Math.random() * 8)];
+      clkQuizData.push({
+        id: 0,
+        type: 'read',
+        h: h1,
+        m: m1,
+        title: 'Uhrzeit an der Uhr ablesen',
+        question: 'Wie viel Uhr zeigt diese Uhr?',
+        svg: makeMiniClockSVG(h1, m1, 115),
+        ansH: h1,
+        ansM: m1,
+        stepDesc: `Der kurze rote Zeiger steht bei ${h1}. Der lange blaue Minutenzeiger steht bei ${m1} Minuten. Umgangssprachlich: „${getGermanColloquialTime(h1 * 60 + m1)}“.`
+      });
+
+      // 2. Zeitspanne vorwärts
+      const h2 = Math.floor(Math.random() * 10) + 8;
+      const m2 = [0, 15, 30][Math.floor(Math.random() * 3)];
+      const del2 = [15, 30, 45, 60, 75][Math.floor(Math.random() * 5)];
+      const tot2 = h2 * 60 + m2 + del2;
+      const endH2 = Math.floor(tot2 / 60) % 24;
+      const endM2 = tot2 % 60;
+      clkQuizData.push({
+        id: 1,
+        type: 'forward',
+        title: 'Zeitspanne in die Zukunft berechnen',
+        question: `Es ist ${pad2(h2)}:${pad2(m2)} Uhr. Das Training dauert ${del2} Minuten. Wann ist es zu Ende?`,
+        ansH: endH2,
+        ansM: endM2,
+        stepDesc: `Startzeit: ${pad2(h2)}:${pad2(m2)} Uhr + ${del2} Minuten = ${pad2(endH2)}:${pad2(endM2)} Uhr.`
+      });
+
+      // 3. Dauer berechnen (Minuten)
+      const h3 = Math.floor(Math.random() * 6) + 13;
+      const m3 = [10, 15, 20, 30][Math.floor(Math.random() * 4)];
+      const del3 = [20, 25, 35, 45, 50][Math.floor(Math.random() * 5)];
+      const tot3 = h3 * 60 + m3 + del3;
+      const endH3 = Math.floor(tot3 / 60) % 24;
+      const endM3 = tot3 % 60;
+      clkQuizData.push({
+        id: 2,
+        type: 'duration',
+        title: 'Vergangene Minuten berechnen',
+        question: `Wie viele Minuten vergehen von ${pad2(h3)}:${pad2(m3)} Uhr bis ${pad2(endH3)}:${pad2(endM3)} Uhr?`,
+        ansMin: del3,
+        stepDesc: `Von ${pad2(h3)}:${pad2(m3)} bis zum nächsten vollen Zeitschritt und dann weiter: ${tot3} Min − ${h3*60+m3} Min = genau ${del3} Minuten.`
+      });
+
+      // 4. Zeitspanne rückwärts
+      const h4 = Math.floor(Math.random() * 8) + 12;
+      const m4 = [30, 45, 50][Math.floor(Math.random() * 3)];
+      const del4 = [15, 20, 30, 45][Math.floor(Math.random() * 4)];
+      const tot4 = h4 * 60 + m4 - del4;
+      const startH4 = Math.floor(tot4 / 60) % 24;
+      const startM4 = tot4 % 60;
+      clkQuizData.push({
+        id: 3,
+        type: 'backward',
+        title: 'Zeitspanne rückwärts rechnen',
+        question: `Der Kuchen kommt um ${pad2(h4)}:${pad2(m4)} Uhr fertig aus dem Ofen. Er musste ${del4} Minuten backen. Wann wurde er hineingestellt?`,
+        ansH: startH4,
+        ansM: startM4,
+        stepDesc: `Endzeit: ${pad2(h4)}:${pad2(m4)} Uhr minus ${del4} Minuten = ${pad2(startH4)}:${pad2(startM4)} Uhr.`
+      });
+
+      // 5. Umgangssprache in Digitalzeit
+      const collItems = [
+        { phrase: 'Viertel vor 4 am Nachmittag', h: 15, m: 45 },
+        { phrase: 'Halb 8 am Morgen', h: 7, m: 30 },
+        { phrase: 'Viertel nach 2 am Nachmittag', h: 14, m: 15 },
+        { phrase: 'Zehn vor 6 am Abend', h: 17, m: 50 },
+        { phrase: 'Fünf nach halb 1 am Mittag', h: 12, m: 35 },
+        { phrase: 'Dreiviertel 5 am Nachmittag', h: 16, m: 45 }
+      ];
+      const pick5 = collItems[Math.floor(Math.random() * collItems.length)];
+      clkQuizData.push({
+        id: 4,
+        type: 'colloquial',
+        title: 'Umgangssprache verstehen',
+        question: `Welche digitale Uhrzeit ist „${pick5.phrase}“?`,
+        ansH: pick5.h,
+        ansM: pick5.m,
+        stepDesc: `„${pick5.phrase}“ bedeutet genau ${pad2(pick5.h)}:${pad2(pick5.m)} Uhr digital.`
+      });
+
+      renderClockQuiz();
+    }
+
+    function renderClockQuiz() {
+      const cont = document.getElementById('clkQuizContainer');
+      if (!cont) return;
+
+      let htmlStr = `
+        <div class="quiz-header">
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Lern-Uhr</div>
+            <div style="font-size: 12px; color: #92400e;">Löse alle 5 Aufgaben, trage deine Werte ein und klicke auf „Prüfen & Lösen“!</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="solveClockQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
+            <button onclick="newClockQuiz()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Neue Aufgaben</button>
+          </div>
+        </div>
+      `;
+
+      clkQuizData.forEach((q, idx) => {
+        htmlStr += `
+          <div class="quiz-nugget" id="clkNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.title}</span>
+              <span id="clkStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            <div style="font-size: 14px; font-weight: 700; color: #1e293b; display: flex; flex-direction: column; gap: 8px;">
+              <div>${q.question}</div>
+              ${q.svg ? `<div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>` : ''}
+            </div>
+
+            <!-- Eingabebereich -->
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+              ${q.ansMin !== undefined ? `
+                <input type="number" id="clkInMin-${idx}" class="quiz-input font-num" placeholder="0" style="width: 80px;">
+                <span style="font-size: 14px; font-weight: 800; color: #475569;">Minuten</span>
+              ` : `
+                <input type="number" id="clkInH-${idx}" class="quiz-input font-num" placeholder="HH" style="width: 60px;">
+                <span style="font-size: 18px; font-weight: 800; color: #94a3b8;">:</span>
+                <input type="number" id="clkInM-${idx}" class="quiz-input font-num" placeholder="MM" style="width: 60px;">
+                <span style="font-size: 14px; font-weight: 800; color: #475569;">Uhr</span>
+              `}
+            </div>
+
+            <!-- Aufklappbarer Lösungsweg -->
+            <div id="clkSolution-${idx}" class="quiz-step-box hidden">
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Lösungsweg:</div>
+              <div>${q.stepDesc}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      cont.innerHTML = htmlStr;
+    }
+
+    function solveClockQuiz() {
+      let correctCount = 0;
+      clkQuizData.forEach((q, idx) => {
+        const nugget = document.getElementById(`clkNugget-${idx}`);
+        const status = document.getElementById(`clkStatus-${idx}`);
+        const sol = document.getElementById(`clkSolution-${idx}`);
+        sol.classList.remove('hidden');
+
+        let isCorrect = false;
+        if (q.ansMin !== undefined) {
+          const userMin = parseInt(document.getElementById(`clkInMin-${idx}`).value, 10);
+          isCorrect = (userMin === q.ansMin);
+        } else {
+          const userH = parseInt(document.getElementById(`clkInH-${idx}`).value, 10);
+          const userM = parseInt(document.getElementById(`clkInM-${idx}`).value, 10);
+          // Match 24h or 12h representation
+          const hMatch = (userH === q.ansH) || (userH % 12 === q.ansH % 12);
+          const mMatch = (userM === q.ansM);
+          isCorrect = (hMatch && mMatch);
+        }
+
+        if (isCorrect) {
+          correctCount++;
+          nugget.className = 'quiz-nugget correct';
+          status.textContent = '✅ Richtig!';
+        } else {
+          nugget.className = 'quiz-nugget incorrect';
+          status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === 5) {
+        addStars(10);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 'sine', 0.2);
+      }
+    }
+
+    // =========================================================
+    // QUIZ 2: EURO & CENT (5 ÜBUNGS-NUGGETS)
+    // =========================================================
+    let mnyQuizData = [];
+
+    function initMoneyQuiz() {
+      newMoneyQuiz();
+    }
+
+    function newMoneyQuiz() {
+      mnyQuizData = [];
+      
+      // 1. Zwei Artikel addieren
+      const itemsList = [
+        { name: 'Buch & Stift', aE: 4, aC: 50, bE: 1, bC: 80, desc: 'Ein Buch für 4,50 € und ein Filzstift für 1,80 €' },
+        { name: 'Eis & Limonade', aE: 2, aC: 60, bE: 1, bC: 90, desc: 'Ein Eisbecher für 2,60 € und eine Limonade für 1,90 €' },
+        { name: 'Block & Malkasten', aE: 3, aC: 40, bE: 4, bC: 70, desc: 'Ein Malblock für 3,40 € und ein Malkasten für 4,70 €' }
+      ];
+      const pick1 = itemsList[Math.floor(Math.random() * itemsList.length)];
+      const totC1 = (pick1.aE * 100 + pick1.aC) + (pick1.bE * 100 + pick1.bC);
+      mnyQuizData.push({
+        id: 0,
+        title: 'Zwei Artikel zusammenrechnen',
+        question: `${pick1.desc}. Wie viel kostet beides zusammen?`,
+        totCents: totC1,
+        stepDesc: `Euro addieren: ${pick1.aE} € + ${pick1.bE} € = ${pick1.aE + pick1.bE} €. Cent addieren: ${pick1.aC} ct + ${pick1.bC} ct = ${pick1.aC + pick1.bC} ct = 1 € ${(pick1.aC + pick1.bC) % 100} ct. Gesamt: ${Math.floor(totC1/100)} € ${totC1%100} Cent.`
+      });
+
+      // 2. Wechselgeld berechnen
+      const paidBill = [5, 10, 20][Math.floor(Math.random() * 3)];
+      const priceCents = paidBill === 5 ? (Math.floor(Math.random() * 30) + 15) * 10 : (Math.floor(Math.random() * 60) + 30) * 10;
+      const changeCents = (paidBill * 100) - priceCents;
+      mnyQuizData.push({
+        id: 1,
+        title: 'Wechselgeld an der Kasse berechnen',
+        question: `Du kaufst ein Spielzeug für ${(priceCents/100).toFixed(2).replace('.', ',')} € und bezahlst mit einem ${paidBill}-€-Schein. Wie viel Wechselgeld bekommst du heraus?`,
+        totCents: changeCents,
+        stepDesc: `Rechne schrittweise hoch: Von ${(priceCents/100).toFixed(2).replace('.', ',')} € bis zum nächsten vollen Euro und dann bis ${paidBill} €. Wechselgeld: ${Math.floor(changeCents/100)} € ${changeCents%100} Cent.`
+      });
+
+      // 3. Spardose zählen
+      const coins2e = Math.floor(Math.random() * 3) + 1;
+      const coins50c = Math.floor(Math.random() * 2) + 1;
+      const coins20c = Math.floor(Math.random() * 3) + 1;
+      const pigTot = (coins2e * 200) + (coins50c * 50) + (coins20c * 20);
+      mnyQuizData.push({
+        id: 2,
+        title: 'Münzen in der Spardose zählen',
+        question: `In deiner Spardose liegen: ${coins2e}× 2-€-Münzen, ${coins50c}× 50-Cent-Münzen und ${coins20c}× 20-Cent-Münzen. Wie viel Geld ist das zusammen?`,
+        totCents: pigTot,
+        stepDesc: `${coins2e}× 2 € = ${coins2e * 2} €. Cent zusammen: (${coins50c}× 50c) + (${coins20c}× 20c) = ${coins50c*50 + coins20c*20} ct. Gesamt: ${Math.floor(pigTot/100)} € ${pigTot%100} Cent.`
+      });
+
+      // 4. Drei Kleinigkeiten im Kaufladen
+      const cA = 80, cB = 150, cC = 70;
+      const tot4 = cA + cB + cC;
+      mnyQuizData.push({
+        id: 3,
+        title: 'Drei Einkäufe addieren',
+        question: 'Ein Brötchen (0,80 €), ein Fruchtsaft (1,50 €) und ein Apfel (0,70 €). Wie viel kostet das insgesamt?',
+        totCents: tot4,
+        stepDesc: '0,80 € + 0,70 € = 1,50 €. Dazu noch 1,50 € für den Saft = genau 3 € 00 Cent.'
+      });
+
+      // 5. Wie viel Geld fehlt noch?
+      const targetE = 8;
+      const targetC = 50;
+      const haveE = 5;
+      const haveC = 90;
+      const diffCents = (targetE * 100 + targetC) - (haveE * 100 + haveC);
+      mnyQuizData.push({
+        id: 4,
+        title: 'Wie viel Geld fehlt noch zum Wunsch?',
+        question: `Ein Comicbuch kostet ${targetE},${targetC} €. Du hast ${haveE},${haveC} € gespart. Wie viel Euro und Cent fehlen dir noch?`,
+        totCents: diffCents,
+        stepDesc: `Von ${haveE},${haveC} € bis 6,00 € fehlen 10 Cent. Von 6,00 € bis ${targetE},${targetC} € fehlen 2 € 50 Cent. Zusammen fehlen genau ${Math.floor(diffCents/100)} € ${diffCents%100} Cent.`
+      });
+
+      renderMoneyQuiz();
+    }
+
+    function renderMoneyQuiz() {
+      const cont = document.getElementById('mnyQuizContainer');
+      if (!cont) return;
+
+      let htmlStr = `
+        <div class="quiz-header">
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Euro & Cent</div>
+            <div style="font-size: 12px; color: #92400e;">Trage jeweils Euro und Cent getrennt ein und klicke auf „Prüfen & Lösen“!</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="solveMoneyQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
+            <button onclick="newMoneyQuiz()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Neue Aufgaben</button>
+          </div>
+        </div>
+      `;
+
+      mnyQuizData.forEach((q, idx) => {
+        htmlStr += `
+          <div class="quiz-nugget" id="mnyNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.title}</span>
+              <span id="mnyStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            <div style="font-size: 14px; font-weight: 700; color: #1e293b;">${q.question}</div>
+
+            <!-- Dual Inputs für € und Cent -->
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+              <input type="number" id="mnyInE-${idx}" class="quiz-input font-num" placeholder="0" style="width: 70px;">
+              <span style="font-size: 16px; font-weight: 800; color: #475569;">€</span>
+              <input type="number" id="mnyInC-${idx}" class="quiz-input font-num" placeholder="0" style="width: 70px;">
+              <span style="font-size: 16px; font-weight: 800; color: #475569;">Cent</span>
+            </div>
+
+            <!-- Aufklappbarer Lösungsweg -->
+            <div id="mnySolution-${idx}" class="quiz-step-box hidden">
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Lösungsweg:</div>
+              <div>${q.stepDesc}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      cont.innerHTML = htmlStr;
+    }
+
+    function solveMoneyQuiz() {
+      let correctCount = 0;
+      mnyQuizData.forEach((q, idx) => {
+        const nugget = document.getElementById(`mnyNugget-${idx}`);
+        const status = document.getElementById(`mnyStatus-${idx}`);
+        const sol = document.getElementById(`mnySolution-${idx}`);
+        sol.classList.remove('hidden');
+
+        const userE = parseInt(document.getElementById(`mnyInE-${idx}`).value, 10) || 0;
+        const userC = parseInt(document.getElementById(`mnyInC-${idx}`).value, 10) || 0;
+        const userTotalCents = (userE * 100) + userC;
+
+        const isCorrect = (userTotalCents === q.totCents);
+        if (isCorrect) {
+          correctCount++;
+          nugget.className = 'quiz-nugget correct';
+          status.textContent = '✅ Richtig!';
+        } else {
+          nugget.className = 'quiz-nugget incorrect';
+          status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === 5) {
+        addStars(10);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 'sine', 0.2);
+      }
+    }
+
+    // =========================================================
+    // QUIZ 3: PLUS & MINUS BIS 100 (5 ÜBUNGS-NUGGETS)
+    // =========================================================
+    let pmQuizData = [];
+
+    function initPM100Quiz() {
+      newPM100Quiz();
+    }
+
+    function newPM100Quiz() {
+      pmQuizData = [];
+      for (let i = 0; i < 5; i++) {
+        const isPlus = (i % 2 === 0);
+        if (isPlus) {
+          // Addition mit Zehnerübergang
+          const a = Math.floor(Math.random() * 45) + 26;
+          const b = Math.floor(Math.random() * 25) + 16;
+          const ans = a + b;
+          const zB = Math.floor(b / 10) * 10;
+          const eB = b % 10;
+          const stop1 = a + zB;
+          pmQuizData.push({
+            id: i,
+            op: '+',
+            a, b, ans,
+            question: `${a} + ${b} = ?`,
+            stepDesc: `1. Zehnerschritt: ${a} + ${zB} = ${stop1}. 2. Einerschritt: ${stop1} + ${eB} = ${ans}.`
+          });
+        } else {
+          // Subtraktion mit Zehnerübergang
+          const a = Math.floor(Math.random() * 40) + 55;
+          const b = Math.floor(Math.random() * 25) + 18;
+          const ans = a - b;
+          const zB = Math.floor(b / 10) * 10;
+          const eB = b % 10;
+          const stop1 = a - zB;
+          pmQuizData.push({
+            id: i,
+            op: '-',
+            a, b, ans,
+            question: `${a} − ${b} = ?`,
+            stepDesc: `1. Zehnerschritt: ${a} − ${zB} = ${stop1}. 2. Einerschritt: ${stop1} − ${eB} = ${ans}.`
+          });
+        }
+      }
+      renderPM100Quiz();
+    }
+
+    function renderPM100Quiz() {
+      const cont = document.getElementById('pmQuizContainer');
+      if (!cont) return;
+
+      let htmlStr = `
+        <div class="quiz-header">
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Plus & Minus bis 100</div>
+            <div style="font-size: 12px; color: #92400e;">Rechne mit Zehnerübergang im Kopf oder auf Papier und klicke auf „Prüfen & Lösen“!</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="solvePM100Quiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
+            <button onclick="newPM100Quiz()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Neue Aufgaben</button>
+          </div>
+        </div>
+      `;
+
+      pmQuizData.forEach((q, idx) => {
+        htmlStr += `
+          <div class="quiz-nugget" id="pmNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1} (${q.op === '+' ? 'Addition' : 'Subtraktion'})</span>
+              <span id="pmStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+              <span class="font-num">${q.question}</span>
+              <input type="number" id="pmInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 80px;">
+            </div>
+
+            <!-- Aufklappbarer Lösungsweg -->
+            <div id="pmSolution-${idx}" class="quiz-step-box hidden">
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Rechenweg:</div>
+              <div>${q.stepDesc} Ergebnis: <strong>${q.ans}</strong></div>
+            </div>
+          </div>
+        `;
+      });
+
+      cont.innerHTML = htmlStr;
+    }
+
+    function solvePM100Quiz() {
+      let correctCount = 0;
+      pmQuizData.forEach((q, idx) => {
+        const nugget = document.getElementById(`pmNugget-${idx}`);
+        const status = document.getElementById(`pmStatus-${idx}`);
+        const sol = document.getElementById(`pmSolution-${idx}`);
+        sol.classList.remove('hidden');
+
+        const userVal = parseInt(document.getElementById(`pmInAns-${idx}`).value, 10);
+        const isCorrect = (userVal === q.ans);
+
+        if (isCorrect) {
+          correctCount++;
+          nugget.className = 'quiz-nugget correct';
+          status.textContent = '✅ Richtig!';
+        } else {
+          nugget.className = 'quiz-nugget incorrect';
+          status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === 5) {
+        addStars(10);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 'sine', 0.2);
+      }
+    }
+
+    // =========================================================
+    // QUIZ 4: MAL & GETEILT (5 ÜBUNGS-NUGGETS)
+    // =========================================================
+    let mdQuizData = [];
+
+    function initMDQuiz() {
+      newMDQuiz();
+    }
+
+    function newMDQuiz() {
+      mdQuizData = [];
+      
+      // 2 Multiplikations-Aufgaben
+      for (let i = 0; i < 2; i++) {
+        const a = Math.floor(Math.random() * 6) + 4;
+        const b = Math.floor(Math.random() * 6) + 4;
+        const ans = a * b;
+        mdQuizData.push({
+          id: i,
+          type: 'mul',
+          a, b, ans,
+          question: `${a} × ${b} = ?`,
+          stepDesc: `${a} × ${b} = ${ans}. (Tipp: 5 × ${b} = ${5*b}, plus ${(a-5)*b} = ${ans})`
+        });
+      }
+
+      // 3 Divisions-Aufgaben (2 mit Rest, 1 ohne Rest)
+      const divisors = [4, 5, 6, 7, 8];
+      for (let i = 2; i < 5; i++) {
+        const div = divisors[Math.floor(Math.random() * divisors.length)];
+        const withRest = (i !== 4);
+        const quot = Math.floor(Math.random() * 5) + 3;
+        const rest = withRest ? (Math.floor(Math.random() * (div - 1)) + 1) : 0;
+        const a = quot * div + rest;
+        mdQuizData.push({
+          id: i,
+          type: 'div',
+          a, div, quot, rest,
+          question: `${a} ÷ ${div} = ?`,
+          stepDesc: `Suche das größte Vielfache von ${div} vor ${a}: ${quot} × ${div} = ${quot * div}. Rest: ${a} − ${quot * div} = ${rest}. Ergebnis: ${quot} Rest ${rest}.`
+        });
+      }
+
+      renderMDQuiz();
+    }
+
+    function renderMDQuiz() {
+      const cont = document.getElementById('mdQuizContainer');
+      if (!cont) return;
+
+      let htmlStr = `
+        <div class="quiz-header">
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Mal & Geteilt</div>
+            <div style="font-size: 12px; color: #92400e;">Bei geteilt trage auch den Rest ein (wenn kein Rest bleibt, schreibe 0).</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="solveMDQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
+            <button onclick="newMDQuiz()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Neue Aufgaben</button>
+          </div>
+        </div>
+      `;
+
+      mdQuizData.forEach((q, idx) => {
+        htmlStr += `
+          <div class="quiz-nugget" id="mdNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.type === 'mul' ? 'Multiplikation (Einmaleins)' : 'Division (Aufteilen)'}</span>
+              <span id="mdStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+              <span class="font-num">${q.question}</span>
+              ${q.type === 'mul' ? `
+                <input type="number" id="mdInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 80px;">
+              ` : `
+                <input type="number" id="mdInQuot-${idx}" class="quiz-input font-num" placeholder="Erg." style="width: 70px;">
+                <span style="font-size: 14px; font-weight: 800; color: #be123c;">Rest</span>
+                <input type="number" id="mdInRest-${idx}" class="quiz-input font-num" placeholder="0" style="width: 60px;">
+              `}
+            </div>
+
+            <!-- Aufklappbarer Lösungsweg -->
+            <div id="mdSolution-${idx}" class="quiz-step-box hidden">
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Rechenweg:</div>
+              <div>${q.stepDesc}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      cont.innerHTML = htmlStr;
+    }
+
+    function solveMDQuiz() {
+      let correctCount = 0;
+      mdQuizData.forEach((q, idx) => {
+        const nugget = document.getElementById(`mdNugget-${idx}`);
+        const status = document.getElementById(`mdStatus-${idx}`);
+        const sol = document.getElementById(`mdSolution-${idx}`);
+        sol.classList.remove('hidden');
+
+        let isCorrect = false;
+        if (q.type === 'mul') {
+          const userVal = parseInt(document.getElementById(`mdInAns-${idx}`).value, 10);
+          isCorrect = (userVal === q.ans);
+        } else {
+          const userQuot = parseInt(document.getElementById(`mdInQuot-${idx}`).value, 10);
+          const userRest = parseInt(document.getElementById(`mdInRest-${idx}`).value, 10) || 0;
+          isCorrect = (userQuot === q.quot && userRest === q.rest);
+        }
+
+        if (isCorrect) {
+          correctCount++;
+          nugget.className = 'quiz-nugget correct';
+          status.textContent = '✅ Richtig!';
+        } else {
+          nugget.className = 'quiz-nugget incorrect';
+          status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === 5) {
+        addStars(10);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 'sine', 0.2);
+      }
+    }
+
+    // =========================================================
+    // QUIZ 5: RECHNEN BIS 1000 (5 ÜBUNGS-NUGGETS)
+    // =========================================================
+    let thQuizData = [];
+
+    function initTHQuiz() {
+      newTHQuiz();
+    }
+
+    function newTHQuiz() {
+      thQuizData = [];
+      for (let i = 0; i < 5; i++) {
+        const isPlus = (i < 3); // 3x Addition, 2x Subtraktion
+        if (isPlus) {
+          const a = Math.floor(Math.random() * 450) + 120;
+          const b = Math.floor(Math.random() * (950 - a)) + 50;
+          const ans = a + b;
+          const hB = Math.floor(b / 100) * 100;
+          const zB = Math.floor((b % 100) / 10) * 10;
+          const eB = b % 10;
+          const step1 = a + hB;
+          const step2 = step1 + zB;
+          thQuizData.push({
+            id: i,
+            op: '+',
+            a, b, ans,
+            question: `${a} + ${b} = ?`,
+            stepDesc: `1. Hunderter: ${a} + ${hB} = ${step1}. 2. Zehner: ${step1} + ${zB} = ${step2}. 3. Einer: ${step2} + ${eB} = ${ans}.`
+          });
+        } else {
+          const a = Math.floor(Math.random() * 500) + 400;
+          const b = Math.floor(Math.random() * (a - 100)) + 60;
+          const ans = a - b;
+          const hB = Math.floor(b / 100) * 100;
+          const zB = Math.floor((b % 100) / 10) * 10;
+          const eB = b % 10;
+          const step1 = a - hB;
+          const step2 = step1 - zB;
+          thQuizData.push({
+            id: i,
+            op: '-',
+            a, b, ans,
+            question: `${a} − ${b} = ?`,
+            stepDesc: `1. Hunderter: ${a} − ${hB} = ${step1}. 2. Zehner: ${step1} − ${zB} = ${step2}. 3. Einer: ${step2} − ${eB} = ${ans}.`
+          });
+        }
+      }
+      renderTHQuiz();
+    }
+
+    function renderTHQuiz() {
+      const cont = document.getElementById('thQuizContainer');
+      if (!cont) return;
+
+      let htmlStr = `
+        <div class="quiz-header">
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Rechnen bis 1000</div>
+            <div style="font-size: 12px; color: #92400e;">Rechne Hunderter, Zehner und Einer schrittweise zusammen und klicke auf „Prüfen & Lösen“!</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="solveTHQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
+            <button onclick="newTHQuiz()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Neue Aufgaben</button>
+          </div>
+        </div>
+      `;
+
+      thQuizData.forEach((q, idx) => {
+        htmlStr += `
+          <div class="quiz-nugget" id="thNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1} (${q.op === '+' ? 'Addition bis 1000' : 'Subtraktion bis 1000'})</span>
+              <span id="thStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+              <span class="font-num">${q.question}</span>
+              <input type="number" id="thInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 90px;">
+            </div>
+
+            <!-- Aufklappbarer Lösungsweg -->
+            <div id="thSolution-${idx}" class="quiz-step-box hidden">
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer H-Z-E Rechenweg:</div>
+              <div>${q.stepDesc} Ergebnis: <strong>${q.ans}</strong></div>
+            </div>
+          </div>
+        `;
+      });
+
+      cont.innerHTML = htmlStr;
+    }
+
+    function solveTHQuiz() {
+      let correctCount = 0;
+      thQuizData.forEach((q, idx) => {
+        const nugget = document.getElementById(`thNugget-${idx}`);
+        const status = document.getElementById(`thStatus-${idx}`);
+        const sol = document.getElementById(`thSolution-${idx}`);
+        sol.classList.remove('hidden');
+
+        const userVal = parseInt(document.getElementById(`thInAns-${idx}`).value, 10);
+        const isCorrect = (userVal === q.ans);
+
+        if (isCorrect) {
+          correctCount++;
+          nugget.className = 'quiz-nugget correct';
+          status.textContent = '✅ Richtig!';
+        } else {
+          nugget.className = 'quiz-nugget incorrect';
+          status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === 5) {
+        addStars(10);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 'sine', 0.2);
+      }
+    }
+
+    // =========================================================
     // INITIALISIERUNG BEI LADEN
     // =========================================================
     window.onload = function() {
@@ -1976,6 +3655,12 @@
       initMoney();
       calcPMSteps();
       calcMDSteps();
+      calcTHSteps();
+      initClockQuiz();
+      initMoneyQuiz();
+      initPM100Quiz();
+      initMDQuiz();
+      initTHQuiz();
     };
   </script>
 </body>
