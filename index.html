@@ -89,6 +89,104 @@
       }
     }
 
+    /* Säckchen & Murmeln */
+    .marble {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #93c5fd 0%, #3b82f6 50%, #1d4ed8 100%);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.22), inset -1.5px -1.5px 3px rgba(0,0,0,0.35), inset 1.5px 1.5px 2px rgba(255,255,255,0.85);
+      position: relative;
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+    .marble:hover {
+      transform: scale(1.18);
+    }
+    .marble-sack {
+      background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 18px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.15);
+      min-width: 115px;
+      transition: transform 0.2s ease;
+    }
+    .marble-sack-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #92400e;
+    }
+    .marble-sack-badge {
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .marble-sack-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      background: rgba(254, 243, 199, 0.7);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px dashed #fde68a;
+    }
+    .marble-loose-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 125px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .marble-loose-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .marble-loose-badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .marble-loose-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+      align-items: center;
+      min-height: 48px;
+      background: #f8fafc;
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px dashed #cbd5e1;
+      max-width: 140px;
+    }
+
     /* 1000er Töpfe */
     .pot-grid {
       display: grid;
@@ -1194,7 +1292,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v5';
+        const CACHE_NAME = 'lernwerkstatt-offline-v6';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -2143,12 +2241,55 @@
 
       const tens = Math.floor((n % 100) / 10);
       const ones = n % 10;
+
+      let htmlStr = '';
+
+      // Zehner-Säckchen mit jeweils 10 sichtbaren Murmeln im 5x2 Zehnerfeld
       for (let t = 0; t < tens; t++) {
-        cont.innerHTML += `<div style="background:#f59e0b; color:white; border-radius:12px; padding:8px 12px; font-weight:800; font-size:12px; display:flex; flex-direction:column; align-items:center;">🎒 10er</div>`;
+        let marblesInSack = '';
+        for (let m = 0; m < 10; m++) {
+          marblesInSack += `<div class="marble" title="Murmel ${m + 1} von 10 im Säckchen"></div>`;
+        }
+
+        htmlStr += `
+          <div class="marble-sack">
+            <div class="marble-sack-header">
+              <span>🎒 Säckchen ${t + 1}</span>
+              <span class="marble-sack-badge">10</span>
+            </div>
+            <div class="marble-sack-grid" title="10er-Säckchen voll (10 Murmeln)">
+              ${marblesInSack}
+            </div>
+          </div>
+        `;
       }
-      if (ones > 0) {
-        cont.innerHTML += `<div style="background:white; border:2px solid #cbd5e1; border-radius:12px; padding:6px 10px; font-weight:800; font-size:12px; display:flex; align-items:center; gap:4px;">🔵 ${ones} Einer</div>`;
+
+      // Lose Einer-Murmeln
+      let looseMarbles = '';
+      for (let m = 0; m < ones; m++) {
+        looseMarbles += `<div class="marble" title="Lose Murmel ${m + 1}"></div>`;
       }
+
+      htmlStr += `
+        <div class="marble-loose-card">
+          <div class="marble-loose-header">
+            <span>🔵 Lose Murmeln</span>
+            <span class="marble-loose-badge">${ones}</span>
+          </div>
+          <div class="marble-loose-grid" title="${ones} lose Einer-Murmeln">
+            ${ones > 0 ? looseMarbles : '<span style="font-size: 11px; color: #94a3b8; font-style: italic; padding: 6px;">0 lose</span>'}
+          </div>
+        </div>
+      `;
+
+      // Zusammenfassungs-Banner
+      htmlStr += `
+        <div style="width: 100%; text-align: center; font-size: 12px; font-weight: 800; color: #78350f; background: #fef3c7; border: 1px solid #fde68a; border-radius: 12px; padding: 6px 12px; margin-top: 4px;">
+          🏺 Bündelung: ${tens}× 10er-Säckchen (${tens * 10} Murmeln) + ${ones} lose Murmeln = <strong>${n} Murmeln</strong>
+        </div>
+      `;
+
+      cont.innerHTML = htmlStr;
     }
 
     function renderPMLine() {
