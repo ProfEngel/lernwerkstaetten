@@ -1492,7 +1492,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v11';
+        const CACHE_NAME = 'lernwerkstatt-offline-v12';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -2268,40 +2268,51 @@
       pmPathMap[a] = 'start';
 
       if (op === '-') {
-        const onesA = a % 10;
-        const stopTen = a - onesA;
-        const rem = onesB - onesA;
+        let cur = a;
+        // 1. ZUERST ZEHNER ABZIEHEN (Zehner-Sprünge)
+        if (tensB > 0) {
+          for (let t = 0; t < tensB / 10; t++) {
+            cur -= 10;
+            pmSteps.push({ val: cur, type: 'ten' });
+            pmPathMap[cur] = 'ten';
+          }
+        }
 
-        if (onesA > 0 && onesB > onesA) {
-          for (let i = 1; i <= onesA; i++) {
-            const v = a - i;
-            const t = (i === onesA ? 'stop' : 'one');
-            pmSteps.push({ val: v, type: t });
-            pmPathMap[v] = t;
-          }
-          for (let i = 1; i <= rem; i++) {
-            const v = stopTen - i;
-            pmSteps.push({ val: v, type: 'love' });
-            pmPathMap[v] = 'love';
-          }
-          let c = stopTen - rem;
-          for (let t = 0; t < tensB / 10; t++) {
-            c -= 10;
-            pmSteps.push({ val: c, type: 'ten' });
-            pmPathMap[c] = 'ten';
-          }
-        } else {
-          for (let i = 1; i <= onesB; i++) {
-            const v = a - i;
-            const t = (v % 10 === 0) ? 'stop' : 'one';
-            pmSteps.push({ val: v, type: t });
-            pmPathMap[v] = t;
-          }
-          let c = a - onesB;
-          for (let t = 0; t < tensB / 10; t++) {
-            c -= 10;
-            pmSteps.push({ val: c, type: 'ten' });
-            pmPathMap[c] = 'ten';
+        // 2. DANN EINER-SCHRITTE, DANN ZEHNERÜBERGANG & VERLIEBTE ZAHL
+        const onesCur = cur % 10;
+        if (onesB > 0) {
+          if (onesCur > 0 && onesB > onesCur) {
+            // Zehnerübergang: Zuerst Einer-Schritte bis zum glatten Zehner
+            const stopTen = cur - onesCur;
+            for (let i = 1; i <= onesCur; i++) {
+              const v = cur - i;
+              const t = (i === onesCur ? 'stop' : 'one');
+              pmSteps.push({ val: v, type: t });
+              pmPathMap[v] = t;
+            }
+            // Dann Zehnerübergang mit der verliebten Zahl für den Rest
+            const rem = onesB - onesCur;
+            for (let i = 1; i <= rem; i++) {
+              const v = stopTen - i;
+              pmSteps.push({ val: v, type: 'love' });
+              pmPathMap[v] = 'love';
+            }
+          } else if (onesCur === 0 && onesB > 0) {
+            // Bereits ein glatter Zehner: direkt Zehnerübergang mit verliebter Zahl
+            const stopTen = cur;
+            for (let i = 1; i <= onesB; i++) {
+              const v = stopTen - i;
+              pmSteps.push({ val: v, type: 'love' });
+              pmPathMap[v] = 'love';
+            }
+          } else {
+            // Kein Zehnerübergang nötig (onesB <= onesCur)
+            for (let i = 1; i <= onesB; i++) {
+              const v = cur - i;
+              const t = (v % 10 === 0 ? 'stop' : 'one');
+              pmSteps.push({ val: v, type: t });
+              pmPathMap[v] = t;
+            }
           }
         }
       } else {
@@ -2354,12 +2365,42 @@
       const b = parseInt(document.getElementById('pmB').value, 10);
       const cont = document.getElementById('pmStepCards');
       if (op === '-') {
-        const stop = a - (a % 10);
-        const rem = (b % 10) - (a % 10);
+        const tensB = Math.floor(b / 10) * 10;
+        const onesB = b % 10;
+        const afterTens = a - tensB;
+        const onesAfter = afterTens % 10;
+        const needsTransition = (onesB > onesAfter);
+
+        let card1Html = '';
+        if (tensB > 0) {
+          card1Html = `1️⃣ Zuerst Zehner abziehen: <strong>${a} − ${tensB} = ${afterTens}</strong>`;
+        } else {
+          card1Html = `1️⃣ Keine Zehner abzuziehen: <strong>${a}</strong>`;
+        }
+
+        let card2Html = '';
+        let card3Html = '';
+
+        if (needsTransition && onesAfter > 0) {
+          const stopTen = afterTens - onesAfter;
+          const rem = onesB - onesAfter;
+          const love = 10 - rem;
+          card2Html = `2️⃣ Einer bis zum Zehner: <strong>${afterTens} − ${onesAfter} = ${stopTen}</strong>`;
+          card3Html = `3️⃣ Zehnerübergang (Verliebte Zahl zu ${rem} ist ${love}): <strong>${stopTen} − ${rem} = ${a - b}</strong>`;
+        } else if (needsTransition && onesAfter === 0) {
+          const rem = onesB;
+          const love = 10 - rem;
+          card2Html = `2️⃣ Zehner-Stopp: Bereits bei <strong>${afterTens}</strong>`;
+          card3Html = `3️⃣ Zehnerübergang (Verliebte Zahl zu ${rem} ist ${love}): <strong>${afterTens} − ${rem} = ${a - b}</strong>`;
+        } else {
+          card2Html = `2️⃣ Einer abziehen: <strong>${afterTens} − ${onesB} = ${a - b}</strong>`;
+          card3Html = `3️⃣ Zehnerübergang: <strong>Nicht nötig</strong> (Ergebnis: ${a - b})`;
+        }
+
         cont.innerHTML = `
-          <div style="background:#fef3c7; border:1px solid #fde68a; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#78350f; text-align:center;">1️⃣ Zum Zehner: ${a} − ${a % 10} = ${stop}</div>
-          <div style="background:#ffe4e6; border:1px solid #fecdd3; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#9f1239; text-align:center;">2️⃣ Verliebte Zahl: 10 − ${rem} = ${10 - rem} ➔ ${stop - rem}</div>
-          <div style="background:#ede9fe; border:1px solid #ddd6fe; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#5b21b6; text-align:center;">3️⃣ Zehner-Sprung: − ${Math.floor(b/10)*10} = ${a - b}</div>
+          <div style="background:#ede9fe; border:1.5px solid #c4b5fd; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#5b21b6; text-align:center;">${card1Html}</div>
+          <div style="background:#fef3c7; border:1.5px solid #fde68a; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#78350f; text-align:center;">${card2Html}</div>
+          <div style="background:#fce7f3; border:1.5px solid #fbcfe8; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#9d174d; text-align:center;">${card3Html}</div>
         `;
       } else {
         cont.innerHTML = `
