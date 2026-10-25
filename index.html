@@ -813,7 +813,10 @@
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <a href="./lesen.html" class="btn btn-secondary" style="text-decoration: none; padding: 6px 12px; font-size: 12.5px; font-weight: 800; background: #e0e7ff; color: #3730a3; border: 1.5px solid #c7d2fe;" title="Zur Lese-Werkstatt">
+            📖 Lese-Werkstatt
+          </a>
           <div style="background: #fef3c7; border: 1.5px solid #fcd34d; border-radius: 14px; padding: 4px 10px; display: flex; align-items: center; gap: 6px;">
             <span style="font-size: 18px;">⭐</span>
             <span id="starCounter" class="font-num" style="font-weight: 800; color: #92400e; font-size: 16px;">0</span>
@@ -1505,11 +1508,17 @@
         const ASSETS = [
           './',
           './index.html',
+          './lesen.html',
           './manifest.json',
+          './manifest-lese.json',
           './apple-touch-icon.png',
+          './apple-touch-icon-lese.png',
           './favicon-32x32.png',
+          './favicon-lese-32x32.png',
           './icon-192.png',
-          './icon-512.png'
+          './icon-lese-192.png',
+          './icon-512.png',
+          './icon-lese-512.png'
         ];
         self.addEventListener('install', e => {
           e.waitUntil(

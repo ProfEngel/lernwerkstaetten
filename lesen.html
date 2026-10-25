@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Lese-Werkstatt</title>
+
+  <!-- PWA & iPad Home Screen Konfiguration -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LeseWerkstatt">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#4f46e5">
+
+  <!-- Offline-App Icon für iPhone, iPad & PWA -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-lese.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-lese-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-lese-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-lese-512.png">
+  <link rel="manifest" href="manifest-lese.json">
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --accent: #0284c7;
+      --accent-green: #10b981;
+      --accent-rose: #f43f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 16px) calc(var(--safe-left) + 12px);
+      background: #f8fafc;
+      color: #1e293b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-card {
+      width: 100%;
+      max-width: 900px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid #e2e8f0;
+    }
+
+    @media (min-width: 640px) {
+      .app-card {
+        padding: 24px;
+        gap: 18px;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 32px;
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      padding: 8px 12px;
+      border-radius: 16px;
+      border: 1.5px solid #a5b4fc;
+      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.15);
+    }
+
+    .app-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #1e1b4b;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .app-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      margin: 2px 0 0 0;
+    }
+
+    .star-pill {
+      background: #fef3c7;
+      border: 1.5px solid #fde68a;
+      color: #b45309;
+      font-size: 15px;
+      font-weight: 900;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 5px rgba(245, 158, 11, 0.15);
+    }
+
+    /* Buttons */
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: #4338ca;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-danger {
+      background: #f43f5e;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+    }
+
+    /* Klassenstufen-Auswahl Leiste */
+    .grade-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 18px;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    .grade-pill-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .grade-pill {
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .grade-pill.active-1 {
+      border-color: #22c55e;
+      background: #dcfce7;
+      color: #15803d;
+      box-shadow: 0 3px 8px rgba(34, 197, 94, 0.2);
+    }
+
+    .grade-pill.active-2 {
+      border-color: #f59e0b;
+      background: #fef3c7;
+      color: #b45309;
+      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.2);
+    }
+
+    .grade-pill.active-3 {
+      border-color: #ea580c;
+      background: #ffedd5;
+      color: #c2410c;
+      box-shadow: 0 3px 8px rgba(234, 88, 12, 0.2);
+    }
+
+    .grade-pill.active-4 {
+      border-color: #8b5cf6;
+      background: #ede9fe;
+      color: #6d28d9;
+      box-shadow: 0 3px 8px rgba(139, 92, 246, 0.2);
+    }
+
+    /* Hauptnavigation */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tab {
+      flex: 1;
+      min-width: 135px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab.active {
+      border-color: #4f46e5;
+      background: #e0e7ff;
+      color: #3730a3;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.18);
+    }
+
+    /* Content Area */
+    .content-box {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Blitzlesen Display */
+    .flash-card {
+      min-height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 2px dashed #cbd5e1;
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .flash-word {
+      font-size: 44px;
+      font-weight: 900;
+      color: #1e1b4b;
+      letter-spacing: 0.5px;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    @media (min-width: 640px) {
+      .flash-word {
+        font-size: 54px;
+      }
+    }
+
+    /* Silben-Styles */
+    .syllable-blue {
+      color: #0284c7;
+      font-weight: 900;
+    }
+
+    .syllable-red {
+      color: #e11d48;
+      font-weight: 900;
+    }
+
+    /* Silbenbögen SVG */
+    .syllable-arc-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 4px;
+    }
+
+    /* Lesetreppe */
+    .pyramid-row {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #334155;
+      transition: all 0.25s ease;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .pyramid-row.active {
+      background: #e0e7ff;
+      border-color: #6366f1;
+      color: #3730a3;
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Karaoke Text */
+    .karaoke-text {
+      font-size: 20px;
+      line-height: 1.7;
+      font-weight: 700;
+      color: #334155;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+    }
+
+    .karaoke-word {
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .karaoke-word.active {
+      background: #fef08a;
+      color: #854d0e;
+      transform: scale(1.12);
+      font-weight: 900;
+      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.35);
+    }
+
+    .karaoke-word.read {
+      color: #94a3b8;
+    }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-card">
+    <!-- Header -->
+    <header class="header">
+      <div class="title-row">
+        <span class="logo-icon">📖</span>
+        <div>
+          <h1 class="app-title">Lese-Werkstatt</h1>
+          <p class="app-sub">Flüssig, schnell & sinnerfassend lesen lernen</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <a href="./index.html" class="btn btn-secondary" style="text-decoration: none; font-size: 13px;">
+          🎒 Zur Mathe-Werkstatt
+        </a>
+        <div class="star-pill">
+          <span>⭐</span>
+          <span id="starCounter" class="font-num">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Klassenstufen-Leiste (Wortschatz-Auswahl) -->
+    <div class="grade-bar">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 12px; font-weight: 900; color: #475569; text-transform: uppercase;">📚 Wortschatz:</span>
+        <span id="gradeDescBadge" style="font-size: 12px; font-weight: 800; color: #1e1b4b; background: #e2e8f0; padding: 2px 8px; border-radius: 8px;">1. Klasse</span>
+      </div>
+      <div class="grade-pill-group">
+        <button id="gradeBtn-1" onclick="setGrade(1)" class="grade-pill active-1">🟢 1. Klasse</button>
+        <button id="gradeBtn-2" onclick="setGrade(2)" class="grade-pill">🟡 2. Klasse</button>
+        <button id="gradeBtn-3" onclick="setGrade(3)" class="grade-pill">🟠 3. Klasse</button>
+        <button id="gradeBtn-4" onclick="setGrade(4)" class="grade-pill">🟣 4. Klasse</button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button id="tab-flash" onclick="switchTab('flash')" class="nav-tab active">
+        <span>⚡</span> Blitzlesen
+      </button>
+      <button id="tab-syllables" onclick="switchTab('syllables')" class="nav-tab">
+        <span>🔴🔵</span> Silben-Werkstatt
+      </button>
+      <button id="tab-nonsense" onclick="switchTab('nonsense')" class="nav-tab">
+        <span>🔍</span> Quatschwort-Check
+      </button>
+      <button id="tab-pyramid" onclick="switchTab('pyramid')" class="nav-tab">
+        <span>🪜</span> Lesetreppen
+      </button>
+      <button id="tab-karaoke" onclick="switchTab('karaoke')" class="nav-tab">
+        <span>📖</span> Lese-Karaoke
+      </button>
+    </nav>
+
+    <!-- MODUL 1: BLITZLESEN -->
+    <div id="sec-flash" class="content-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #1e1b4b;">⚡ Blitzlesen (Sichtwortschatz)</div>
+          <div style="font-size: 12px; color: #64748b;">Das Wort blitzt kurz auf – erfasse es mit einem Blick ganzheitlich!</div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span style="font-size: 12px; font-weight: 800; color: #475569;">Tempo:</span>
+          <span id="flashSpeedLabel" class="font-num" style="font-size: 13px; font-weight: 900; color: #4f46e5; background: #e0e7ff; padding: 2px 8px; border-radius: 8px;">0.8 s</span>
+          <input type="range" id="flashSpeedSlider" min="2" max="20" value="8" step="1" oninput="updateFlashSpeed(this.value)" style="accent-color: #4f46e5; width: 100px; cursor: pointer;">
+        </div>
+      </div>
+
+      <!-- Blitz-Kartenfeld -->
+      <div class="flash-card" id="flashCard">
+        <div id="flashWordDisplay" class="flash-word">Bereit?</div>
+      </div>
+
+      <!-- Steuerungs- und Auswahlbereich -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <button onclick="startFlashWord()" class="btn btn-primary" id="flashTriggerBtn" style="padding: 10px 20px; font-size: 15px;">
+          ⚡ Wort aufblitzen lassen
+        </button>
+        <div style="font-size: 13px; font-weight: 800; color: #64748b;">
+          Serie: <span id="flashStreakTxt" class="font-num" style="color: #ea580c; font-size: 16px;">🔥 0</span> | 
+          Treffer: <span id="flashScoreTxt" class="font-num" style="color: #15803d; font-size: 15px;">0</span>
+        </div>
+      </div>
+
+      <!-- Multiple Choice Optionen nach Aufblitzen -->
+      <div id="flashChoiceBox" class="hidden" style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 13px; font-weight: 800; color: #475569; text-align: center;">Welches Wort war zu sehen?</div>
+        <div id="flashChoiceGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- MODUL 2: SILBEN-WERKSTATT -->
+    <div id="sec-syllables" class="content-box hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #1e1b4b;">🔴🔵 Silben-Werkstatt</div>
+          <div style="font-size: 12px; color: #64748b;">Wörter in zwei Farben gliedern – schneller und leichter lesen!</div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button id="syllArcToggleBtn" onclick="toggleSyllArcs()" class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;">
+            ◡◡ Silbenbögen: AN
+          </button>
+          <button onclick="nextSyllableWord()" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">
+            🎲 Nächstes Wort
+          </button>
+        </div>
+      </div>
+
+      <!-- Wortanzeige in Silben -->
+      <div style="min-height: 140px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; gap: 8px;">
+        <div id="syllWordContainer" style="display: flex; align-items: flex-end; justify-content: center; gap: 6px; flex-wrap: wrap;"></div>
+        <div id="syllCountTxt" style="font-size: 13px; font-weight: 800; color: #64748b;">2 Silben</div>
+      </div>
+
+      <!-- Silben-Puzzle Spiel -->
+      <div style="background: #eef2ff; border: 1.5px solid #c7d2fe; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 12px; font-weight: 900; color: #3730a3; text-transform: uppercase;">🎯 Silben-Puzzle: Baue das Wort in der richtigen Reihenfolge zusammen!</div>
+        <div id="syllPuzzlePieces" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;"></div>
+        <div id="syllPuzzleStatus" style="font-size: 13px; font-weight: 800; text-align: center; color: #4338ca; min-height: 20px;">Tippe die Silben nacheinander an.</div>
+      </div>
+    </div>
+
+    <!-- MODUL 3: QUATSCHWORT-CHECK -->
+    <div id="sec-nonsense" class="content-box hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #1e1b4b;">🔍 Quatschwort-Check (Genauigkeits-Booster)</div>
+          <div style="font-size: 12px; color: #64748b;">Lies ganz genau bis zum Ende – nicht einfach raten!</div>
+        </div>
+        <div style="font-size: 13px; font-weight: 800; color: #64748b;">
+          Punkte: <span id="nonsenseScoreTxt" class="font-num" style="color: #10b981; font-size: 15px;">0</span>
+        </div>
+      </div>
+
+      <div style="min-height: 140px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+        <span id="nonsenseWordDisplay" style="font-size: 46px; font-weight: 900; color: #1e1b4b; letter-spacing: 1px;">Kanne</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <button onclick="checkNonsense(true)" class="btn btn-success" style="padding: 14px; font-size: 16px;">
+          ✅ Echtes Wort
+        </button>
+        <button onclick="checkNonsense(false)" class="btn btn-danger" style="padding: 14px; font-size: 16px;">
+          ❌ Quatschwort
+        </button>
+      </div>
+
+      <div id="nonsenseFeedback" class="hidden" style="padding: 12px; border-radius: 14px; font-size: 14px; font-weight: 800; text-align: center;"></div>
+    </div>
+
+    <!-- MODUL 4: LESETREPPEN -->
+    <div id="sec-pyramid" class="content-box hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #1e1b4b;">🪜 Lesetreppen (Blickspanne erweitern)</div>
+          <div style="font-size: 12px; color: #64748b;">Schritt für Schritt wächst der Satz – überfliege die Wörter flüssig!</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button onclick="nextPyramid()" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+            🎲 Neuer Satz
+          </button>
+          <button onclick="stepPyramid()" class="btn btn-primary" style="font-size: 12px; padding: 6px 14px;">
+            Stufe weiter ➔
+          </button>
+        </div>
+      </div>
+
+      <div id="pyramidContainer" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px; background: #ffffff; border: 2px solid #e0e7ff; border-radius: 18px; min-height: 200px;"></div>
+    </div>
+
+    <!-- MODUL 5: LESE-KARAOKE -->
+    <div id="sec-karaoke" class="content-box hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #1e1b4b;">📖 Lese-Karaoke (Text-Fluss & Sinnentnahme)</div>
+          <div style="font-size: 12px; color: #64748b;">Der Leuchtmarker führt deine Augen im passenden Tempo!</div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 4px; background: #f1f5f9; padding: 4px 8px; border-radius: 10px;">
+            <span style="font-size: 11px; font-weight: 800; color: #475569;">Tempo:</span>
+            <span id="karaokeWpmTxt" class="font-num" style="font-size: 13px; font-weight: 900; color: #0284c7;">70 WpM</span>
+          </div>
+          <input type="range" id="karaokeSpeedSlider" min="40" max="150" value="70" step="5" oninput="updateKaraokeSpeed(this.value)" style="accent-color: #0284c7; width: 85px; cursor: pointer;">
+          <button onclick="toggleKaraokePlay()" class="btn btn-primary" id="karaokePlayBtn" style="padding: 6px 12px; font-size: 12px;">
+            ▶️ Start
+          </button>
+          <button onclick="nextKaraokeStory()" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;">
+            🎲 Andere Geschichte
+          </button>
+        </div>
+      </div>
+
+      <!-- Karaoke Text Box -->
+      <div id="karaokeTextBox" class="karaoke-text"></div>
+
+      <!-- Verständnis-Fragen Box -->
+      <div id="karaokeQuizBox" class="hidden" style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 13px; font-weight: 900; color: #166534; text-transform: uppercase;">🎯 Verständnis-Check: Hast du alles verstanden?</div>
+        <div id="karaokeQuestionList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        <button onclick="solveKaraokeQuiz()" class="btn btn-success" style="align-self: flex-start; padding: 7px 14px; font-size: 13px;">
+          ✨ Antworten prüfen
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================
+    // INLINE SERVICE WORKER (100% OFFLINE)
+    // =========================================================
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'lesewerkstatt-offline-v1';
+        const ASSETS = [
+          './lesen.html',
+          './manifest-lese.json',
+          './apple-touch-icon-lese.png',
+          './favicon-lese-32x32.png',
+          './icon-lese-192.png',
+          './icon-lese-512.png'
+        ];
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).catch(() => {}));
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => clients.claim()));
+        });
+        self.addEventListener('fetch', e => {
+          e.respondWith(fetch(e.request).catch(() => caches.match(e.request).then(c => c || caches.match('./lesen.html'))));
+        });
+      `;
+      try {
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      } catch (err) {}
+    }
+
+    // =========================================================
+    // AUDIO SYNTHESIZER
+    // =========================================================
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1) {
+      try {
+        const ctx = getAudio();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      playTone(523.25, 'sine', 0.08);
+      setTimeout(() => playTone(659.25, 'sine', 0.08), 80);
+      setTimeout(() => playTone(783.99, 'sine', 0.15), 160);
+    }
+
+    function playSuccessFanfare() {
+      playTone(587.33, 'triangle', 0.1);
+      setTimeout(() => playTone(739.99, 'triangle', 0.1), 100);
+      setTimeout(() => playTone(880.00, 'triangle', 0.22), 200);
+    }
+
+    function addStars(n) {
+      const el = document.getElementById('starCounter');
+      el.textContent = parseInt(el.textContent, 10) + n;
+    }
+
+    // =========================================================
+    // KONFETTI ANIMATION
+    // =========================================================
+    function fireConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = [];
+      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+      for (let i = 0; i < 70; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height * 0.4,
+          r: Math.random() * 5 + 3,
+          d: Math.random() * 3 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          tilt: Math.random() * 10 - 5,
+          tiltAngle: 0,
+          tiltAngleInc: Math.random() * 0.07 + 0.05
+        });
+      }
+      let frames = 0;
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.tiltAngle += p.tiltAngleInc;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) * 0.9;
+          p.tilt = Math.sin(p.tiltAngle) * 12;
+          ctx.beginPath();
+          ctx.lineWidth = p.r;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+          ctx.stroke();
+        });
+        frames++;
+        if (frames < 80) requestAnimationFrame(render);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      render();
+    }
+
+    // =========================================================
+    // WÖRTER-DATENBANK NACH KLASSENSTUFEN (1 BIS 4)
+    // =========================================================
+    let currentGrade = 1;
+
+    const WORDS_DB = {
+      1: {
+        label: "1. Klasse (Silben & Lautgetreue Wörter)",
+        words: [
+          { word: "Oma", syll: ["O", "ma"] },
+          { word: "Mimi", syll: ["Mi", "mi"] },
+          { word: "Nase", syll: ["Na", "se"] },
+          { word: "Sonne", syll: ["Son", "ne"] },
+          { word: "Hut", syll: ["Hut"] },
+          { word: "Ball", syll: ["Ball"] },
+          { word: "Rose", syll: ["Ro", "se"] },
+          { word: "Dino", syll: ["Di", "no"] },
+          { word: "Lama", syll: ["La", "ma"] },
+          { word: "Eule", syll: ["Eu", "le"] },
+          { word: "Wal", syll: ["Wal"] },
+          { word: "Dose", syll: ["Do", "se"] },
+          { word: "Tor", syll: ["Tor"] },
+          { word: "Ast", syll: ["Ast"] },
+          { word: "Nest", syll: ["Nest"] },
+          { word: "Boot", syll: ["Boot"] },
+          { word: "Mond", syll: ["Mond"] },
+          { word: "Fisch", syll: ["Fisch"] },
+          { word: "Hand", syll: ["Hand"] },
+          { word: "Buch", syll: ["Buch"] },
+          { word: "Baum", syll: ["Baum"] },
+          { word: "Ente", syll: ["En", "te"] },
+          { word: "Maus", syll: ["Maus"] },
+          { word: "Käse", syll: ["Kä", "se"] },
+          { word: "Löwe", syll: ["Lö", "we"] },
+          { word: "Auto", syll: ["Au", "to"] }
+        ],
+        nonsense: [
+          { text: "Nase", real: true, hint: "Ein echtes Wort!" },
+          { text: "Nese", real: false, hint: "Quatsch! Es heißt Nase mit a." },
+          { text: "Sonne", real: true, hint: "Ein echtes Wort!" },
+          { text: "Sone", real: false, hint: "Quatsch! Sonne schreibt man mit Doppel-n." },
+          { text: "Lama", real: true, hint: "Ein echtes Wort!" },
+          { text: "Lamo", real: false, hint: "Quatsch! Es heißt Lama mit a am Ende." },
+          { text: "Eule", real: true, hint: "Ein echtes Wort!" },
+          { text: "Eulo", real: false, hint: "Quatsch! Es heißt Eule mit e." },
+          { text: "Mond", real: true, hint: "Ein echtes Wort!" },
+          { text: "Moud", real: false, hint: "Quatsch! Mond schreibt man mit n." }
+        ],
+        pyramids: [
+          [
+            "Der Hund",
+            "Der brave Hund",
+            "Der brave Hund rennt.",
+            "Der brave Hund rennt zum Ball."
+          ],
+          [
+            "Die Katze",
+            "Die weiße Katze",
+            "Die weiße Katze schläft.",
+            "Die weiße Katze schläft im Korb."
+          ]
+        ],
+        stories: [
+          {
+            title: "Mimi auf dem Baum",
+            text: "Mimi ist eine kleine Katze. Sie klettert gerne auf den hohen Baum. Von oben sieht sie eine kleine Maus. Die Maus flitzt schnell in ihr Nest.",
+            questions: [
+              { q: "Wer klettert auf den Baum?", options: ["Die Katze Mimi", "Ein Hund", "Ein Dino"], correct: 0 },
+              { q: "Wohin flitzt die Maus?", options: ["In den See", "In ihr Nest", "Auf das Dach"], correct: 1 }
+            ]
+          }
+        ]
+      },
+      2: {
+        label: "2. Klasse (Grundwortschatz & Doppelkonsonanten)",
+        words: [
+          { word: "Schnecke", syll: ["Schnek", "ke"] },
+          { word: "Katze", syll: ["Kat", "ze"] },
+          { word: "Brief", syll: ["Brief"] },
+          { word: "Winter", syll: ["Win", "ter"] },
+          { word: "Wolke", syll: ["Wol", "ke"] },
+          { word: "Sommer", syll: ["Som", "mer"] },
+          { word: "Apfel", syll: ["Ap", "fel"] },
+          { word: "Pferd", syll: ["Pferd"] },
+          { word: "Traum", syll: ["Traum"] },
+          { word: "Garten", syll: ["Gar", "ten"] },
+          { word: "Teller", syll: ["Tel", "ler"] },
+          { word: "Vogel", syll: ["Vo", "gel"] },
+          { word: "Regen", syll: ["Re", "gen"] },
+          { word: "Brille", syll: ["Bril", "le"] },
+          { word: "Fenster", syll: ["Fen", "ster"] },
+          { word: "Wasser", syll: ["Was", "ser"] },
+          { word: "Schere", syll: ["Sche", "re"] },
+          { word: "Zirkus", syll: ["Zir", "kus"] },
+          { word: "Koffer", syll: ["Kof", "fer"] },
+          { word: "Schatz", syll: ["Schatz"] },
+          { word: "Schule", syll: ["Schu", "le"] },
+          { word: "Freund", syll: ["Freund"] },
+          { word: "Bruder", syll: ["Bru", "der"] },
+          { word: "Schwester", syll: ["Schwe", "ster"] },
+          { word: "Drache", syll: ["Dra", "che"] }
+        ],
+        nonsense: [
+          { text: "Schnecke", real: true, hint: "Ein echtes Wort!" },
+          { text: "Schencke", real: false, hint: "Quatsch! ch vor n ist falsch vertauscht." },
+          { text: "Katze", real: true, hint: "Ein echtes Wort!" },
+          { text: "Kaze", real: false, hint: "Quatsch! Katze schreibt man mit tz." },
+          { text: "Fenster", real: true, hint: "Ein echtes Wort!" },
+          { text: "Fensdr", real: false, hint: "Quatsch! Fenster endet auf ter." },
+          { text: "Wasser", real: true, hint: "Ein echtes Wort!" },
+          { text: "Waser", real: false, hint: "Quatsch! Wasser schreibt man mit Doppel-s." },
+          { text: "Drache", real: true, hint: "Ein echtes Wort!" },
+          { text: "Drachek", real: false, hint: "Quatsch! Kein k am Ende." }
+        ],
+        pyramids: [
+          [
+            "Ein Frosch",
+            "Ein grüner Frosch",
+            "Ein grüner Frosch hüpft",
+            "Ein grüner Frosch hüpft in den Teich."
+          ],
+          [
+            "Der Drache",
+            "Der bunte Drache",
+            "Der bunte Drache fliegt hoch",
+            "Der bunte Drache fliegt hoch in den Wind."
+          ]
+        ],
+        stories: [
+          {
+            title: "Leos Ausflug",
+            text: "Leo packt seinen roten Koffer für den großen Ausflug. Er nimmt warme Socken und eine Lupe mit. Im dichten Wald entdeckt er eine bunte Schnecke auf einem Mooskissen.",
+            questions: [
+              { q: "Welche Farbe hat der Koffer?", options: ["Blau", "Rot", "Grün"], correct: 1 },
+              { q: "Was entdeckt Leo im Wald?", options: ["Eine bunte Schnecke", "Einen Wolf", "Ein Fahrrad"], correct: 0 }
+            ]
+          }
+        ]
+      },
+      3: {
+        label: "3. Klasse (Zusammengesetzte Nomen & Dehnungen)",
+        words: [
+          { word: "Fahrrad", syll: ["Fahr", "rad"] },
+          { word: "Geburtstag", syll: ["Ge", "burts", "tag"] },
+          { word: "Schloss", syll: ["Schloss"] },
+          { word: "gefährlich", syll: ["ge", "fähr", "lich"] },
+          { word: "Schmetterling", syll: ["Schmet", "ter", "ling"] },
+          { word: "Zahnarzt", syll: ["Zahn", "arzt"] },
+          { word: "Gewitter", syll: ["Ge", "wit", "ter"] },
+          { word: "plötzlich", syll: ["plötz", "lich"] },
+          { word: "Frühling", syll: ["Früh", "ling"] },
+          { word: "Gespenst", syll: ["Ge", "spenst"] },
+          { word: "Geheimnis", syll: ["Ge", "heim", "nis"] },
+          { word: "Taschenlampe", syll: ["Ta", "schen", "lam", "pe"] },
+          { word: "Regenbogen", syll: ["Re", "gen", "bo", "gen"] },
+          { word: "Zauberer", syll: ["Zau", "be", "rer"] },
+          { word: "Rucksack", syll: ["Ruck", "sack"] },
+          { word: "Frühstück", syll: ["Früh", "stück"] },
+          { word: "Elefant", syll: ["E", "le", "fant"] },
+          { word: "Erfinder", syll: ["Er", "fin", "der"] },
+          { word: "Kompass", syll: ["Kom", "pass"] },
+          { word: "Flugzeug", syll: ["Flug", "zeug"] }
+        ],
+        nonsense: [
+          { text: "Fahrrad", real: true, hint: "Ein echtes Wort!" },
+          { text: "Farad", real: false, hint: "Quatsch! Fahrrad schreibt man mit h und Doppel-r." },
+          { text: "Zahnarzt", real: true, hint: "Ein echtes Wort!" },
+          { text: "Zanarzt", real: false, hint: "Quatsch! Zahnarzt braucht das Dehnungs-h." },
+          { text: "plötzlich", real: true, hint: "Ein echtes Wort!" },
+          { text: "plözlich", real: false, hint: "Quatsch! plötzlich schreibt man mit tz." },
+          { text: "Frühling", real: true, hint: "Ein echtes Wort!" },
+          { text: "Fruling", real: false, hint: "Quatsch! Frühling braucht das ü und h." }
+        ],
+        pyramids: [
+          [
+            "Ein altes Schloss",
+            "Ein altes Schloss im Nebel",
+            "Ein altes Schloss steht im Nebel.",
+            "Ein altes Schloss steht im tiefen Nebel auf dem Berg."
+          ]
+        ],
+        stories: [
+          {
+            title: "Das Gewitter am Samstag",
+            text: "Am Samstag repariert Jonas sein blaues Fahrrad im Hof. Plötzlich hört er ein lautes Gewitter am Himmel grollen. Schnell rollt er das Rad in den Schuppen und schaltet seine Taschenlampe ein.",
+            questions: [
+              { q: "Was repariert Jonas?", options: ["Sein Fahrrad", "Sein Boot", "Ein Skateboard"], correct: 0 },
+              { q: "Wohin bringt er das Rad?", options: ["In den Keller", "In den Schuppen", "Ins Wohnzimmer"], correct: 1 }
+            ]
+          }
+        ]
+      },
+      4: {
+        label: "4. Klasse (Anspruchsvoller Wortschatz & Tempo)",
+        words: [
+          { word: "Bibliothek", syll: ["Bib", "li", "o", "thek"] },
+          { word: "Abenteuer", syll: ["A", "ben", "teu", "er"] },
+          { word: "Experiment", syll: ["Ex", "pe", "ri", "ment"] },
+          { word: "Expedition", syll: ["Ex", "pe", "di", "ti", "on"] },
+          { word: "riesengroß", syll: ["rie", "sen", "groß"] },
+          { word: "Dschungel", syll: ["Dschun", "gel"] },
+          { word: "Atmosphäre", syll: ["At", "mo", "sphä", "re"] },
+          { word: "fantastisch", syll: ["fan", "tas", "tisch"] },
+          { word: "Mikroskop", syll: ["Mi", "kro", "skop"] },
+          { word: "Teleskop", syll: ["Te", "le", "skop"] },
+          { word: "Raumschiff", syll: ["Raum", "schiff"] },
+          { word: "Vulkan", syll: ["Vul", "kan"] },
+          { word: "Pyramide", syll: ["Py", "ra", "mi", "de"] },
+          { word: "Dinosaurier", syll: ["Di", "no", "sau", "ri", "er"] },
+          { word: "Zeitmaschine", syll: ["Zeit", "ma", "schi", "ne"] },
+          { word: "Labyrinth", syll: ["La", "by", "rinth"] }
+        ],
+        nonsense: [
+          { text: "Bibliothek", real: true, hint: "Ein echtes Wort!" },
+          { text: "Biblotek", real: false, hint: "Quatsch! Es heißt Bibliothek mit i und th." },
+          { text: "Dschungel", real: true, hint: "Ein echtes Wort!" },
+          { text: "Jungel", real: false, hint: "Quatsch! Dschungel schreibt man mit Dsch." },
+          { text: "Atmosphäre", real: true, hint: "Ein echtes Wort!" },
+          { text: "Atmosfere", real: false, hint: "Quatsch! Atmosphäre schreibt man mit ph und ä." }
+        ],
+        pyramids: [
+          [
+            "Das alte Teleskop",
+            "Das alte Teleskop im Turm",
+            "Das alte Teleskop im Turm zeigt Sterne.",
+            "Das alte Teleskop im Turm zeigt die funkelnden Sterne der fernen Galaxie."
+          ]
+        ],
+        stories: [
+          {
+            title: "Die Dschungel-Expedition",
+            text: "Professor Nova forscht tief im dichten Dschungel nach einer versunkenen Pyramide. Mit seinem Kompass bahnt er sich einen sicheren Pfad durch das Dickicht. Plötzlich leuchtet eine versteckte Geheimtür im Felsgestein auf.",
+            questions: [
+              { q: "Wonach forscht Professor Nova?", options: ["Nach einer versunkenen Pyramide", "Nach einem Dinosaurier", "Nach einem Vulkan"], correct: 0 },
+              { q: "Was leuchtet im Felsgestein auf?", options: ["Eine Goldmünze", "Eine versteckte Geheimtür", "Eine Fackel"], correct: 1 }
+            ]
+          }
+        ]
+      }
+    };
+
+    // =========================================================
+    // KLASSENSTUFEN-WECHSEL
+    // =========================================================
+    function setGrade(g) {
+      currentGrade = g;
+      [1, 2, 3, 4].forEach(x => {
+        const btn = document.getElementById(`gradeBtn-${x}`);
+        if (btn) btn.className = (x === g) ? `grade-pill active-${x}` : 'grade-pill';
+      });
+      const desc = document.getElementById('gradeDescBadge');
+      if (desc) desc.textContent = `${g}. Klasse`;
+      
+      playTone(550, 'sine', 0.06);
+
+      // Aktualisiere alle Module für die neue Klasse
+      resetFlashWord();
+      nextSyllableWord();
+      nextNonsenseWord();
+      nextPyramid();
+      nextKaraokeStory();
+    }
+
+    // =========================================================
+    // TAB NAVIGATION
+    // =========================================================
+    function switchTab(id) {
+      ['flash', 'syllables', 'nonsense', 'pyramid', 'karaoke'].forEach(x => {
+        const sec = document.getElementById(`sec-${x}`);
+        const tab = document.getElementById(`tab-${x}`);
+        if (sec) sec.classList.add('hidden');
+        if (tab) tab.classList.remove('active');
+      });
+      const activeSec = document.getElementById(`sec-${id}`);
+      const activeTab = document.getElementById(`tab-${id}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeTab) activeTab.classList.add('active');
+
+      playTone(480, 'sine', 0.04);
+    }
+
+    // =========================================================
+    // MODUL 1: BLITZLESEN LOGIK
+    // =========================================================
+    let flashSpeedSec = 0.8;
+    let flashCurrentTarget = null;
+    let flashStreak = 0;
+    let flashScore = 0;
+    let flashTimer = null;
+
+    function updateFlashSpeed(val) {
+      flashSpeedSec = (val / 10).toFixed(1);
+      document.getElementById('flashSpeedLabel').textContent = flashSpeedSec + ' s';
+    }
+
+    function resetFlashWord() {
+      const db = WORDS_DB[currentGrade].words;
+      flashCurrentTarget = db[Math.floor(Math.random() * db.length)];
+      document.getElementById('flashWordDisplay').textContent = "Bereit?";
+      document.getElementById('flashChoiceBox').classList.add('hidden');
+      document.getElementById('flashTriggerBtn').disabled = false;
+    }
+
+    function startFlashWord() {
+      const db = WORDS_DB[currentGrade].words;
+      flashCurrentTarget = db[Math.floor(Math.random() * db.length)];
+      const display = document.getElementById('flashWordDisplay');
+      const triggerBtn = document.getElementById('flashTriggerBtn');
+      const choiceBox = document.getElementById('flashChoiceBox');
+      choiceBox.classList.add('hidden');
+      triggerBtn.disabled = true;
+
+      // Wort aufblitzen lassen
+      display.textContent = flashCurrentTarget.word;
+      display.style.opacity = '1';
+      playTone(700, 'sine', 0.05);
+
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => {
+        display.textContent = "❓";
+        renderFlashChoices();
+        triggerBtn.disabled = false;
+      }, flashSpeedSec * 1000);
+    }
+
+    function renderFlashChoices() {
+      const db = WORDS_DB[currentGrade].words;
+      const target = flashCurrentTarget.word;
+      const options = [target];
+      while (options.length < 4 && options.length < db.length) {
+        const r = db[Math.floor(Math.random() * db.length)].word;
+        if (!options.includes(r)) options.push(r);
+      }
+      // Mischen
+      options.sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('flashChoiceGrid');
+      grid.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary';
+        btn.style.padding = '12px 10px';
+        btn.style.fontSize = '17px';
+        btn.style.fontWeight = '800';
+        btn.textContent = opt;
+        btn.onclick = () => selectFlashChoice(opt, btn);
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('flashChoiceBox').classList.remove('hidden');
+    }
+
+    function selectFlashChoice(selected, btnEl) {
+      const isCorrect = (selected === flashCurrentTarget.word);
+      const display = document.getElementById('flashWordDisplay');
+      display.textContent = flashCurrentTarget.word;
+
+      if (isCorrect) {
+        btnEl.style.background = '#dcfce7';
+        btnEl.style.borderColor = '#16a34a';
+        btnEl.style.color = '#15803d';
+        flashStreak++;
+        flashScore++;
+        addStars(1);
+        playChime();
+        if (flashStreak % 5 === 0) fireConfetti();
+      } else {
+        btnEl.style.background = '#ffe4e6';
+        btnEl.style.borderColor = '#e11d48';
+        btnEl.style.color = '#9f1239';
+        flashStreak = 0;
+        playTone(280, 'sine', 0.15);
+      }
+
+      document.getElementById('flashStreakTxt').textContent = '🔥 ' + flashStreak;
+      document.getElementById('flashScoreTxt').textContent = flashScore;
+
+      // Nach kurzer Zeit nächstes Wort bereitstellen
+      setTimeout(() => {
+        document.getElementById('flashChoiceBox').classList.add('hidden');
+        display.textContent = "Klicke auf Blitz!";
+      }, 1200);
+    }
+
+    // =========================================================
+    // MODUL 2: SILBEN-WERKSTATT LOGIK
+    // =========================================================
+    let currentSyllWord = null;
+    let showSyllArcs = true;
+    let puzzlePickedSylls = [];
+
+    function toggleSyllArcs() {
+      showSyllArcs = !showSyllArcs;
+      document.getElementById('syllArcToggleBtn').textContent = showSyllArcs ? '◡◡ Silbenbögen: AN' : '⚪ Silbenbögen: AUS';
+      renderCurrentSyllableWord();
+      playTone(550, 'sine', 0.05);
+    }
+
+    function nextSyllableWord() {
+      const db = WORDS_DB[currentGrade].words.filter(w => w.syll.length > 1);
+      currentSyllWord = db[Math.floor(Math.random() * db.length)];
+      renderCurrentSyllableWord();
+      initSyllablePuzzle();
+    }
+
+    function renderCurrentSyllableWord() {
+      const cont = document.getElementById('syllWordContainer');
+      if (!cont || !currentSyllWord) return;
+      cont.innerHTML = '';
+
+      currentSyllWord.syll.forEach((s, idx) => {
+        const isBlue = (idx % 2 === 0);
+        const box = document.createElement('div');
+        box.className = 'syllable-arc-box';
+
+        const txt = document.createElement('span');
+        txt.className = isBlue ? 'syllable-blue' : 'syllable-red';
+        txt.style.fontSize = '38px';
+        txt.textContent = s;
+        box.appendChild(txt);
+
+        if (showSyllArcs) {
+          // Bogen unter der Silbe
+          const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          svg.setAttribute("width", "42");
+          svg.setAttribute("height", "14");
+          svg.setAttribute("viewBox", "0 0 42 14");
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", "M 2 2 Q 21 13 40 2");
+          path.setAttribute("fill", "none");
+          path.setAttribute("stroke", isBlue ? "#0284c7" : "#e11d48");
+          path.setAttribute("stroke-width", "3");
+          path.setAttribute("stroke-linecap", "round");
+          svg.appendChild(path);
+          box.appendChild(svg);
+        }
+
+        cont.appendChild(box);
+      });
+
+      document.getElementById('syllCountTxt').textContent = `${currentSyllWord.syll.length} Silben (${currentSyllWord.word})`;
+    }
+
+    function initSyllablePuzzle() {
+      if (!currentSyllWord) return;
+      puzzlePickedSylls = [];
+      const piecesCont = document.getElementById('syllPuzzlePieces');
+      piecesCont.innerHTML = '';
+      document.getElementById('syllPuzzleStatus').textContent = 'Tippe die Silben nacheinander an.';
+
+      const pieces = [...currentSyllWord.syll].sort(() => Math.random() - 0.5);
+      pieces.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary';
+        btn.style.fontSize = '18px';
+        btn.style.fontWeight = '900';
+        btn.style.padding = '8px 16px';
+        btn.textContent = s;
+        btn.onclick = () => pickPuzzlePiece(s, btn);
+        piecesCont.appendChild(btn);
+      });
+    }
+
+    function pickPuzzlePiece(syll, btnEl) {
+      if (btnEl.disabled) return;
+      btnEl.disabled = true;
+      btnEl.style.opacity = '0.4';
+      puzzlePickedSylls.push(syll);
+      playTone(500 + puzzlePickedSylls.length * 50, 'sine', 0.05);
+
+      const status = document.getElementById('syllPuzzleStatus');
+      status.textContent = 'Geklickt: ' + puzzlePickedSylls.join(' - ');
+
+      if (puzzlePickedSylls.length === currentSyllWord.syll.length) {
+        const userWord = puzzlePickedSylls.join('');
+        if (userWord === currentSyllWord.word) {
+          status.innerHTML = '<span style="color:#15803d;">🎉 Perfekt zusammengesetzt: <strong>' + currentSyllWord.word + '</strong>!</span>';
+          playSuccessFanfare();
+          addStars(2);
+          fireConfetti();
+        } else {
+          status.innerHTML = '<span style="color:#b91c1c;">❌ Nicht ganz richtig. Probiere es noch einmal!</span>';
+          playTone(280, 'sine', 0.15);
+          setTimeout(initSyllablePuzzle, 1500);
+        }
+      }
+    }
+
+    // =========================================================
+    // MODUL 3: QUATSCHWORT-CHECK LOGIK
+    // =========================================================
+    let currentNonsense = null;
+    let nonsenseScore = 0;
+
+    function nextNonsenseWord() {
+      const list = WORDS_DB[currentGrade].nonsense;
+      currentNonsense = list[Math.floor(Math.random() * list.length)];
+      document.getElementById('nonsenseWordDisplay').textContent = currentNonsense.text;
+      const fb = document.getElementById('nonsenseFeedback');
+      fb.classList.add('hidden');
+    }
+
+    function checkNonsense(userSaysReal) {
+      if (!currentNonsense) return;
+      const isCorrect = (userSaysReal === currentNonsense.real);
+      const fb = document.getElementById('nonsenseFeedback');
+      fb.classList.remove('hidden');
+
+      if (isCorrect) {
+        nonsenseScore++;
+        document.getElementById('nonsenseScoreTxt').textContent = nonsenseScore;
+        fb.style.background = '#dcfce7';
+        fb.style.color = '#15803d';
+        fb.innerHTML = '✅ <strong>Richtig erkannt!</strong> ' + currentNonsense.hint;
+        playChime();
+        addStars(1);
+      } else {
+        fb.style.background = '#ffe4e6';
+        fb.style.color = '#9f1239';
+        fb.innerHTML = '❌ <strong>Hoppla!</strong> ' + currentNonsense.hint;
+        playTone(280, 'sine', 0.15);
+      }
+
+      setTimeout(nextNonsenseWord, 2000);
+    }
+
+    // =========================================================
+    // MODUL 4: LESETREPPEN LOGIK
+    // =========================================================
+    let currentPyramidIdx = 0;
+    let pyramidStepIdx = 1;
+
+    function nextPyramid() {
+      const pyramids = WORDS_DB[currentGrade].pyramids;
+      currentPyramidIdx = (currentPyramidIdx + 1) % pyramids.length;
+      pyramidStepIdx = 1;
+      renderPyramid();
+      playTone(550, 'sine', 0.05);
+    }
+
+    function stepPyramid() {
+      const rows = WORDS_DB[currentGrade].pyramids[currentPyramidIdx];
+      if (pyramidStepIdx < rows.length) {
+        pyramidStepIdx++;
+        renderPyramid();
+        playTone(450 + pyramidStepIdx * 60, 'sine', 0.06);
+        if (pyramidStepIdx === rows.length) {
+          playSuccessFanfare();
+          addStars(2);
+        }
+      } else {
+        nextPyramid();
+      }
+    }
+
+    function renderPyramid() {
+      const cont = document.getElementById('pyramidContainer');
+      if (!cont) return;
+      cont.innerHTML = '';
+      const rows = WORDS_DB[currentGrade].pyramids[currentPyramidIdx];
+
+      for (let i = 0; i < pyramidStepIdx; i++) {
+        const div = document.createElement('div');
+        div.className = 'pyramid-row' + (i === pyramidStepIdx - 1 ? ' active' : '');
+        div.textContent = rows[i];
+        cont.appendChild(div);
+      }
+    }
+
+    // =========================================================
+    // MODUL 5: LESE-KARAOKE LOGIK
+    // =========================================================
+    let currentStoryIdx = 0;
+    let karaokeWords = [];
+    let karaokeActiveWordIdx = -1;
+    let karaokeWpm = 70;
+    let karaokePlaying = false;
+    let karaokeTimer = null;
+
+    function updateKaraokeSpeed(val) {
+      karaokeWpm = parseInt(val, 10);
+      document.getElementById('karaokeWpmTxt').textContent = karaokeWpm + ' WpM';
+    }
+
+    function nextKaraokeStory() {
+      const stories = WORDS_DB[currentGrade].stories;
+      currentStoryIdx = (currentStoryIdx + 1) % stories.length;
+      karaokeActiveWordIdx = -1;
+      stopKaraokePlay();
+      renderKaraokeStory();
+      playTone(550, 'sine', 0.05);
+    }
+
+    function renderKaraokeStory() {
+      const story = WORDS_DB[currentGrade].stories[currentStoryIdx];
+      const box = document.getElementById('karaokeTextBox');
+      box.innerHTML = '';
+
+      const words = story.text.split(' ');
+      karaokeWords = words;
+
+      words.forEach((w, i) => {
+        const span = document.createElement('span');
+        span.className = 'karaoke-word';
+        span.id = `kw-${i}`;
+        span.textContent = w;
+        box.appendChild(span);
+        box.appendChild(document.createTextNode(' '));
+      });
+
+      document.getElementById('karaokeQuizBox').classList.add('hidden');
+    }
+
+    function toggleKaraokePlay() {
+      if (karaokePlaying) stopKaraokePlay();
+      else startKaraokePlay();
+    }
+
+    function startKaraokePlay() {
+      karaokePlaying = true;
+      document.getElementById('karaokePlayBtn').textContent = '⏸️ Pause';
+      if (karaokeActiveWordIdx >= karaokeWords.length - 1) {
+        karaokeActiveWordIdx = -1;
+      }
+      playNextKaraokeWord();
+    }
+
+    function stopKaraokePlay() {
+      karaokePlaying = false;
+      document.getElementById('karaokePlayBtn').textContent = '▶️ Start';
+      clearTimeout(karaokeTimer);
+    }
+
+    function playNextKaraokeWord() {
+      if (!karaokePlaying) return;
+      karaokeActiveWordIdx++;
+
+      if (karaokeActiveWordIdx < karaokeWords.length) {
+        // Highlight active word
+        karaokeWords.forEach((_, i) => {
+          const el = document.getElementById(`kw-${i}`);
+          if (el) {
+            if (i === karaokeActiveWordIdx) el.className = 'karaoke-word active';
+            else if (i < karaokeActiveWordIdx) el.className = 'karaoke-word read';
+            else el.className = 'karaoke-word';
+          }
+        });
+
+        // Delay based on WpM (60,000 ms / WpM)
+        const delay = Math.round(60000 / karaokeWpm);
+        karaokeTimer = setTimeout(playNextKaraokeWord, delay);
+      } else {
+        stopKaraokePlay();
+        playSuccessFanfare();
+        addStars(2);
+        // Show questions
+        renderKaraokeQuiz();
+      }
+    }
+
+    function renderKaraokeQuiz() {
+      const story = WORDS_DB[currentGrade].stories[currentStoryIdx];
+      const quizBox = document.getElementById('karaokeQuizBox');
+      const qList = document.getElementById('karaokeQuestionList');
+      qList.innerHTML = '';
+
+      story.questions.forEach((qObj, qIdx) => {
+        const qDiv = document.createElement('div');
+        qDiv.style.background = '#ffffff';
+        qDiv.style.border = '1px solid #cbd5e1';
+        qDiv.style.borderRadius = '12px';
+        qDiv.style.padding = '10px';
+
+        qDiv.innerHTML = `<div style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 6px;">${qIdx + 1}. ${qObj.q}</div>`;
+
+        const optDiv = document.createElement('div');
+        optDiv.style.display = 'flex';
+        optDiv.style.flexDirection = 'column';
+        optDiv.style.gap = '4px';
+
+        qObj.options.forEach((opt, optIdx) => {
+          const lbl = document.createElement('label');
+          lbl.style.display = 'flex';
+          lbl.style.alignItems = 'center';
+          lbl.style.gap = '8px';
+          lbl.style.fontSize = '13px';
+          lbl.style.fontWeight = '700';
+          lbl.style.color = '#334155';
+          lbl.style.cursor = 'pointer';
+
+          lbl.innerHTML = `<input type="radio" name="kq-${qIdx}" value="${optIdx}"> ${opt}`;
+          optDiv.appendChild(lbl);
+        });
+
+        qDiv.appendChild(optDiv);
+        qList.appendChild(qDiv);
+      });
+
+      quizBox.classList.remove('hidden');
+    }
+
+    function solveKaraokeQuiz() {
+      const story = WORDS_DB[currentGrade].stories[currentStoryIdx];
+      let correct = 0;
+
+      story.questions.forEach((qObj, qIdx) => {
+        const radios = document.getElementsByName(`kq-${qIdx}`);
+        let chosen = -1;
+        radios.forEach(r => { if (r.checked) chosen = parseInt(r.value, 10); });
+        if (chosen === qObj.correct) correct++;
+      });
+
+      if (correct === story.questions.length) {
+        playSuccessFanfare();
+        addStars(3);
+        fireConfetti();
+        alert('🎉 Super! Alle Fragen zum Text richtig beantwortet!');
+      } else {
+        playTone(300, 'sine', 0.15);
+        alert(`Du hast ${correct} von ${story.questions.length} Fragen richtig. Lies die Geschichte gerne noch einmal!`);
+      }
+    }
+
+    // =========================================================
+    // INITIALISIERUNG BEIM LADEN
+    // =========================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      setGrade(1);
+    });
+  </script>
+</body>
+</html>

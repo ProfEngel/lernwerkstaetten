@@ -1,0 +1,29 @@
+{
+  "name": "Lese-Werkstatt",
+  "short_name": "LeseWerkstatt",
+  "description": "Interaktive Grundschul-Lese-Werkstatt für iPad und Web (Klasse 1-4, Blitzlesen, Silbentraining, Quatschwörter, Lesetreppen, Lese-Karaoke)",
+  "start_url": "./lesen.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "apple-touch-icon-lese.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-lese-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-lese-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
