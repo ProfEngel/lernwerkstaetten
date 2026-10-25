@@ -119,16 +119,22 @@
         opacity: 1;
         transform: scale(1) translateY(0);
         border-color: #ef4444;
-        box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+        box-shadow: 0 0 16px rgba(239, 68, 68, 0.65);
       }
-      40% {
-        opacity: 0.9;
-        transform: scale(1.06) translateY(-8px);
+      45% {
+        opacity: 1;
+        transform: scale(1.02) translateY(0);
+        border-color: #ef4444;
+        box-shadow: 0 0 18px rgba(239, 68, 68, 0.75);
+      }
+      70% {
+        opacity: 0.92;
+        transform: scale(1.06) translateY(-10px);
         border-color: #ef4444;
       }
       100% {
         opacity: 0;
-        transform: scale(0.85) translateY(-26px);
+        transform: scale(0.85) translateY(-32px);
         pointer-events: none;
       }
     }
@@ -137,27 +143,33 @@
         opacity: 1;
         transform: scale(1);
         border-color: #f59e0b;
+        box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
       }
-      40% {
-        opacity: 0.9;
-        transform: scale(1.1) rotate(2deg);
+      45% {
+        opacity: 1;
+        transform: scale(1.03) rotate(1deg);
         border-color: #ea580c;
-        box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+        box-shadow: 0 0 18px rgba(234, 88, 12, 0.7);
+      }
+      70% {
+        opacity: 0.92;
+        transform: scale(1.1) rotate(2deg) translateY(-8px);
+        border-color: #ea580c;
       }
       100% {
         opacity: 0;
-        transform: scale(0.8) translateY(-20px);
+        transform: scale(0.8) translateY(-28px);
         pointer-events: none;
       }
     }
     .marble-sack-removed {
-      animation: sackFlyOut 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: sackFlyOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border-color: #ef4444 !important;
       background: #fee2e2 !important;
       position: relative;
     }
     .marble-sack-burst {
-      animation: sackBurst 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: sackBurst 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border-color: #ea580c !important;
       background: #fff7ed !important;
       position: relative;
@@ -167,15 +179,20 @@
       0% {
         opacity: 1;
         transform: scale(1) translateY(0);
-        filter: drop-shadow(0 0 6px rgba(239,68,68,0.6));
+        filter: drop-shadow(0 0 8px rgba(239,68,68,0.75));
       }
-      40% {
-        opacity: 0.85;
-        transform: scale(1.1) translateY(-8px);
+      45% {
+        opacity: 1;
+        transform: scale(1.04) translateY(0);
+        filter: drop-shadow(0 0 12px rgba(239,68,68,0.85));
+      }
+      70% {
+        opacity: 0.92;
+        transform: scale(1.12) translateY(-10px);
       }
       100% {
         opacity: 0;
-        transform: scale(0.75) translateY(-22px);
+        transform: scale(0.75) translateY(-30px);
         pointer-events: none;
       }
     }
@@ -196,15 +213,20 @@
       0% {
         opacity: 1;
         transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(245,158,11,0.75));
       }
-      40% {
-        opacity: 0.95;
-        transform: scale(1.12) rotate(3deg);
-        box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+      45% {
+        opacity: 1;
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 12px rgba(234,88,12,0.85));
+      }
+      70% {
+        opacity: 0.92;
+        transform: scale(1.12) rotate(3deg) translateY(-8px);
       }
       100% {
         opacity: 0;
-        transform: scale(0.7) translateY(-24px);
+        transform: scale(0.7) translateY(-28px);
         pointer-events: none;
       }
     }
@@ -213,34 +235,38 @@
         opacity: 1;
         transform: scale(1) translateY(0);
       }
-      40% {
+      45% {
+        opacity: 1;
+        transform: scale(1.2) translateY(0);
+      }
+      70% {
         opacity: 0.9;
-        transform: scale(1.2) translateY(-6px);
+        transform: scale(1.25) translateY(-8px);
       }
       100% {
         opacity: 0;
-        transform: scale(0.6) translateY(-18px);
+        transform: scale(0.6) translateY(-22px);
         pointer-events: none;
       }
     }
     .marble-removed {
-      animation: marbleFlyOut 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: marbleFlyOut 3.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #b91c1c 100%) !important;
-      box-shadow: 0 0 6px rgba(239, 68, 68, 0.5) !important;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
     }
     .pot-token-removed {
-      animation: tokenFloatOut 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: tokenFloatOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border: 2px dashed #ef4444 !important;
       background: #fee2e2 !important;
       color: #991b1b !important;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.55) !important;
     }
     .pot-token-unbundled {
-      animation: tokenUnbundleOut 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+      animation: tokenUnbundleOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
       border: 2px dashed #ea580c !important;
       background: #fff7ed !important;
       color: #c2410c !important;
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.55) !important;
     }
     .pot-token-z.pot-token-removed,
     .pot-token-z.pot-token-unbundled {
@@ -1194,7 +1220,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
             <span>Tempo:</span>
-            <input type="range" id="pmSpeed" min="200" max="1400" value="700" style="width: 90px; accent-color: #f59e0b;">
+            <input type="range" id="pmSpeed" min="600" max="2600" value="1300" style="width: 90px; accent-color: #f59e0b;">
           </div>
         </div>
 
@@ -1444,7 +1470,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #64748b;">
             <span>Tempo:</span>
-            <input type="range" id="thSpeed" min="300" max="1800" value="800" style="width: 90px; accent-color: #f59e0b;">
+            <input type="range" id="thSpeed" min="700" max="3000" value="1500" style="width: 90px; accent-color: #f59e0b;">
           </div>
         </div>
 
@@ -1460,7 +1486,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v9';
+        const CACHE_NAME = 'lernwerkstatt-offline-v10';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -2471,8 +2497,8 @@
             htmlStr += `
               <div class="marble-sack marble-sack-removed" title="10er-Säckchen wird komplett entnommen (−10 Murmeln)!">
                 <div class="marble-sack-header" style="color: #ef4444;">
-                  <span>💨 −10 Entnommen</span>
-                  <span class="marble-sack-badge" style="background: #ef4444;">❌</span>
+                  <span>💨 −10 Murmeln</span>
+                  <span class="marble-sack-badge" style="background: #ef4444; font-size: 11px; padding: 2px 8px;">Weggenommen ❌</span>
                 </div>
                 <div class="marble-sack-grid" style="border-color: #fca5a5; background: #fee2e2;">
                   ${ghostMarbles}
@@ -2568,18 +2594,36 @@
       }
     }
 
+    function playNextPMStep() {
+      if (!pmPlaying) return;
+      if (pmIdx < pmSteps.length - 1) {
+        stepPM(1);
+        let delay = parseInt(document.getElementById('pmSpeed').value, 10);
+        const cur = pmSteps[pmIdx];
+        const prev = pmSteps[pmIdx - 1];
+        if (prev && cur) {
+          const curTens = Math.floor((cur.val % 100) / 10);
+          const prevTens = Math.floor((prev.val % 100) / 10);
+          if (prevTens > curTens) {
+            // Zehner-Säckchen entnommen oder aufgeplatzt: Ruhige 3,8s Pause, damit Kinder es sehen & verstehen!
+            delay = Math.max(delay * 2.2, 3800);
+          }
+        }
+        pmTimer = setTimeout(playNextPMStep, delay);
+      } else {
+        togglePMPlay();
+      }
+    }
+
     function togglePMPlay() {
       pmPlaying = !pmPlaying;
       document.getElementById('pmPlayTxt').textContent = pmPlaying ? 'Stopp' : 'Vollanimation';
       if (pmPlaying) {
         if (pmIdx >= pmSteps.length - 1) pmIdx = 0;
         const spd = parseInt(document.getElementById('pmSpeed').value, 10);
-        pmTimer = setInterval(() => {
-          if (pmIdx < pmSteps.length - 1) stepPM(1);
-          else togglePMPlay();
-        }, spd);
+        pmTimer = setTimeout(playNextPMStep, spd);
       } else {
-        clearInterval(pmTimer);
+        clearTimeout(pmTimer);
       }
     }
 
@@ -3187,13 +3231,31 @@
       const removedE = step.removedE || 0;
       const addedE = step.addedE || 0;
 
-      // Badges
+      // Badges mit verständlichem Entnahme-Hinweis
       document.getElementById('thBadgeH').textContent = `H: ${hCount}`;
-      document.getElementById('thValH').textContent = `Wert: ${hCount * 100}`;
+      let hValHtml = `Wert: ${hCount * 100}`;
+      if (removedH > 0) {
+        hValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedH * 100} abgezogen ❌)</span>`;
+      } else if (unbundledH > 0) {
+        hValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 3.5s forwards;">(🔓 1 H entbündelt ➔ 10 Z)</span>`;
+      }
+      document.getElementById('thValH').innerHTML = hValHtml;
+
       document.getElementById('thBadgeZ').textContent = `Z: ${zCount}`;
-      document.getElementById('thValZ').textContent = `Wert: ${zCount * 10}`;
+      let zValHtml = `Wert: ${zCount * 10}`;
+      if (removedZ > 0) {
+        zValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedZ * 10} abgezogen ❌)</span>`;
+      } else if (unbundledZ > 0) {
+        zValHtml += ` <span style="color: #ea580c; font-weight: 800; animation: tokenUnbundleOut 3.5s forwards;">(🔓 1 Z entbündelt ➔ 10 E)</span>`;
+      }
+      document.getElementById('thValZ').innerHTML = zValHtml;
+
       document.getElementById('thBadgeE').textContent = `E: ${eCount}`;
-      document.getElementById('thValE').textContent = `Wert: ${eCount}`;
+      let eValHtml = `Wert: ${eCount}`;
+      if (removedE > 0) {
+        eValHtml += ` <span style="color: #dc2626; font-weight: 800; animation: tokenFloatOut 3.5s forwards;">(−${removedE} abgezogen ❌)</span>`;
+      }
+      document.getElementById('thValE').innerHTML = eValHtml;
 
       // Formula bar
       document.getElementById('thFormulaTxt').textContent = `${hCount * 100} + ${zCount * 10} + ${eCount} = ${step.num}`;
@@ -3650,6 +3712,22 @@
       }
     }
 
+    function playNextTHStep() {
+      if (!thPlaying) return;
+      if (thIdx < thSteps.length - 1) {
+        stepTH(1);
+        let delay = parseInt(document.getElementById('thSpeed').value, 10);
+        const cur = thSteps[thIdx];
+        if (cur && (cur.removedH > 0 || cur.removedZ > 0 || cur.removedE > 0 || cur.unbundledH > 0 || cur.unbundledZ > 0)) {
+          // Entnahme- oder Entbündelungsschritt: Ruhige 3,8s Pause, damit Kinder es sehen & verstehen!
+          delay = Math.max(delay * 2.2, 3800);
+        }
+        thTimer = setTimeout(playNextTHStep, delay);
+      } else {
+        toggleTHPlay();
+      }
+    }
+
     function toggleTHPlay() {
       thPlaying = !thPlaying;
       document.getElementById('thPlayTxt').textContent = thPlaying ? 'Stopp' : 'Vollanimation';
@@ -3657,12 +3735,9 @@
         if (thIdx >= thSteps.length - 1) thIdx = 0;
         renderTHStepView();
         const spd = parseInt(document.getElementById('thSpeed').value, 10);
-        thTimer = setInterval(() => {
-          if (thIdx < thSteps.length - 1) stepTH(1);
-          else toggleTHPlay();
-        }, spd);
+        thTimer = setTimeout(playNextTHStep, spd);
       } else {
-        clearInterval(thTimer);
+        clearTimeout(thTimer);
       }
     }
 
