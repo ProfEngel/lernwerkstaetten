@@ -12,12 +12,12 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#f59e0b">
 
-  <!-- Offline-App Icon als SVG-Data-URI -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' width='180' height='180'><rect width='180' height='180' rx='42' fill='%23f59e0b'/><circle cx='90' cy='90' r='58' fill='%23ffffff'/><text x='90' y='110' font-size='62' text-anchor='middle'>🎒</text></svg>">
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🎒</text></svg>">
-
-  <!-- Manifest Data-URI für Installation -->
-  <link rel="manifest" href="data:application/manifest+json;utf8,{&quot;name&quot;:&quot;Mathe- &amp; Lern-Werkstatt&quot;,&quot;short_name&quot;:&quot;LernWerkstatt&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23fef3c7&quot;,&quot;theme_color&quot;:&quot;%23f59e0b&quot;}">
+  <!-- Offline-App Icon für iPhone, iPad & PWA -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
 
   <style>
     :root {
@@ -113,6 +113,10 @@
     }
     .marble:hover {
       transform: scale(1.18);
+    }
+    @keyframes pmPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.22); }
     }
     @keyframes sackFlyOut {
       0% {
@@ -1492,11 +1496,41 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v12';
-        self.addEventListener('install', e => { self.skipWaiting(); });
-        self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+        const CACHE_NAME = 'lernwerkstatt-offline-v13';
+        const ASSETS = [
+          './',
+          './index.html',
+          './manifest.json',
+          './apple-touch-icon.png',
+          './favicon-32x32.png',
+          './icon-192.png',
+          './icon-512.png'
+        ];
+        self.addEventListener('install', e => {
+          e.waitUntil(
+            caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
+          );
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(
+            caches.keys().then(keys => Promise.all(
+              keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+            )).then(() => clients.claim())
+          );
+        });
         self.addEventListener('fetch', e => {
-          e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+          e.respondWith(
+            fetch(e.request)
+              .then(res => {
+                if (res && res.status === 200 && e.request.method === 'GET') {
+                  const resClone = res.clone();
+                  caches.open(CACHE_NAME).then(c => c.put(e.request, resClone));
+                }
+                return res;
+              })
+              .catch(() => caches.match(e.request).then(cached => cached || caches.match('./index.html')))
+          );
         });
       `;
       try {
@@ -2359,11 +2393,56 @@
       renderPMLine();
     }
 
+    function renderLoveHeartSvg(leftNum, rightNum) {
+      return `<svg viewBox="0 0 160 110" width="124" height="86" style="display:inline-block; vertical-align:middle; filter:drop-shadow(0 4px 6px rgba(225,29,72,0.25));" aria-label="Verliebte Zahl Herz: links ${leftNum}, rechts ${rightNum}">
+        <defs>
+          <linearGradient id="gradHeartL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fb7185"/>
+            <stop offset="100%" stop-color="#e11d48"/>
+          </linearGradient>
+          <linearGradient id="gradHeartR" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f472b6"/>
+            <stop offset="100%" stop-color="#db2777"/>
+          </linearGradient>
+        </defs>
+        <!-- Linke Herzhälfte (abzuziehende Zahl) -->
+        <path d="M 78,22 C 75,12 65,4 49,4 C 27,4 6,17 6,38 C 6,64 30,90 78,108 Z" fill="url(#gradHeartL)" stroke="#be123c" stroke-width="2"/>
+        <!-- Rechte Herzhälfte (verliebte Partnerzahl) -->
+        <path d="M 82,22 C 85,12 95,4 111,4 C 133,4 154,17 154,38 C 154,64 130,90 82,108 Z" fill="url(#gradHeartR)" stroke="#9d174d" stroke-width="2"/>
+        <!-- Gestrichelte Trennlinie der Herzhälften -->
+        <line x1="80" y1="20" x2="80" y2="108" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,3"/>
+        <!-- Beschriftung links -->
+        <text x="46" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#ffffff" text-anchor="middle">${leftNum}</text>
+        <text x="46" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="800" fill="#ffe4e6" text-anchor="middle">abziehen</text>
+        <!-- Beschriftung rechts -->
+        <text x="114" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#ffffff" text-anchor="middle">${rightNum}</text>
+        <text x="114" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="800" fill="#fdf2f8" text-anchor="middle">verliebt ❤️</text>
+      </svg>`;
+    }
+
     function renderPMCards() {
       const a = parseInt(document.getElementById('pmA').value, 10);
       const op = document.getElementById('pmOp').value;
       const b = parseInt(document.getElementById('pmB').value, 10);
       const cont = document.getElementById('pmStepCards');
+      if (!cont) return;
+
+      // Ermitteln, welcher Schritt aktuell in der Animation abläuft
+      let activeStep = 0;
+      if (pmSteps && pmSteps[pmIdx]) {
+        const t = pmSteps[pmIdx].type;
+        if (op === '-') {
+          if (t === 'ten') activeStep = 1;
+          else if (t === 'one' || t === 'stop') activeStep = 2;
+          else if (t === 'love') activeStep = 3;
+        } else {
+          if (t === 'one' || t === 'stop') activeStep = 1;
+          else if (t === 'love') activeStep = 2;
+          else if (t === 'ten') activeStep = 3;
+        }
+      }
+      const anyActive = (activeStep > 0);
+
       if (op === '-') {
         const tensB = Math.floor(b / 10) * 10;
         const onesB = b % 10;
@@ -2371,43 +2450,310 @@
         const onesAfter = afterTens % 10;
         const needsTransition = (onesB > onesAfter);
 
-        let card1Html = '';
+        // Zahlzerlegung des Subtrahenden (z.B. 15 = 10 + 4 + 1)
+        let decompBadges = [];
         if (tensB > 0) {
-          card1Html = `1️⃣ Zuerst Zehner abziehen: <strong>${a} − ${tensB} = ${afterTens}</strong>`;
+          decompBadges.push(`<span style="background:#ede9fe; color:#5b21b6; border:1px solid #c4b5fd; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${tensB} <small style="font-weight:600; opacity:0.85;">(Zehner)</small></span>`);
+        }
+        if (needsTransition && onesAfter > 0) {
+          decompBadges.push(`<span style="background:#fef3c7; color:#78350f; border:1px solid #fde68a; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${onesAfter} <small style="font-weight:600; opacity:0.85;">(bis ${afterTens - onesAfter})</small></span>`);
+          const rem = onesB - onesAfter;
+          decompBadges.push(`<span style="background:#fce7f3; color:#9d174d; border:1px solid #fbcfe8; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${rem} <small style="font-weight:600; opacity:0.85;">(Übergang)</small></span>`);
+        } else if (needsTransition && onesAfter === 0) {
+          decompBadges.push(`<span style="background:#fce7f3; color:#9d174d; border:1px solid #fbcfe8; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${onesB} <small style="font-weight:600; opacity:0.85;">(Übergang)</small></span>`);
         } else {
-          card1Html = `1️⃣ Keine Zehner abzuziehen: <strong>${a}</strong>`;
+          if (onesB > 0) {
+            decompBadges.push(`<span style="background:#fef3c7; color:#78350f; border:1px solid #fde68a; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${onesB} <small style="font-weight:600; opacity:0.85;">(Einer)</small></span>`);
+          }
+        }
+        if (decompBadges.length === 0) {
+          decompBadges.push(`<span style="background:#f1f5f9; color:#475569; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">0</span>`);
         }
 
+        const decompHtml = `
+          <div style="grid-column: 1 / -1; background: #ffffff; border: 2px solid #e0e7ff; border-radius: 14px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; box-shadow: 0 2px 6px rgba(99,102,241,0.06);">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 13px; font-weight: 800; color: #4338ca;">✂️ Zahlzerlegung:</span>
+              <span style="font-size: 13px; font-weight: 800; color: #1e293b; background: #f1f5f9; padding: 2px 8px; border-radius: 8px;">Die <strong>${b}</strong> wird aufgeteilt in:</span>
+              <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                ${decompBadges.join('<span style="font-weight:900; color:#94a3b8; font-size:13px;">+</span>')}
+              </div>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; color: #64748b;">
+              Ausgangszahl: <strong style="color: #1e293b; font-size: 13px;">${a}</strong>
+            </div>
+          </div>
+        `;
+
+        // Karte 1: Zehner abziehen
+        const remAfter1 = b - tensB;
+        const act1 = (activeStep === 1);
+        const style1 = act1 
+          ? 'border:3.5px solid #7c3aed; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); box-shadow:0 0 0 4px rgba(124,58,237,0.35), 0 8px 24px rgba(124,58,237,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #ddd6fe; background:#faf5ff; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #c4b5fd; background:#ede9fe; box-shadow:0 2px 5px rgba(124,58,237,0.07); transform:scale(1); opacity:1;');
+
+        const badge1 = act1 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#7c3aed; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(124,58,237,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
+
+        const card1Html = `
+          <div onclick="jumpToPMStage(1)" title="Klicken, um diesen Schritt aufzurufen" style="${style1} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+            ${badge1}
+            <div style="font-size:11px; font-weight:800; color:#5b21b6; text-transform:uppercase; letter-spacing:0.5px;">1️⃣ Zuerst Zehner abziehen</div>
+            <div style="font-size:16px; font-weight:900; color:#3b0764;">
+              ${tensB > 0 ? `${a} − ${tensB} = ${afterTens}` : `${a} (keine Zehner)`}
+            </div>
+            <div style="font-size:11px; font-weight:700; color:#4c1d95; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">
+              Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:${remAfter1 === 0 ? '#16a34a' : '#d97706'}; font-size:13px;">${remAfter1 === 0 ? '0 ✅' : remAfter1}</strong>
+            </div>
+          </div>
+        `;
+
+        // Karte 2 & 3
         let card2Html = '';
         let card3Html = '';
+        const act2 = (activeStep === 2);
+        const act3 = (activeStep === 3);
+
+        const style2 = act2 
+          ? 'border:3.5px solid #d97706; background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); box-shadow:0 0 0 4px rgba(217,119,6,0.35), 0 8px 24px rgba(217,119,6,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #fde68a; background:#fffdf5; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #fde68a; background:#fef3c7; box-shadow:0 2px 5px rgba(217,119,6,0.07); transform:scale(1); opacity:1;');
+
+        const badge2 = act2 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#d97706; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(217,119,6,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
+
+        const style3 = act3 
+          ? 'border:3.5px solid #db2777; background:linear-gradient(135deg, #fff1f2 0%, #fce7f3 100%); box-shadow:0 0 0 4px rgba(219,39,119,0.35), 0 8px 24px rgba(219,39,119,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #fbcfe8; background:#fff5f7; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #fbcfe8; background:#fce7f3; box-shadow:0 2px 5px rgba(219,39,119,0.07); transform:scale(1); opacity:1;');
+
+        const badge3 = act3 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#db2777; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(219,39,119,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
 
         if (needsTransition && onesAfter > 0) {
           const stopTen = afterTens - onesAfter;
           const rem = onesB - onesAfter;
           const love = 10 - rem;
-          card2Html = `2️⃣ Einer bis zum Zehner: <strong>${afterTens} − ${onesAfter} = ${stopTen}</strong>`;
-          card3Html = `3️⃣ Zehnerübergang (Verliebte Zahl zu ${rem} ist ${love}): <strong>${stopTen} − ${rem} = ${a - b}</strong>`;
+          card2Html = `
+            <div onclick="jumpToPMStage(2)" title="Klicken, um diesen Schritt aufzurufen" style="${style2} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge2}
+              <div style="font-size:11px; font-weight:800; color:#78350f; text-transform:uppercase; letter-spacing:0.5px;">2️⃣ Einer bis zum Zehner</div>
+              <div style="font-size:16px; font-weight:900; color:#78350f;">
+                ${afterTens} − ${onesAfter} = ${stopTen}
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#78350f; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">
+                Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:#d97706; font-size:13px;">${rem}</strong>
+              </div>
+            </div>
+          `;
+          card3Html = `
+            <div onclick="jumpToPMStage(3)" title="Klicken, um diesen Schritt aufzurufen" style="${style3} padding:12px; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:6px; box-shadow: 0 2px 5px rgba(219,39,119,0.07); text-align:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge3}
+              <div style="font-size:11px; font-weight:800; color:#9d174d; text-transform:uppercase; letter-spacing:0.5px; width:100%; text-align:left;">3️⃣ Zehnerübergang & Verliebte Zahl</div>
+              <div style="font-size:16px; font-weight:900; color:#831843;">
+                ${stopTen} − ${rem} = ${a - b}
+              </div>
+              <div style="margin:2px 0;">
+                ${renderLoveHeartSvg(rem, love)}
+              </div>
+              <div style="font-size:11px; font-weight:800; color:#9d174d; background:#fff; padding:3px 8px; border-radius:8px; border:1px solid #fbcfe8;">
+                ❤️ Partner zu 10: <strong>${rem} + ${love} = 10</strong> → Einer wird ${love}!
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#9d174d; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px; width:100%;">
+                Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:#16a34a; font-size:13px;">0 (alles erledigt! ✅)</strong>
+              </div>
+            </div>
+          `;
         } else if (needsTransition && onesAfter === 0) {
           const rem = onesB;
           const love = 10 - rem;
-          card2Html = `2️⃣ Zehner-Stopp: Bereits bei <strong>${afterTens}</strong>`;
-          card3Html = `3️⃣ Zehnerübergang (Verliebte Zahl zu ${rem} ist ${love}): <strong>${afterTens} − ${rem} = ${a - b}</strong>`;
+          card2Html = `
+            <div onclick="jumpToPMStage(2)" title="Klicken, um diesen Schritt aufzurufen" style="${style2} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge2}
+              <div style="font-size:11px; font-weight:800; color:#78350f; text-transform:uppercase; letter-spacing:0.5px;">2️⃣ Zehner-Stopp</div>
+              <div style="font-size:16px; font-weight:900; color:#78350f;">
+                Bereits bei ${afterTens}
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#78350f; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">
+                Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:#d97706; font-size:13px;">${rem}</strong>
+              </div>
+            </div>
+          `;
+          card3Html = `
+            <div onclick="jumpToPMStage(3)" title="Klicken, um diesen Schritt aufzurufen" style="${style3} padding:12px; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge3}
+              <div style="font-size:11px; font-weight:800; color:#9d174d; text-transform:uppercase; letter-spacing:0.5px; width:100%; text-align:left;">3️⃣ Zehnerübergang & Verliebte Zahl</div>
+              <div style="font-size:16px; font-weight:900; color:#831843;">
+                ${afterTens} − ${rem} = ${a - b}
+              </div>
+              <div style="margin:2px 0;">
+                ${renderLoveHeartSvg(rem, love)}
+              </div>
+              <div style="font-size:11px; font-weight:800; color:#9d174d; background:#fff; padding:3px 8px; border-radius:8px; border:1px solid #fbcfe8;">
+                ❤️ Partner zu 10: <strong>${rem} + ${love} = 10</strong> → Einer wird ${love}!
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#9d174d; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px; width:100%;">
+                Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:#16a34a; font-size:13px;">0 (alles erledigt! ✅)</strong>
+              </div>
+            </div>
+          `;
         } else {
-          card2Html = `2️⃣ Einer abziehen: <strong>${afterTens} − ${onesB} = ${a - b}</strong>`;
-          card3Html = `3️⃣ Zehnerübergang: <strong>Nicht nötig</strong> (Ergebnis: ${a - b})`;
+          card2Html = `
+            <div onclick="jumpToPMStage(2)" title="Klicken, um diesen Schritt aufzurufen" style="${style2} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge2}
+              <div style="font-size:11px; font-weight:800; color:#78350f; text-transform:uppercase; letter-spacing:0.5px;">2️⃣ Einer abziehen</div>
+              <div style="font-size:16px; font-weight:900; color:#78350f;">
+                ${afterTens} − ${onesB} = ${a - b}
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#78350f; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">
+                Vom Subtrahend <strong>${b}</strong> noch abzuziehen: <strong style="color:#16a34a; font-size:13px;">0 (alles erledigt! ✅)</strong>
+              </div>
+            </div>
+          `;
+          card3Html = `
+            <div style="${style3} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              <div style="font-size:11px; font-weight:800; color:#9d174d; text-transform:uppercase; letter-spacing:0.5px;">3️⃣ Zehnerübergang</div>
+              <div style="font-size:14px; font-weight:800; color:#831843;">
+                Nicht nötig 🎉
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#9d174d; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">
+                Endergebnis: <strong style="font-size:14px; color:#1e293b;">${a - b}</strong>
+              </div>
+            </div>
+          `;
         }
 
-        cont.innerHTML = `
-          <div style="background:#ede9fe; border:1.5px solid #c4b5fd; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#5b21b6; text-align:center;">${card1Html}</div>
-          <div style="background:#fef3c7; border:1.5px solid #fde68a; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#78350f; text-align:center;">${card2Html}</div>
-          <div style="background:#fce7f3; border:1.5px solid #fbcfe8; padding:10px; border-radius:14px; font-size:12px; font-weight:800; color:#9d174d; text-align:center;">${card3Html}</div>
-        `;
+        cont.innerHTML = decompHtml + card1Html + card2Html + card3Html;
       } else {
-        cont.innerHTML = `
-          <div style="background:#fef3c7; border:1px solid #fde68a; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#78350f; text-align:center;">1️⃣ Zum Zehner auffüllen</div>
-          <div style="background:#ffe4e6; border:1px solid #fecdd3; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#9f1239; text-align:center;">2️⃣ Restliche Einer dazu</div>
-          <div style="background:#ede9fe; border:1px solid #ddd6fe; padding:8px; border-radius:12px; font-size:11px; font-weight:800; color:#5b21b6; text-align:center;">3️⃣ Zehner-Sprünge</div>
+        // Addition (op === '+')
+        const onesA = a % 10;
+        const toTen = (10 - onesA) % 10;
+        const onesB = b % 10;
+        const tensB = Math.floor(b / 10) * 10;
+        const needsTransition = (onesA > 0 && onesB >= toTen && toTen > 0);
+
+        let decompBadges = [];
+        if (needsTransition) {
+          decompBadges.push(`<span style="background:#fef3c7; color:#78350f; border:1px solid #fde68a; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${toTen} <small style="font-weight:600; opacity:0.85;">(bis ${a + toTen})</small></span>`);
+          const rem = onesB - toTen;
+          if (rem > 0) decompBadges.push(`<span style="background:#ffe4e6; color:#9f1239; border:1px solid #fecdd3; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${rem} <small style="font-weight:600; opacity:0.85;">(Rest-Einer)</small></span>`);
+          if (tensB > 0) decompBadges.push(`<span style="background:#ede9fe; color:#5b21b6; border:1px solid #c4b5fd; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${tensB} <small style="font-weight:600; opacity:0.85;">(Zehner)</small></span>`);
+        } else {
+          if (onesB > 0) decompBadges.push(`<span style="background:#fef3c7; color:#78350f; border:1px solid #fde68a; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${onesB} <small style="font-weight:600; opacity:0.85;">(Einer)</small></span>`);
+          if (tensB > 0) decompBadges.push(`<span style="background:#ede9fe; color:#5b21b6; border:1px solid #c4b5fd; padding:3px 9px; border-radius:8px; font-weight:800; font-size:12px;">${tensB} <small style="font-weight:600; opacity:0.85;">(Zehner)</small></span>`);
+        }
+
+        const decompHtml = `
+          <div style="grid-column: 1 / -1; background: #ffffff; border: 2px solid #e0e7ff; border-radius: 14px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; box-shadow: 0 2px 6px rgba(99,102,241,0.06);">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 13px; font-weight: 800; color: #4338ca;">✂️ Zahlzerlegung:</span>
+              <span style="font-size: 13px; font-weight: 800; color: #1e293b; background: #f1f5f9; padding: 2px 8px; border-radius: 8px;">Die <strong>${b}</strong> wird hinzugefügt als:</span>
+              <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                ${decompBadges.join('<span style="font-weight:900; color:#94a3b8; font-size:13px;">+</span>')}
+              </div>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; color: #64748b;">
+              Startzahl: <strong style="color: #1e293b; font-size: 13px;">${a}</strong>
+            </div>
+          </div>
         `;
+
+        const act1 = (activeStep === 1);
+        const act2 = (activeStep === 2);
+        const act3 = (activeStep === 3);
+
+        const style1 = act1 
+          ? 'border:3.5px solid #d97706; background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); box-shadow:0 0 0 4px rgba(217,119,6,0.35), 0 8px 24px rgba(217,119,6,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #fde68a; background:#fffdf5; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #fde68a; background:#fef3c7; box-shadow:0 2px 5px rgba(217,119,6,0.07); transform:scale(1); opacity:1;');
+
+        const badge1 = act1 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#d97706; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(217,119,6,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
+
+        const style2 = act2 
+          ? 'border:3.5px solid #e11d48; background:linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); box-shadow:0 0 0 4px rgba(225,29,72,0.35), 0 8px 24px rgba(225,29,72,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #fecdd3; background:#fff5f6; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #fecdd3; background:#ffe4e6; box-shadow:0 2px 5px rgba(225,29,72,0.07); transform:scale(1); opacity:1;');
+
+        const badge2 = act2 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#e11d48; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(225,29,72,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
+
+        const style3 = act3 
+          ? 'border:3.5px solid #7c3aed; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); box-shadow:0 0 0 4px rgba(124,58,237,0.35), 0 8px 24px rgba(124,58,237,0.22); transform:scale(1.025); opacity:1;'
+          : (anyActive 
+              ? 'border:1.5px solid #ddd6fe; background:#faf5ff; box-shadow:none; transform:scale(0.985); opacity:0.52; filter:saturate(70%);'
+              : 'border:1.5px solid #ddd6fe; background:#ede9fe; box-shadow:0 2px 5px rgba(124,58,237,0.07); transform:scale(1); opacity:1;');
+
+        const badge3 = act3 
+          ? `<div style="display:inline-flex; align-items:center; gap:5px; background:#7c3aed; color:#ffffff; font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; margin-bottom:2px; box-shadow:0 2px 5px rgba(124,58,237,0.3); align-self:flex-start;"><span style="display:inline-block; animation:pmPulse 1.2s infinite ease-in-out;">🐸</span> AKTUELLER SCHRITT</div>`
+          : '';
+
+        let card1Html, card2Html, card3Html;
+        if (needsTransition) {
+          const stopTen = a + toTen;
+          const rem = onesB - toTen;
+          const afterRem = stopTen + rem;
+          card1Html = `
+            <div onclick="jumpToPMStage(1)" title="Klicken, um diesen Schritt aufzurufen" style="${style1} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge1}
+              <div style="font-size:11px; font-weight:800; color:#78350f; text-transform:uppercase;">1️⃣ Zum Zehner auffüllen</div>
+              <div style="font-size:16px; font-weight:900; color:#78350f;">${a} + ${toTen} = ${stopTen}</div>
+              <div style="font-size:11px; font-weight:700; color:#78350f; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Noch hinzuzufügen: <strong>${b - toTen}</strong></div>
+            </div>
+          `;
+          card2Html = `
+            <div onclick="jumpToPMStage(2)" title="Klicken, um diesen Schritt aufzurufen" style="${style2} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge2}
+              <div style="font-size:11px; font-weight:800; color:#9f1239; text-transform:uppercase;">2️⃣ Restliche Einer dazu</div>
+              <div style="font-size:16px; font-weight:900; color:#9f1239;">${stopTen} + ${rem} = ${afterRem}</div>
+              <div style="font-size:11px; font-weight:700; color:#9f1239; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Noch hinzuzufügen: <strong>${tensB}</strong></div>
+            </div>
+          `;
+          card3Html = `
+            <div onclick="jumpToPMStage(3)" title="Klicken, um diesen Schritt aufzurufen" style="${style3} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge3}
+              <div style="font-size:11px; font-weight:800; color:#5b21b6; text-transform:uppercase;">3️⃣ Zehner-Sprünge</div>
+              <div style="font-size:16px; font-weight:900; color:#5b21b6;">${afterRem} + ${tensB} = ${a + b}</div>
+              <div style="font-size:11px; font-weight:700; color:#5b21b6; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Noch hinzuzufügen: <strong style="color:#16a34a;">0 (alles erledigt! ✅)</strong></div>
+            </div>
+          `;
+        } else {
+          card1Html = `
+            <div onclick="jumpToPMStage(1)" title="Klicken, um diesen Schritt aufzurufen" style="${style1} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge1}
+              <div style="font-size:11px; font-weight:800; color:#78350f; text-transform:uppercase;">1️⃣ Einer dazu</div>
+              <div style="font-size:16px; font-weight:900; color:#78350f;">${a} + ${onesB} = ${a + onesB}</div>
+              <div style="font-size:11px; font-weight:700; color:#78350f; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Noch hinzuzufügen: <strong>${tensB}</strong></div>
+            </div>
+          `;
+          card2Html = `
+            <div onclick="jumpToPMStage(2)" title="Klicken, um diesen Schritt aufzurufen" style="${style2} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              ${badge2}
+              <div style="font-size:11px; font-weight:800; color:#5b21b6; text-transform:uppercase;">2️⃣ Zehner dazu</div>
+              <div style="font-size:16px; font-weight:900; color:#5b21b6;">${a + onesB} + ${tensB} = ${a + b}</div>
+              <div style="font-size:11px; font-weight:700; color:#5b21b6; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Noch hinzuzufügen: <strong style="color:#16a34a;">0 (alles erledigt! ✅)</strong></div>
+            </div>
+          `;
+          card3Html = `
+            <div style="${style3} padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:6px; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+              <div style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase;">3️⃣ Zehnerübergang</div>
+              <div style="font-size:14px; font-weight:800; color:#166534;">Nicht nötig 🎉</div>
+              <div style="font-size:11px; font-weight:700; color:#166534; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:8px;">Endergebnis: <strong style="font-size:14px; color:#1e293b;">${a + b}</strong></div>
+            </div>
+          `;
+        }
+        cont.innerHTML = decompHtml + card1Html + card2Html + card3Html;
       }
     }
 
@@ -2635,6 +2981,37 @@
       if (next >= 0 && next < pmSteps.length) {
         pmIdx = next;
         playTone(500 + pmIdx * 25, 'sine', 0.04);
+        renderPMCards();
+        renderPMBoard();
+        renderPMBags();
+        renderPMLine();
+      }
+    }
+
+    function jumpToPMStage(stage) {
+      if (!pmSteps || pmSteps.length === 0) return;
+      const op = document.getElementById('pmOp').value;
+      let targetIdx = -1;
+      for (let i = 0; i < pmSteps.length; i++) {
+        const t = pmSteps[i].type;
+        let s = 0;
+        if (op === '-') {
+          if (t === 'ten') s = 1;
+          else if (t === 'one' || t === 'stop') s = 2;
+          else if (t === 'love') s = 3;
+        } else {
+          if (t === 'one' || t === 'stop') s = 1;
+          else if (t === 'love') s = 2;
+          else if (t === 'ten') s = 3;
+        }
+        if (s === stage) {
+          targetIdx = i;
+        }
+      }
+      if (targetIdx !== -1) {
+        pmIdx = targetIdx;
+        playTone(550, 'sine', 0.05);
+        renderPMCards();
         renderPMBoard();
         renderPMBags();
         renderPMLine();
@@ -2678,7 +3055,13 @@
       pmPlaying = !pmPlaying;
       document.getElementById('pmPlayTxt').textContent = pmPlaying ? 'Stopp' : 'Vollanimation';
       if (pmPlaying) {
-        if (pmIdx >= pmSteps.length - 1) pmIdx = 0;
+        if (pmIdx >= pmSteps.length - 1) {
+          pmIdx = 0;
+          renderPMCards();
+          renderPMBoard();
+          renderPMBags();
+          renderPMLine();
+        }
         const spd = getStepDelay('pmSpeed', false);
         pmTimer = setTimeout(playNextPMStep, spd);
       } else {
