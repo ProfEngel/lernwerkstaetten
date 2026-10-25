@@ -36,13 +36,15 @@ Eine didaktisch aufbereitete Lernwerkstatt mit **fünf Lernbereichen** und **int
   - **🎯 5 Übungs-Nuggets:** Einmaleins- und Divisionsaufgaben mit Rest-Eingabe und ausführlichem Rechenweg
 
 - **🏰 Rechnen bis 1000 (Neu):**
-  - **🏺 100er-, 10er- und 1er-Töpfe:** Farbcodiert nach Grundschuldidaktik:
-    - 🔵 **100er-Topf (Blau):** Hunderter-Platten (H)
-    - 🔴 **10er-Topf (Rot):** Zehner-Stangen (Z)
+  - **🏺 100er-, 10er- und 1er-Töpfe:** Farbcodiert nach dem Montessori-Standard:
+    - 🔴 **100er-Topf (Rot):** Hunderter-Platten (H)
+    - 🔵 **10er-Topf (Blau):** Zehner-Stangen (Z)
     - 🟢 **1er-Topf (Grün):** Einer-Würfel (E)
     - Mit animierter Bündelung (10 Einer werden zu 1 Zehner, 10 Zehner zu 1 Hunderter) und Entbündelung bei Subtraktion
-  - **🔢 Tausendertafel:** 10 Hunderter-Felder (1–100 bis 901–1000) mit Froschsprung, Start- und Zwischenstopp-Kennzeichnung
-  - **📏 Zahlenstrahl bis 1000:** Didaktische Sprungbögen für Hunderter-, Zehner- und Einerschritte
+  - **🔢 Tausendertafel (Immer vollständig 1–1000 & Einzel-Fokus auf Wunsch):**
+    - **Vollständige Ansicht (Standard):** Alle 10 Hunderter-Felder (1–1000) gleichzeitig im Überblick mit lückenloser Pfadverfolgung des Frosches.
+    - **Einzel-Hunderter (Fokus-Ansicht):** Auf Wunsch kann jedes Hunderterfeld groß im Fokus betrachtet und durchgeschaltet werden.
+  - **📏 Zahlenstrahl bis 1000:** Didaktische Sprungbögen für Hunderter (Rot), Zehner (Blau) und Einer (Grün)
   - **🎯 5 Übungs-Nuggets:** 5 zufällige 3-stellige Rechnungen mit Stellenwert-Eingabe, „Prüfen & Lösen“, didaktischem Schritt-für-Schritt Lösungsweg, Sternen und Audiofeedback
 
 ## Didaktisches Konzept der 5 Übungs-Nuggets

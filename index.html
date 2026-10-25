@@ -106,12 +106,12 @@
       transition: all 0.2s ease;
     }
     .pot-card-h {
-      border: 2.5px solid #2563eb;
-      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-    }
-    .pot-card-z {
       border: 2.5px solid #dc2626;
       background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+    }
+    .pot-card-z {
+      border: 2.5px solid #2563eb;
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
     }
     .pot-card-e {
       border: 2.5px solid #16a34a;
@@ -133,7 +133,7 @@
     .pot-token-h {
       width: 38px;
       height: 38px;
-      background: #2563eb;
+      background: #dc2626;
       color: #ffffff;
       border-radius: 6px;
       display: inline-flex;
@@ -141,14 +141,14 @@
       justify-content: center;
       font-size: 11px;
       font-weight: 800;
-      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
-      border: 1.5px solid #1d4ed8;
+      box-shadow: 0 2px 4px rgba(220,38,38,0.3);
+      border: 1.5px solid #b91c1c;
       transition: transform 0.2s;
     }
     .pot-token-z {
       width: 15px;
       height: 44px;
-      background: #dc2626;
+      background: #2563eb;
       color: #ffffff;
       border-radius: 4px;
       display: inline-flex;
@@ -156,9 +156,69 @@
       justify-content: center;
       font-size: 9px;
       font-weight: 800;
-      box-shadow: 0 2px 4px rgba(220,38,38,0.3);
-      border: 1.5px solid #b91c1c;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+      border: 1.5px solid #1d4ed8;
       transition: transform 0.2s;
+    }
+
+    /* Vollständige Tausendertafel (1–1000) */
+    .thousand-full-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .hundred-block {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .hundred-block.has-steps {
+      border-color: #93c5fd;
+      background: #f0f9ff;
+    }
+    .hundred-block.active-block {
+      border-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+    }
+    .hundred-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #475569;
+      cursor: pointer;
+    }
+    .hundred-block-cells {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2px;
+    }
+    .cell-1000-mini {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 4px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      position: relative;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .cell-1000-mini:hover {
+      border-color: #f59e0b;
+      transform: scale(1.15);
+      z-index: 20;
     }
     .pot-token-e {
       width: 17px;
@@ -1006,25 +1066,25 @@
         <!-- Ansicht 1: 100er, 10er & 1er Töpfe -->
         <div id="thSec-pots" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
           
-          <!-- 3 Stellenwert-Töpfe nebeneinander -->
+          <!-- 3 Stellenwert-Töpfe nebeneinander (Montessori-Farbcodierung: H=Rot, Z=Blau, E=Grün) -->
           <div class="pot-grid">
-            <!-- 100er-Topf (Blau) -->
+            <!-- 100er-Topf (Rot) -->
             <div class="pot-card pot-card-h">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 13px; font-weight: 800; color: #1e40af;">🔵 100er-Topf</span>
-                <span id="thBadgeH" class="font-num" style="background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">H: 0</span>
+                <span style="font-size: 13px; font-weight: 800; color: #991b1b;">🔴 100er-Topf</span>
+                <span id="thBadgeH" class="font-num" style="background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">H: 0</span>
               </div>
-              <div style="font-size: 11px; font-weight: 700; color: #3b82f6;" id="thValH">Wert: 0</div>
+              <div style="font-size: 11px; font-weight: 700; color: #ef4444;" id="thValH">Wert: 0</div>
               <div id="thTokensH" class="pot-tokens-area"></div>
             </div>
 
-            <!-- 10er-Topf (Rot) -->
+            <!-- 10er-Topf (Blau) -->
             <div class="pot-card pot-card-z">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 13px; font-weight: 800; color: #991b1b;">🔴 10er-Topf</span>
-                <span id="thBadgeZ" class="font-num" style="background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">Z: 0</span>
+                <span style="font-size: 13px; font-weight: 800; color: #1e40af;">🔵 10er-Topf</span>
+                <span id="thBadgeZ" class="font-num" style="background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">Z: 0</span>
               </div>
-              <div style="font-size: 11px; font-weight: 700; color: #ef4444;" id="thValZ">Wert: 0</div>
+              <div style="font-size: 11px; font-weight: 700; color: #3b82f6;" id="thValZ">Wert: 0</div>
               <div id="thTokensZ" class="pot-tokens-area"></div>
             </div>
 
@@ -1052,30 +1112,48 @@
 
         </div>
 
-        <!-- Ansicht 2: Tausendertafel (10 Hunderterfelder) -->
-        <div id="thSec-grid" class="hidden" style="width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #475569;">
-              <span>🔢 Wähle ein Hunderter-Feld der Tausendertafel:</span>
-              <span id="thActiveHundredTxt" class="font-num" style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 8px;">Feld 401–500</span>
+        <!-- Ansicht 2: Tausendertafel (Vollständig 1–1000 & Einzel-Fokus auf Wunsch) -->
+        <div id="thSec-grid" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Umschalter: Vollständige Tafel (Standard) vs. Einzel-Hunderter (auf Wunsch) -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #fffbeb; padding: 8px 12px; border-radius: 14px; border: 1.5px solid #fde68a;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 800; color: #78350f;">Ansicht:</span>
+              <div style="display: flex; gap: 4px;">
+                <button id="thViewBtn-full" onclick="setTHGridView('full')" class="btn btn-primary" style="padding: 5px 12px; font-size: 11px;">🗺️ Vollständige Tafel (1–1000)</button>
+                <button id="thViewBtn-single" onclick="setTHGridView('single')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">🔍 Einzel-Hunderter (Fokus)</button>
+              </div>
             </div>
-            
-            <!-- 10 Hunderter-Buttons (1-100 bis 901-1000) -->
-            <div id="thHundredSelectors" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+            <span id="thViewInfoTxt" style="font-size: 11px; font-weight: 700; color: #92400e;">Immer vollständig: Alle 10 Hunderterfelder im Überblick</span>
           </div>
 
+          <!-- Legende (Montessori: H=Rot, Z=Blau, E=Grün) -->
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #64748b; flex-wrap: wrap; gap: 4px;">
-            <span>🐸 Frosch-Pfad (Schritte bleiben in allen Feldern bunt markiert):</span>
+            <span>🐸 Frosch-Pfad (Schritte bleiben bunt markiert):</span>
             <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
               <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 6px; border: 1px solid #bae6fd;">📍 Start</span>
-              <span style="background: #bfdbfe; color: #1e40af; padding: 2px 6px; border-radius: 6px; border: 1px solid #1d4ed8;">🔵 Hunderter</span>
-              <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 6px; border: 1px solid #dc2626;">🔴 Zehner</span>
+              <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 6px; border: 1px solid #dc2626;">🔴 Hunderter</span>
+              <span style="background: #bfdbfe; color: #1e40af; padding: 2px 6px; border-radius: 6px; border: 1px solid #1d4ed8;">🔵 Zehner</span>
               <span style="background: #fed7aa; color: #9a3412; padding: 2px 6px; border-radius: 6px; border: 1px solid #ea580c;">🟠 Stopp</span>
               <span style="background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 6px; border: 1px solid #16a34a;">🟢 Einer</span>
             </div>
           </div>
 
-          <div id="thThousandBoard" class="thousand-grid" style="background: #f8fafc; padding: 8px; border-radius: 14px; border: 2px solid #cbd5e1;"></div>
+          <!-- Bereich A: Vollständige Tausendertafel (alle 10 Hunderterfelder 1–1000) -->
+          <div id="thFullGridContainer" class="thousand-full-grid"></div>
+
+          <!-- Bereich B: Einzel-Hunderter Fokus-Ansicht (wie zuvor, auf Wunsch) -->
+          <div id="thSingleGridContainer" class="hidden" style="width: 100%; max-width: 540px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #475569;">
+                <span>🔢 Wähle ein Hunderter-Feld der Tausendertafel:</span>
+                <span id="thActiveHundredTxt" class="font-num" style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 8px;">Feld 401–500</span>
+              </div>
+              <div id="thHundredSelectors" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+            </div>
+            <div id="thThousandBoard" class="thousand-grid" style="background: #f8fafc; padding: 8px; border-radius: 14px; border: 2px solid #cbd5e1;"></div>
+          </div>
+
         </div>
 
         <!-- Ansicht 3: Zahlenstrahl bis 1000 -->
@@ -1116,7 +1194,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v4';
+        const CACHE_NAME = 'lernwerkstatt-offline-v5';
         self.addEventListener('install', e => { self.skipWaiting(); });
         self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', e => {
@@ -2451,6 +2529,7 @@
     let thTimer = null;
     let thPlaying = false;
     let thActiveHundred = 4; // 0: 1-100, 1: 101-200, ... 4: 401-500
+    let thGridViewMode = 'full'; // 'full' (immer standardmäßig vollständig) oder 'single' (Fokus-Ansicht auf Wunsch)
 
     function switchTHSub(id) {
       ['pots', 'grid', 'line', 'quiz'].forEach(x => {
@@ -2472,6 +2551,35 @@
 
       if (id === 'line') setTimeout(renderTHLine, 40);
       if (id === 'grid') renderTHBoard();
+    }
+
+    function setTHGridView(mode) {
+      thGridViewMode = mode;
+      const fullBtn = document.getElementById('thViewBtn-full');
+      const singleBtn = document.getElementById('thViewBtn-single');
+      const fullCont = document.getElementById('thFullGridContainer');
+      const singleCont = document.getElementById('thSingleGridContainer');
+      const infoTxt = document.getElementById('thViewInfoTxt');
+
+      if (mode === 'full') {
+        if (fullBtn) fullBtn.className = 'btn btn-primary';
+        if (singleBtn) singleBtn.className = 'btn btn-secondary';
+        if (fullCont) fullCont.classList.remove('hidden');
+        if (singleCont) singleCont.classList.add('hidden');
+        if (infoTxt) infoTxt.textContent = 'Immer vollständig: Alle 10 Hunderterfelder im Überblick';
+      } else {
+        if (fullBtn) fullBtn.className = 'btn btn-secondary';
+        if (singleBtn) singleBtn.className = 'btn btn-primary';
+        if (fullCont) fullCont.classList.add('hidden');
+        if (singleCont) singleCont.classList.remove('hidden');
+        if (infoTxt) infoTxt.textContent = 'Fokus-Ansicht: Ausgewähltes Hunderter-Feld groß anzeigen';
+      }
+      renderTHBoard();
+    }
+
+    function zoomToHundred(hIndex) {
+      thActiveHundred = hIndex;
+      setTHGridView('single');
     }
 
     function calcTHSteps() {
@@ -2499,12 +2607,12 @@
       thPathMap[cur] = { type: 'start', desc: `📍 Startzahl ${cur}` };
 
       if (op === '+') {
-        // Hunderter
+        // 1. Hunderter (Montessori: Rot)
         if (hB > 0) {
           const prev = cur;
           for (let k = 1; k <= hB / 100; k++) {
             const v = prev + k * 100;
-            thPathMap[v] = { type: 'hundred', desc: `🔵 Hundertersprung: +100 ➔ ${v}` };
+            thPathMap[v] = { type: 'hundred', desc: `🔴 Hundertersprung: +100 ➔ ${v}` };
           }
           cur += hB;
           thSteps.push({
@@ -2513,17 +2621,17 @@
             h: Math.floor(cur / 100),
             z: Math.floor((cur % 100) / 10),
             e: cur % 10,
-            action: `🔵 Hunderter-Schritt: +${hB / 100} Hunderter (${hB}) in den 100er-Topf gelegt.`,
+            action: `🔴 Hunderter-Schritt: +${hB / 100} Hunderter (${hB}) in den roten 100er-Topf gelegt.`,
             cardTitle: '2. Hunderter addieren',
             delta: `+${hB}`
           });
         }
-        // Zehner
+        // 2. Zehner (Montessori: Blau)
         if (zB > 0) {
           const prev = cur;
           for (let k = 1; k <= zB / 10; k++) {
             const v = prev + k * 10;
-            thPathMap[v] = { type: 'ten', desc: `🔴 Zehnersprung: +10 ➔ ${v}` };
+            thPathMap[v] = { type: 'ten', desc: `🔵 Zehnersprung: +10 ➔ ${v}` };
           }
           cur += zB;
           const prevZ = Math.floor((prev % 100) / 10);
@@ -2535,13 +2643,13 @@
             h: Math.floor(cur / 100),
             z: Math.floor((cur % 100) / 10),
             e: cur % 10,
-            action: `🔴 Zehner-Schritt: +${addZ} Zehner (${zB}) in den 10er-Topf gelegt.` +
-                    (bundled ? ' 🔄 Übertrag: 10 Zehner voll! Zu 1 neuem Hunderter im 100er-Topf gebündelt!' : ''),
+            action: `🔵 Zehner-Schritt: +${addZ} Zehner (${zB}) in den blauen 10er-Topf gelegt.` +
+                    (bundled ? ' 🔄 Übertrag: 10 Zehner voll! Zu 1 neuem Hunderter im roten 100er-Topf gebündelt!' : ''),
             cardTitle: '3. Zehner addieren',
             delta: `+${zB}`
           });
         }
-        // Einer
+        // 3. Einer (Montessori: Grün)
         if (eB > 0) {
           const prev = cur;
           for (let k = 1; k <= eB; k++) {
@@ -2558,8 +2666,8 @@
             h: Math.floor(cur / 100),
             z: Math.floor((cur % 100) / 10),
             e: cur % 10,
-            action: `🟢 Einer-Schritt: +${eB} Einer in den 1er-Topf gelegt.` +
-                    (bundled ? ' 🔄 Übertrag: 10 Einer voll! Zu 1 neuem Zehner im 10er-Topf gebündelt!' : ''),
+            action: `🟢 Einer-Schritt: +${eB} Einer in den grünen 1er-Topf gelegt.` +
+                    (bundled ? ' 🔄 Übertrag: 10 Einer voll! Zu 1 neuem Zehner im blauen 10er-Topf gebündelt!' : ''),
             cardTitle: '4. Einer addieren',
             delta: `+${eB}`
           });
@@ -2570,7 +2678,7 @@
           const prev = cur;
           for (let k = 1; k <= hB / 100; k++) {
             const v = Math.max(0, prev - k * 100);
-            thPathMap[v] = { type: 'hundred', desc: `🔵 Hundertersprung: −100 ➔ ${v}` };
+            thPathMap[v] = { type: 'hundred', desc: `🔴 Hundertersprung: −100 ➔ ${v}` };
           }
           cur = Math.max(0, cur - hB);
           thSteps.push({
@@ -2579,7 +2687,7 @@
             h: Math.floor(cur / 100),
             z: Math.floor((cur % 100) / 10),
             e: cur % 10,
-            action: `🔵 Hunderter-Schritt: −${hB / 100} Hunderter (${hB}) aus dem 100er-Topf genommen.`,
+            action: `🔴 Hunderter-Schritt: −${hB / 100} Hunderter (${hB}) aus dem roten 100er-Topf genommen.`,
             cardTitle: '2. Hunderter abziehen',
             delta: `−${hB}`
           });
@@ -2588,7 +2696,7 @@
           const prev = cur;
           for (let k = 1; k <= zB / 10; k++) {
             const v = Math.max(0, prev - k * 10);
-            thPathMap[v] = { type: 'ten', desc: `🔴 Zehnersprung: −10 ➔ ${v}` };
+            thPathMap[v] = { type: 'ten', desc: `🔵 Zehnersprung: −10 ➔ ${v}` };
           }
           const prevZ = Math.floor((prev % 100) / 10);
           const subZ = zB / 10;
@@ -2600,7 +2708,7 @@
             h: Math.floor(cur / 100),
             z: Math.floor((cur % 100) / 10),
             e: cur % 10,
-            action: `🔴 Zehner-Schritt: −${subZ} Zehner (${zB}) abgezogen.` +
+            action: `🔵 Zehner-Schritt: −${subZ} Zehner (${zB}) abgezogen.` +
                     (unbundled ? ' 🔓 Entbündelt: 1 Hunderter wurde vorher in 10 Zehner gewechselt!' : ''),
             cardTitle: '3. Zehner abziehen',
             delta: `−${zB}`
@@ -2695,7 +2803,7 @@
       // Action banner
       document.getElementById('thPotActionTxt').textContent = step.action;
 
-      // Tokens in 100er-Topf (Blue tiles)
+      // Tokens in 100er-Topf (Montessori: Red tiles)
       const tokH = document.getElementById('thTokensH');
       tokH.innerHTML = '';
       for (let i = 0; i < hCount; i++) {
@@ -2709,7 +2817,7 @@
         tokH.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Topf ist leer (0 Hunderter)</span>';
       }
 
-      // Tokens in 10er-Topf (Red bars)
+      // Tokens in 10er-Topf (Montessori: Blue bars)
       const tokZ = document.getElementById('thTokensZ');
       tokZ.innerHTML = '';
       for (let i = 0; i < zCount; i++) {
@@ -2723,7 +2831,7 @@
         tokZ.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Topf ist leer (0 Zehner)</span>';
       }
 
-      // Tokens in 1er-Topf (Green cubes)
+      // Tokens in 1er-Topf (Montessori: Green cubes)
       const tokE = document.getElementById('thTokensE');
       tokE.innerHTML = '';
       for (let i = 0; i < eCount; i++) {
@@ -2743,123 +2851,233 @@
     }
 
     function renderTHBoard() {
-      const selectors = document.getElementById('thHundredSelectors');
-      const board = document.getElementById('thThousandBoard');
-      if (!selectors || !board) return;
-
       const step = thSteps[thIdx] || thSteps[0];
       const curVal = step ? step.num : 0;
       const startVal = thSteps[0] ? thSteps[0].num : 0;
 
-      // Render 10 Hundred-Buttons
-      selectors.innerHTML = '';
-      for (let h = 0; h < 10; h++) {
-        const s = h * 100 + 1;
-        const e = (h + 1) * 100;
-        const btn = document.createElement('button');
-        const isCurrentHundred = (thActiveHundred === h);
-        const containsCurVal = (curVal >= s && curVal <= e);
+      // 1. VOLLSTÄNDIGE TAUSENDERTAFEL RENDERN (1–1000)
+      const fullCont = document.getElementById('thFullGridContainer');
+      if (fullCont) {
+        fullCont.innerHTML = '';
+        for (let h = 0; h < 10; h++) {
+          const s = h * 100 + 1;
+          const e = (h + 1) * 100;
 
-        // Check which path steps are inside this hundred
-        let hasStart = false, hasH = false, hasZ = false, hasE = false;
-        for (let num in thPathMap) {
-          const n = parseInt(num, 10);
-          if (n >= s && n <= e) {
-            const t = thPathMap[n].type;
-            if (t === 'start') hasStart = true;
-            else if (t === 'hundred') hasH = true;
-            else if (t === 'ten') hasZ = true;
-            else if (t === 'stop' || t === 'one') hasE = true;
+          // Check steps in this hundred
+          let hasStart = false, hasH = false, hasZ = false, hasE = false;
+          for (let num in thPathMap) {
+            const n = parseInt(num, 10);
+            if (n >= s && n <= e) {
+              const t = thPathMap[n].type;
+              if (t === 'start') hasStart = true;
+              else if (t === 'hundred') hasH = true;
+              else if (t === 'ten') hasZ = true;
+              else if (t === 'stop' || t === 'one') hasE = true;
+            }
           }
+          const hasSteps = (hasStart || hasH || hasZ || hasE);
+          const containsCurVal = (curVal >= s && curVal <= e);
+
+          const block = document.createElement('div');
+          block.className = 'hundred-block' + (hasSteps ? ' has-steps' : '') + (containsCurVal ? ' active-block' : '');
+
+          let badges = '';
+          if (hasStart) badges += ' 📍';
+          if (hasH) badges += ' 🔴';
+          if (hasZ) badges += ' 🔵';
+          if (hasE) badges += ' 🟢';
+          if (containsCurVal) badges += ' 🐸';
+
+          // Block Header
+          const header = document.createElement('div');
+          header.className = 'hundred-block-header';
+          header.innerHTML = `
+            <span>Feld ${s}–${e}${badges}</span>
+            <span style="font-size: 10px; color: #2563eb; text-decoration: underline;" title="Dieses Hunderterfeld groß im Fokus ansehen">Vergrößern 🔍</span>
+          `;
+          header.onclick = () => zoomToHundred(h);
+          block.appendChild(header);
+
+          // 10x10 Mini-Cells Grid
+          const grid = document.createElement('div');
+          grid.className = 'hundred-block-cells';
+
+          for (let n = s; n <= e; n++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell-1000-mini font-num';
+            cell.textContent = n;
+
+            const isCur = (n === curVal);
+
+            if (thPathMap[n]) {
+              const item = thPathMap[n];
+              const t = item.type;
+              if (t === 'start') {
+                cell.style.background = '#bae6fd';
+                cell.style.borderColor = '#0284c7';
+                cell.style.color = '#0369a1';
+                cell.style.fontWeight = '900';
+                cell.title = item.desc;
+              } else if (t === 'hundred') {
+                cell.style.background = '#fee2e2';
+                cell.style.borderColor = '#dc2626';
+                cell.style.color = '#991b1b';
+                cell.style.fontWeight = '900';
+                cell.title = item.desc;
+              } else if (t === 'ten') {
+                cell.style.background = '#bfdbfe';
+                cell.style.borderColor = '#1d4ed8';
+                cell.style.color = '#1e40af';
+                cell.style.fontWeight = '900';
+                cell.title = item.desc;
+              } else if (t === 'stop') {
+                cell.style.background = '#fed7aa';
+                cell.style.borderColor = '#ea580c';
+                cell.style.color = '#9a3412';
+                cell.style.fontWeight = '900';
+                cell.title = item.desc;
+              } else if (t === 'one') {
+                cell.style.background = '#dcfce7';
+                cell.style.borderColor = '#16a34a';
+                cell.style.color = '#166534';
+                cell.style.fontWeight = '900';
+                cell.title = item.desc;
+              }
+            } else {
+              cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
+            }
+
+            if (isCur) {
+              cell.style.background = '#fef08a';
+              cell.style.borderColor = '#ea580c';
+              cell.style.transform = 'scale(1.25)';
+              cell.style.boxShadow = '0 2px 8px rgba(234, 88, 12, 0.4)';
+              cell.style.zIndex = '15';
+              cell.innerHTML = `<span style="position: absolute; top: -6px; left: -1px; font-size: 9px;">🐸</span>${n}`;
+            }
+
+            cell.onclick = (e) => {
+              e.stopPropagation();
+              zoomToHundred(h);
+            };
+
+            grid.appendChild(cell);
+          }
+
+          block.appendChild(grid);
+          fullCont.appendChild(block);
         }
-
-        const hasAnySteps = (hasStart || hasH || hasZ || hasE);
-
-        btn.type = 'button';
-        btn.className = isCurrentHundred ? 'btn btn-primary' : 'btn btn-secondary';
-        btn.style.padding = '4px 6px';
-        btn.style.fontSize = '10px';
-        btn.style.position = 'relative';
-        if (!isCurrentHundred && hasAnySteps) {
-          btn.style.borderColor = '#93c5fd';
-          btn.style.background = '#f0f9ff';
-          btn.style.fontWeight = '800';
-        }
-
-        let badges = '';
-        if (hasStart) badges += ' 📍';
-        if (hasH) badges += ' 🔵';
-        if (hasZ) badges += ' 🔴';
-        if (hasE) badges += ' 🟢';
-        if (containsCurVal) badges += ' 🐸';
-
-        btn.innerHTML = `<span>${s}-${e}${badges}</span>`;
-        btn.onclick = () => selectTHHundred(h);
-        selectors.appendChild(btn);
       }
 
-      // Active Hundred Title
-      const actStart = thActiveHundred * 100 + 1;
-      const actEnd = (thActiveHundred + 1) * 100;
-      document.getElementById('thActiveHundredTxt').textContent = `Hunderter-Feld: ${actStart} – ${actEnd}`;
+      // 2. EINZEL-HUNDERTER FOKUS-ANSICHT RENDERN (AUF WUNSCH)
+      const selectors = document.getElementById('thHundredSelectors');
+      const board = document.getElementById('thThousandBoard');
+      if (selectors && board) {
+        selectors.innerHTML = '';
+        for (let h = 0; h < 10; h++) {
+          const s = h * 100 + 1;
+          const e = (h + 1) * 100;
+          const btn = document.createElement('button');
+          const isCurrentHundred = (thActiveHundred === h);
+          const containsCurVal = (curVal >= s && curVal <= e);
 
-      // Render 100 Cells for this hundred
-      board.innerHTML = '';
-      for (let n = actStart; n <= actEnd; n++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell-1000 font-num';
-        cell.textContent = n;
-
-        const isCur = (n === curVal);
-
-        // Check if n is on the calculation path
-        if (thPathMap[n]) {
-          const item = thPathMap[n];
-          const t = item.type;
-          if (t === 'start') {
-            cell.style.background = '#bae6fd';
-            cell.style.borderColor = '#0284c7';
-            cell.style.color = '#0369a1';
-            cell.style.fontWeight = '900';
-            cell.title = item.desc;
-          } else if (t === 'hundred') {
-            cell.style.background = '#bfdbfe';
-            cell.style.borderColor = '#1d4ed8';
-            cell.style.color = '#1e40af';
-            cell.style.fontWeight = '900';
-            cell.title = item.desc;
-          } else if (t === 'ten') {
-            cell.style.background = '#fee2e2';
-            cell.style.borderColor = '#dc2626';
-            cell.style.color = '#991b1b';
-            cell.style.fontWeight = '900';
-            cell.title = item.desc;
-          } else if (t === 'stop') {
-            cell.style.background = '#fed7aa';
-            cell.style.borderColor = '#ea580c';
-            cell.style.color = '#9a3412';
-            cell.style.fontWeight = '900';
-            cell.title = item.desc;
-          } else if (t === 'one') {
-            cell.style.background = '#dcfce7';
-            cell.style.borderColor = '#16a34a';
-            cell.style.color = '#166534';
-            cell.style.fontWeight = '900';
-            cell.title = item.desc;
+          let hasStart = false, hasH = false, hasZ = false, hasE = false;
+          for (let num in thPathMap) {
+            const n = parseInt(num, 10);
+            if (n >= s && n <= e) {
+              const t = thPathMap[n].type;
+              if (t === 'start') hasStart = true;
+              else if (t === 'hundred') hasH = true;
+              else if (t === 'ten') hasZ = true;
+              else if (t === 'stop' || t === 'one') hasE = true;
+            }
           }
-        } else {
-          cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
+          const hasAnySteps = (hasStart || hasH || hasZ || hasE);
+
+          btn.type = 'button';
+          btn.className = isCurrentHundred ? 'btn btn-primary' : 'btn btn-secondary';
+          btn.style.padding = '4px 6px';
+          btn.style.fontSize = '10px';
+          btn.style.position = 'relative';
+          if (!isCurrentHundred && hasAnySteps) {
+            btn.style.borderColor = '#93c5fd';
+            btn.style.background = '#f0f9ff';
+            btn.style.fontWeight = '800';
+          }
+
+          let badges = '';
+          if (hasStart) badges += ' 📍';
+          if (hasH) badges += ' 🔴';
+          if (hasZ) badges += ' 🔵';
+          if (hasE) badges += ' 🟢';
+          if (containsCurVal) badges += ' 🐸';
+
+          btn.innerHTML = `<span>${s}-${e}${badges}</span>`;
+          btn.onclick = () => selectTHHundred(h);
+          selectors.appendChild(btn);
         }
 
-        if (isCur) {
-          cell.style.borderColor = '#ea580c';
-          cell.style.transform = 'scale(1.15)';
-          cell.style.boxShadow = '0 3px 10px rgba(234, 88, 12, 0.4)';
-          cell.style.zIndex = '10';
-          cell.innerHTML = `<span style="position: absolute; top: -7px; left: 2px; font-size: 11px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">🐸</span>${n}`;
-        }
+        const actStart = thActiveHundred * 100 + 1;
+        const actEnd = (thActiveHundred + 1) * 100;
+        document.getElementById('thActiveHundredTxt').textContent = `Feld: ${actStart} – ${actEnd}`;
 
-        board.appendChild(cell);
+        board.innerHTML = '';
+        for (let n = actStart; n <= actEnd; n++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell-1000 font-num';
+          cell.textContent = n;
+
+          const isCur = (n === curVal);
+
+          if (thPathMap[n]) {
+            const item = thPathMap[n];
+            const t = item.type;
+            if (t === 'start') {
+              cell.style.background = '#bae6fd';
+              cell.style.borderColor = '#0284c7';
+              cell.style.color = '#0369a1';
+              cell.style.fontWeight = '900';
+              cell.title = item.desc;
+            } else if (t === 'hundred') {
+              cell.style.background = '#fee2e2';
+              cell.style.borderColor = '#dc2626';
+              cell.style.color = '#991b1b';
+              cell.style.fontWeight = '900';
+              cell.title = item.desc;
+            } else if (t === 'ten') {
+              cell.style.background = '#bfdbfe';
+              cell.style.borderColor = '#1d4ed8';
+              cell.style.color = '#1e40af';
+              cell.style.fontWeight = '900';
+              cell.title = item.desc;
+            } else if (t === 'stop') {
+              cell.style.background = '#fed7aa';
+              cell.style.borderColor = '#ea580c';
+              cell.style.color = '#9a3412';
+              cell.style.fontWeight = '900';
+              cell.title = item.desc;
+            } else if (t === 'one') {
+              cell.style.background = '#dcfce7';
+              cell.style.borderColor = '#16a34a';
+              cell.style.color = '#166534';
+              cell.style.fontWeight = '900';
+              cell.title = item.desc;
+            }
+          } else {
+            cell.title = `Zahl ${n}: ${Math.floor(n/100)} Hunderter, ${Math.floor((n%100)/10)} Zehner, ${n%10} Einer`;
+          }
+
+          if (isCur) {
+            cell.style.background = '#fef08a';
+            cell.style.borderColor = '#ea580c';
+            cell.style.transform = 'scale(1.15)';
+            cell.style.boxShadow = '0 3px 10px rgba(234, 88, 12, 0.4)';
+            cell.style.zIndex = '10';
+            cell.innerHTML = `<span style="position: absolute; top: -7px; left: 2px; font-size: 11px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">🐸</span>${n}`;
+          }
+
+          board.appendChild(cell);
+        }
       }
     }
 
@@ -2909,7 +3127,7 @@
         }
       }
 
-      // Draw Jump Arcs up to thIdx
+      // Draw Jump Arcs up to thIdx (Montessori: H=Rot, Z=Blau, E=Grün)
       for (let i = 1; i <= thIdx; i++) {
         if (!thSteps[i]) continue;
         const x1 = getX(thSteps[i-1].num);
@@ -2919,9 +3137,9 @@
         const midX = (x1 + x2) / 2;
         const peakY = yBase - arcH;
 
-        // Color based on step type
-        let col = '#2563eb';
-        if (i === 2) col = '#dc2626';
+        // Color based on step type (Montessori: 1=Rot, 2=Blau, 3=Grün)
+        let col = '#dc2626';
+        if (i === 2) col = '#2563eb';
         if (i === 3) col = '#16a34a';
 
         ctx.beginPath();
