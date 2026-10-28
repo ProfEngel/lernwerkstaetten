@@ -864,7 +864,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 8px;">
         <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
           <button id="clkSubTab-explore" onclick="switchClockSub('explore')" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;">🕰️ Uhr einstellen & lernen</button>
-          <button id="clkSubTab-quiz" onclick="switchClockSub('quiz')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">🎯 5 Übungs-Nuggets</button>
+          <button id="clkSubTab-quiz" onclick="switchClockSub('quiz')" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">🎯 7 Buch-Nuggets</button>
         </div>
       </div>
 
@@ -1176,7 +1176,7 @@
           <button id="pmSubTab-100" onclick="switchPMSub('100')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🔢 100er-Tafel</button>
           <button id="pmSubTab-bags" onclick="switchPMSub('bags')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎒 Säckchen & Murmeln</button>
           <button id="pmSubTab-line" onclick="switchPMSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Rechenleiste</button>
-          <button id="pmSubTab-quiz" onclick="switchPMSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
+          <button id="pmSubTab-quiz" onclick="switchPMSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 7 Buch-Nuggets</button>
         </div>
       </div>
 
@@ -1269,7 +1269,7 @@
             <button id="mdSubTab-cookies" onclick="switchMDSub('cookies')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🍪 Backblech</button>
             <button id="mdSubTab-grid" onclick="switchMDSub('grid')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🟦 Punktefeld</button>
             <button id="mdSubTab-line" onclick="switchMDSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Zahlenstrahl</button>
-            <button id="mdSubTab-quiz" onclick="switchMDSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
+            <button id="mdSubTab-quiz" onclick="switchMDSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 6 Buch-Nuggets</button>
           </div>
         </div>
       </div>
@@ -1357,11 +1357,12 @@
           <button onclick="randomTH()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 13px;">🎲 Zufall</button>
         </div>
 
-        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+        <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px; flex-wrap: wrap;">
           <button id="thSubTab-pots" onclick="switchTHSub('pots')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;">🏺 Töpfe (H-Z-E)</button>
+          <button id="thSubTab-secret" onclick="switchTHSub('secret')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🕵️ Geheimschrift & Steckbrief</button>
           <button id="thSubTab-grid" onclick="switchTHSub('grid')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🔢 Tausendertafel</button>
           <button id="thSubTab-line" onclick="switchTHSub('line')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">📏 Zahlenstrahl</button>
-          <button id="thSubTab-quiz" onclick="switchTHSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 5 Übungs-Nuggets</button>
+          <button id="thSubTab-quiz" onclick="switchTHSub('quiz')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">🎯 Buch-Nuggets</button>
         </div>
       </div>
 
@@ -1419,6 +1420,9 @@
           </div>
 
         </div>
+
+        <!-- Ansicht 1b: Geheimschrift (Quadrate, Striche, Punkte), Zahlensteckbrief & Stellentafel mit Quersumme (Buch S. 19–23) -->
+        <div id="thSec-secret" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 14px;"></div>
 
         <!-- Ansicht 2: Tausendertafel (Vollständig 1–1000 & Einzel-Fokus auf Wunsch) -->
         <div id="thSec-grid" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
@@ -1504,7 +1508,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v14';
+        const CACHE_NAME = 'lernwerkstatt-offline-v15';
         const ASSETS = [
           './',
           './index.html',
@@ -3475,7 +3479,7 @@
     let thGridViewMode = 'full'; // 'full' (immer standardmäßig vollständig) oder 'single' (Fokus-Ansicht auf Wunsch)
 
     function switchTHSub(id) {
-      ['pots', 'grid', 'line', 'quiz'].forEach(x => {
+      ['pots', 'secret', 'grid', 'line', 'quiz'].forEach(x => {
         const sec = document.getElementById(`thSec-${x}`);
         const btn = document.getElementById(`thSubTab-${x}`);
         if (sec) sec.classList.add('hidden');
@@ -3494,6 +3498,7 @@
 
       if (id === 'line') setTimeout(renderTHLine, 40);
       if (id === 'grid') renderTHBoard();
+      if (id === 'secret') renderTHSecret();
     }
 
     function setTHGridView(mode) {
@@ -3705,6 +3710,7 @@
       updateActiveHundredForCurrentStep();
       renderTHCards();
       renderTHPots();
+      renderTHSecret();
       renderTHBoard();
       renderTHLine();
     }
@@ -4227,10 +4233,296 @@
       }
     }
 
+    // =========================================================
+    // GEHEIMSCHRIFT, ZAHLENSTECKBRIEF & STELLENTAFEL (BUCH S. 19–23)
+    // =========================================================
+    function numberToGermanWord(n) {
+      if (n === 0) return 'null';
+      if (n === 1000) return 'eintausend';
+      const ones = ['', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf', 'dreizehn', 'vierzehn', 'fünfzehn', 'sechzehn', 'siebzehn', 'achtzehn', 'neunzehn'];
+      const tens = ['', '', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig'];
+      const h = Math.floor(n / 100);
+      const rem = n % 100;
+      let res = '';
+      if (h > 0) {
+        res += ones[h] + 'hundert';
+      }
+      if (rem > 0) {
+        if (rem === 1) res += 'eins';
+        else if (rem < 20) res += ones[rem];
+        else {
+          const z = Math.floor(rem / 10);
+          const e = rem % 10;
+          if (e === 0) res += tens[z];
+          else res += ones[e] + 'und' + tens[z];
+        }
+      }
+      return res;
+    }
+
+    // Erzeugt originalgetreue Geheimschrift als SVG (wie Buch S. 19, 20, 21:
+    // Hunderter = Rote Quadrate, Zehner = Blaue waagerechte Striche im 5er-Bündel, Einer = Grüne Punkte in 5er-Reihen)
+    // Optional mit durchgestrichenen Symbolen (für Minus, S. 21 Aufg. 1 & 2) oder 2. Zeile (für Plus, S. 21 Aufg. 4 & 5)
+    function makeSecretCodeSVG(h1, z1, e1, opts = {}) {
+      const strikeH = opts.strikeH || 0;
+      const strikeZ = opts.strikeZ || 0;
+      const strikeE = opts.strikeE || 0;
+      const addH = opts.addH || 0;
+      const addZ = opts.addZ || 0;
+      const addE = opts.addE || 0;
+
+      const sqSize = 26;
+      const sqGap = 8;
+      const barW = 32;
+      const barGapY = 5;
+      const dotR = 3.8;
+      const dotGap = 11;
+
+      const totalHCols = Math.max(h1, addH, 1);
+      const hAreaW = Math.max(36, totalHCols * (sqSize + sqGap));
+      const zCols = Math.max(Math.ceil(z1 / 5), Math.ceil(addZ / 5), 1);
+      const zAreaW = Math.max(44, zCols * (barW + 10));
+      const eAreaW = Math.max(50, Math.max(e1, addE, 1) * dotGap + 14);
+
+      const hasSecondRow = (addH > 0 || addZ > 0 || addE > 0);
+      const svgW = Math.min(680, Math.max(240, hAreaW + zAreaW + eAreaW + 50));
+      const svgH = hasSecondRow ? 98 : 54;
+
+      let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width: 100%; height: auto; overflow: visible;">`;
+
+      // Hilfsfunktion für eine Zeile Geheimschrift bei yTop
+      function drawRow(yTop, countH, countZ, countE, sH, sZ, sE, isSecondRow) {
+        let curX = 10;
+
+        // 1. Hunderter-Quadrate (Rot)
+        for (let i = 0; i < countH; i++) {
+          const x = curX + i * (sqSize + sqGap);
+          const y = yTop + 6;
+          const isStruck = (i >= countH - sH);
+          svg += `<rect x="${x}" y="${y}" width="${sqSize}" height="${sqSize}" rx="2" fill="${isSecondRow ? 'rgba(220,38,38,0.12)' : 'rgba(220,38,38,0.06)'}" stroke="#dc2626" stroke-width="2.4"/>`;
+          if (isStruck) {
+            svg += `<line x1="${x - 3}" y1="${y + sqSize + 3}" x2="${x + sqSize + 3}" y2="${y - 3}" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round"/>`;
+          }
+        }
+        curX += Math.max(countH, hasSecondRow ? Math.max(h1, addH) : countH) * (sqSize + sqGap) + (Math.max(h1, addH) > 0 ? 10 : 0);
+
+        // 2. Zehner-Striche (Blau, je bis zu 5 untereinander)
+        const numZBundles = Math.ceil(countZ / 5);
+        for (let b = 0; b < numZBundles; b++) {
+          const bx = curX + b * (barW + 10);
+          const inBundle = Math.min(5, countZ - b * 5);
+          for (let j = 0; j < inBundle; j++) {
+            const globalIdx = b * 5 + j;
+            const by = yTop + 8 + j * barGapY;
+            const isStruck = (globalIdx >= countZ - sZ);
+            svg += `<line x1="${bx}" y1="${by}" x2="${bx + barW}" y2="${by}" stroke="#2563eb" stroke-width="2.6" stroke-linecap="round"/>`;
+            if (isStruck) {
+              svg += `<line x1="${bx + 4}" y1="${by + 3.5}" x2="${bx + barW - 4}" y2="${by - 3.5}" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round"/>`;
+            }
+          }
+        }
+        const maxZBundles = Math.max(Math.ceil(z1 / 5), Math.ceil(addZ / 5));
+        curX += maxZBundles * (barW + 10) + (maxZBundles > 0 ? 8 : 0);
+
+        // 3. Einer-Punkte (Grün, nach 5 Punkten kleine Lücke wie im Buch!)
+        for (let k = 0; k < countE; k++) {
+          const extraGap = (k >= 5) ? 7 : 0;
+          const cx = curX + k * dotGap + extraGap + 4;
+          const cy = yTop + 14;
+          const isStruck = (k >= countE - sE);
+          svg += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="#16a34a"/>`;
+          if (isStruck) {
+            svg += `<line x1="${cx - 5}" y1="${cy + 5}" x2="${cx + 5}" y2="${cy - 5}" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round"/>`;
+          }
+        }
+      }
+
+      drawRow(6, h1, z1, e1, strikeH, strikeZ, strikeE, false);
+      if (hasSecondRow) {
+        drawRow(50, addH, addZ, addE, 0, 0, 0, true);
+      }
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    // Erzeugt die Stellentafel (H | Z | E) mit blauen Plättchen & Quersumme (wie Buch S. 23)
+    function makeStellentafelPlättchenHTML(num) {
+      const h = Math.floor(num / 100);
+      const z = Math.floor((num % 100) / 10);
+      const e = num % 10;
+      const qs = h + z + e;
+
+      function renderDots(count) {
+        if (count === 0) return `<span style="color:#cbd5e1; font-size:11px; font-style:italic;">leer (0)</span>`;
+        let d = '<div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; max-width:74px;">';
+        for (let i = 0; i < count; i++) {
+          d += `<span style="width:12px; height:12px; border-radius:50%; background:#1d4ed8; display:inline-block; box-shadow:0 1px 2px rgba(0,0,0,0.2);"></span>`;
+        }
+        d += '</div>';
+        return d;
+      }
+
+      return `
+        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center;">
+          <table style="border-collapse:collapse; border:2px solid #475569; background:#ffffff; border-radius:10px; overflow:hidden; text-align:center;">
+            <thead>
+              <tr style="border-bottom:2px solid #475569;">
+                <th style="padding:5px 18px; background:#fee2e2; color:#991b1b; font-weight:900; border-right:1.5px solid #94a3b8;">H</th>
+                <th style="padding:5px 18px; background:#dbeafe; color:#1e40af; font-weight:900; border-right:1.5px solid #94a3b8;">Z</th>
+                <th style="padding:5px 18px; background:#dcfce7; color:#166534; font-weight:900;">E</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1.5px solid #cbd5e1; font-size:15px; font-weight:900;">
+                <td style="padding:4px 12px; color:#dc2626; border-right:1.5px solid #cbd5e1;">${h}</td>
+                <td style="padding:4px 12px; color:#2563eb; border-right:1.5px solid #cbd5e1;">${z}</td>
+                <td style="padding:4px 12px; color:#16a34a;">${e}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 12px; border-right:1.5px solid #cbd5e1; min-width:76px; min-height:46px;">${renderDots(h)}</td>
+                <td style="padding:10px 12px; border-right:1.5px solid #cbd5e1; min-width:76px; min-height:46px;">${renderDots(z)}</td>
+                <td style="padding:10px 12px; min-width:76px; min-height:46px;">${renderDots(e)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="background:#fffbeb; border:1.5px solid #fcd34d; border-radius:14px; padding:10px 14px; display:flex; flex-direction:column; gap:4px; max-width:250px;">
+            <span style="font-size:11px; font-weight:900; color:#92400e; text-transform:uppercase;">🧮 Quersumme (Buch S. 23):</span>
+            <span class="font-num" style="font-size:16px; font-weight:900; color:#b45309;">${h} + ${z} + ${e} = ${qs}</span>
+            <span style="font-size:11.5px; color:#78350f; font-weight:700;">Die Summe der Ziffern (Anzahl aller Plättchen in der Tafel) ist <strong>${qs}</strong>.</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTHSecret() {
+      const cont = document.getElementById('thSec-secret');
+      if (!cont) return;
+
+      const a = parseInt(document.getElementById('thA').value, 10) || 0;
+      const b = parseInt(document.getElementById('thB').value, 10) || 0;
+      const op = document.getElementById('thOp').value;
+      const step = thSteps[thIdx] || thSteps[0];
+      if (!step) return;
+
+      const hA = Math.floor(a / 100), zA = Math.floor((a % 100) / 10), eA = a % 10;
+      const hB = Math.floor(b / 100), zB = Math.floor((b % 100) / 10), eB = b % 10;
+
+      // Bestimme, wie viel bis zum aktuellen Schritt thIdx bereits addiert / durchgestrichen wurde
+      let cumAddH = 0, cumAddZ = 0, cumAddE = 0;
+      let cumSubH = 0, cumSubZ = 0, cumSubE = 0;
+      for (let i = 1; i <= thIdx; i++) {
+        const s = thSteps[i];
+        if (!s) continue;
+        if (s.delta && s.delta.startsWith('+')) {
+          const val = parseInt(s.delta.slice(1), 10) || 0;
+          if (val >= 100) cumAddH += Math.floor(val / 100);
+          else if (val >= 10) cumAddZ += Math.floor(val / 10);
+          else cumAddE += val;
+        } else if (s.delta && s.delta.startsWith('−')) {
+          const val = parseInt(s.delta.slice(1), 10) || 0;
+          if (val >= 100) cumSubH += Math.floor(val / 100);
+          else if (val >= 10) cumSubZ += Math.floor(val / 10);
+          else cumSubE += val;
+        }
+      }
+
+      let secretTaskSvg = '';
+      let secretExplain = '';
+
+      if (op === '+') {
+        secretTaskSvg = makeSecretCodeSVG(hA, zA, eA, { addH: cumAddH, addZ: cumAddZ, addE: cumAddE });
+        secretExplain = (thIdx === 0)
+          ? `Zahlix zeichnet zuerst die 1. Zahl <strong>${a}</strong> in Geheimschrift: <span style="color:#dc2626;font-weight:800;">${hA} Quadrate</span>, <span style="color:#2563eb;font-weight:800;">${zA} Striche</span>, <span style="color:#16a34a;font-weight:800;">${eA} Punkte</span>.`
+          : `Zahlix zeichnet darunter schrittweise dazu: <span style="color:#dc2626;font-weight:800;">+${cumAddH} H</span>, <span style="color:#2563eb;font-weight:800;">+${cumAddZ} Z</span>, <span style="color:#16a34a;font-weight:800;">+${cumAddE} E</span> ➔ Aktueller Stand: <strong>${step.num}</strong>.`;
+      } else {
+        // Bei Minus: falls mehr Zehner oder Einer abgezogen werden als in a vorhanden sind, zeigen wir das entbündelte Bild
+        let dispH = hA, dispZ = zA, dispE = eA;
+        if (cumSubZ > dispZ && dispH > cumSubH) { dispH -= 1; dispZ += 10; }
+        if (cumSubE > dispE && dispZ > cumSubZ) { dispZ -= 1; dispE += 10; }
+        secretTaskSvg = makeSecretCodeSVG(dispH, dispZ, dispE, { strikeH: cumSubH, strikeZ: cumSubZ, strikeE: cumSubE });
+        secretExplain = (thIdx === 0)
+          ? `Zahline zeichnet die Startzahl <strong>${a}</strong> in Geheimschrift. Gleich streichen wir schrittweise weg!`
+          : `Zahline streicht in Geheimschrift weg: <span style="color:#dc2626;font-weight:800;">−${cumSubH} Quadrate</span>, <span style="color:#2563eb;font-weight:800;">−${cumSubZ} Striche</span>, <span style="color:#16a34a;font-weight:800;">−${cumSubE} Punkte</span> ➔ Übrig bleibt: <strong>${step.num}</strong>.`;
+      }
+
+      const curNum = step.num;
+      const curH = step.h, curZ = step.z, curE = step.e;
+      const curWord = numberToGermanWord(curNum);
+      const nextTen = Math.ceil((curNum + 1) / 10) * 10;
+      const diffToNextTen = nextTen - curNum;
+
+      cont.innerHTML = `
+        <!-- 1. ZAHLIX & ZAHLINE GEHEIMSCHRIFT-TAFEL (BUCH S. 19 & 21) -->
+        <div style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 14px; font-weight: 900; color: #1e293b;">🕵️ Geheimschrift-Rechnung (Buch S. 19 & 21)</span>
+            <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 800; flex-wrap: wrap;">
+              <span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:8px; border:1px solid #fca5a5;">🟥 Quadrat = 100 (H)</span>
+              <span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:8px; border:1px solid #93c5fd;">🟦 Strich = 10 (Z)</span>
+              <span style="background:#dcfce7; color:#166534; padding:3px 8px; border-radius:8px; border:1px solid #86efac;">🟢 Punkt = 1 (E)</span>
+            </div>
+          </div>
+
+          <div style="background: #ffffff; border: 1.5px dashed #94a3b8; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            ${secretTaskSvg}
+            <div style="font-size: 12.5px; color: #334155; font-weight: 700; text-align: center;">${secretExplain}</div>
+          </div>
+
+          ${thIdx > 0 ? `
+            <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+              <span style="font-size:12px; font-weight:800; color:#166534;">Ergebnis-Zahl (${curNum}) neu in Geheimschrift gezeichnet:</span>
+              <div>${makeSecretCodeSVG(curH, curZ, curE)}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- 2. MEIN ZAHLENSTECKBRIEF & STELLENTAFEL MIT QUERSUMME (BUCH S. 20, 22 & 23) -->
+        <div style="background: #ffffff; border: 2px solid #fde68a; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 14px; font-weight: 900; color: #78350f; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+            <span>📋 Mein Zahlensteckbrief & Stellentafel (Buch S. 20, 22 & 23): <strong class="font-num" style="color:#d97706; font-size:17px;">${curNum}</strong></span>
+            <span style="font-size: 11px; background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:8px;">Gebündelt: ${Math.floor(curNum / 10)} Zehner + ${curE} Einer</span>
+          </div>
+
+          <!-- Steckbrief-Kärtchen wie auf Buch S. 20 Aufg. 5 -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 8px;">
+            <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:8px 10px; text-align:center;">
+              <div style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase;">Stellenwerte</div>
+              <div class="font-num" style="font-size:15px; font-weight:900; color:#1e293b; margin-top:2px;">
+                <span style="color:#dc2626;">${curH}H</span> + <span style="color:#2563eb;">${curZ}Z</span> + <span style="color:#16a34a;">${curE}E</span>
+              </div>
+            </div>
+            <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:8px 10px; text-align:center;">
+              <div style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase;">Summen-Zerlegung</div>
+              <div class="font-num" style="font-size:15px; font-weight:900; color:#1e293b; margin-top:2px;">
+                ${curH * 100} + ${curZ * 10} + ${curE}
+              </div>
+            </div>
+            <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:8px 10px; text-align:center;">
+              <div style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase;">Nachbarzehner-Trick</div>
+              <div class="font-num" style="font-size:15px; font-weight:900; color:#1e293b; margin-top:2px;">
+                ${nextTen} − ${diffToNextTen} = ${curNum}
+              </div>
+            </div>
+            <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:12px; padding:8px 10px; text-align:center;">
+              <div style="font-size:10px; font-weight:800; color:#1e40af; text-transform:uppercase;">Zahlwort</div>
+              <div style="font-size:13px; font-weight:900; color:#1d4ed8; margin-top:2px; word-break:break-word;">
+                „${curWord}“
+              </div>
+            </div>
+          </div>
+
+          <!-- Stellentafel mit Plättchen & Quersumme (Buch S. 22 & 23) -->
+          ${makeStellentafelPlättchenHTML(curNum)}
+        </div>
+      `;
+    }
+
     function renderTHStepView() {
       updateActiveHundredForCurrentStep();
       renderTHCards();
       renderTHPots();
+      renderTHSecret();
       renderTHBoard();
       renderTHLine();
     }
@@ -4449,6 +4741,55 @@
         stepDesc: `Startzeit war ${pad2(h5)}:${pad2(m5)} Uhr. Rechnet man ${del5} Minuten dazu: ${pad2(h5)}:${pad2(m5)} + ${del5} Min = genau **${pad2(targetH12_5)}:${pad2(targetM5)} Uhr**.`
       });
 
+      // Nugget 6 (Buch S. 16 Aufg. 1 & 5): Tag & Nacht (24-Stunden-Uhr) + „Wie viel Uhr war es VOR X Minuten?“
+      const h6 = [7, 8, 9, 10][Math.floor(Math.random() * 4)];
+      const m6 = [15, 30, 45][Math.floor(Math.random() * 3)];
+      const eveH6 = h6 + 12;
+      const backDel6 = [15, 30, 45][Math.floor(Math.random() * 3)];
+      const pastTot6 = h6 * 60 + m6 - backDel6;
+      const pastH6 = Math.floor(pastTot6 / 60);
+      const pastM6 = pastTot6 % 60;
+      clkQuizData.push({
+        id: 5,
+        type: 'day_night_past',
+        title: '🌞🌙 Tag & Nacht (24h) + Zeit rückwärts (Buch S. 16)',
+        h: h6,
+        m: m6,
+        eveH: eveH6,
+        backDel: backDel6,
+        pastH: pastH6,
+        pastM: pastM6,
+        svg: makeMiniClockSVG(h6, m6, 110),
+        question: `Am Vormittag zeigt die Uhr ${pad2(h6)}:${pad2(m6)} Uhr. 1) Wie spät ist es am Abend (24-Stunden-Format)? 2) Wie viel Uhr war es am Vormittag VOR ${backDel6} Minuten?`,
+        stepDesc: `1) Für die Abendzeit rechnet man +12 Stunden: ${h6} + 12 = ${eveH6} ➔ **${pad2(eveH6)}:${pad2(m6)} Uhr**. 2) ${backDel6} Minuten zurück von ${pad2(h6)}:${pad2(m6)} Uhr ist genau **${pad2(pastH6)}:${pad2(pastM6)} Uhr**.`
+      });
+
+      // Nugget 7 (Buch S. 17 Aufg. 1–4): Zeitspanne zwischen Start-Uhr & Ziel-Uhr (mit grünem Sektor)
+      const spanScenarios = [
+        { label: '🎻 Ben übt Geige (Montag)', hS: 4, mS: 15, span: 15, dispS: '16:15', dispE: '16:30' },
+        { label: '🎻 Geigenunterricht (Dienstag)', hS: 3, mS: 30, span: 30, dispS: '15:30', dispE: '16:00' },
+        { label: '🛒 Einkaufen für die Nachbarin (Mittwoch)', hS: 4, mS: 15, span: 45, dispS: '16:15', dispE: '17:00' },
+        { label: '🎵 Probe des Schulchors (Donnerstag)', hS: 2, mS: 30, span: 45, dispS: '14:30', dispE: '15:15' },
+        { label: '🚌 Ninas Schulbus-Fahrt zur Schule', hS: 7, mS: 30, span: 15, dispS: '07:30', dispE: '07:45' }
+      ];
+      const sc7 = spanScenarios[Math.floor(Math.random() * spanScenarios.length)];
+      const endTot7 = sc7.hS * 60 + sc7.mS + sc7.span;
+      const hE7 = Math.floor(endTot7 / 60) % 12 || 12;
+      const mE7 = endTot7 % 60;
+      clkQuizData.push({
+        id: 6,
+        type: 'time_span',
+        title: '⏳ Zeitspanne zwischen zwei Uhren (Buch S. 17)',
+        scenario: sc7.label,
+        dispS: sc7.dispS,
+        dispE: sc7.dispE,
+        svgStart: makeMiniClockSVG(sc7.hS, sc7.mS, 105),
+        svgEnd: makeMiniClockSVG(hE7, mE7, 105, { sector: { startMin: sc7.mS, endMin: sc7.mS + sc7.span, color: 'rgba(132, 204, 22, 0.35)' } }),
+        ansSpan: sc7.span,
+        question: `${sc7.label}: Von ${sc7.dispS} Uhr bis ${sc7.dispE} Uhr. Wie viele Minuten dauert es?`,
+        stepDesc: `Von ${sc7.dispS} Uhr bis ${sc7.dispE} Uhr wandert der Minutenzeiger durch das grüne Feld um genau **${sc7.span} Minuten** (${sc7.span === 15 ? 'eine Viertelstunde' : sc7.span === 30 ? 'eine halbe Stunde' : 'eine Dreiviertelstunde'}).`
+      });
+
       renderClockQuiz();
     }
 
@@ -4558,6 +4899,51 @@
           inputHtml = `
             <div style="font-size: 12px; color: #64748b; font-weight: 700;">
               Tippe/ziehe am Zifferblatt der rechten Uhr oder nutze die Schnelltasten darunter.
+            </div>
+          `;
+        } else if (q.type === 'day_night_past') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; justify-content: center; margin: 4px 0;">${q.svg}</div>
+          `;
+          inputHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 800; color: #1e293b;">🌙 1) Am Abend (24h):</span>
+                <input type="number" id="clkInEveH-${idx}" class="quiz-input font-num" placeholder="HH" style="width: 60px;">
+                <span style="font-size: 18px; font-weight: 800; color: #94a3b8;">:</span>
+                <input type="number" id="clkInEveM-${idx}" class="quiz-input font-num" placeholder="MM" style="width: 60px;">
+                <span style="font-size: 13px; font-weight: 800; color: #475569;">Uhr</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 800; color: #1e293b;">⏪ 2) Vor ${q.backDel} Minuten war es:</span>
+                <input type="number" id="clkInPastH-${idx}" class="quiz-input font-num" placeholder="HH" style="width: 60px;">
+                <span style="font-size: 18px; font-weight: 800; color: #94a3b8;">:</span>
+                <input type="number" id="clkInPastM-${idx}" class="quiz-input font-num" placeholder="MM" style="width: 60px;">
+                <span style="font-size: 13px; font-weight: 800; color: #475569;">Uhr</span>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'time_span') {
+          displayHtml = `
+            <div>${q.question}</div>
+            <div style="display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; margin: 6px 0; background: #f8fafc; padding: 10px; border-radius: 14px; border: 1.5px solid #e2e8f0;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <span style="font-size: 11px; font-weight: 800; color: #64748b;">Beginn (${q.dispS} Uhr)</span>
+                ${q.svgStart}
+              </div>
+              <span style="font-size: 22px; font-weight: 900; color: #65a30d;">➔</span>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <span style="font-size: 11px; font-weight: 800; color: #4d7c0f;">Ende (${q.dispE} Uhr)</span>
+                ${q.svgEnd}
+              </div>
+            </div>
+          `;
+          inputHtml = `
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+              <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Dauer (Zeitspanne):</span>
+              <input type="number" id="clkInSpan-${idx}" class="quiz-input font-num" placeholder="Min" style="width: 75px;">
+              <span style="font-size: 14px; font-weight: 800; color: #4d7c0f;">Minuten</span>
             </div>
           `;
         }
@@ -4752,6 +5138,17 @@
           const hMatch = (curH === q.targetH) || (curH % 12 === q.targetH % 12);
           const mMatch = (curM === q.targetM);
           isCorrect = (hMatch && mMatch);
+        } else if (q.type === 'day_night_past') {
+          const uEveH = parseInt(document.getElementById(`clkInEveH-${idx}`).value, 10);
+          const uEveM = parseInt(document.getElementById(`clkInEveM-${idx}`).value, 10);
+          const uPastH = parseInt(document.getElementById(`clkInPastH-${idx}`).value, 10);
+          const uPastM = parseInt(document.getElementById(`clkInPastM-${idx}`).value, 10);
+          const eveOk = (uEveH === q.eveH && uEveM === q.m);
+          const pastOk = ((uPastH === q.pastH || uPastH === q.pastH + 12) && uPastM === q.pastM);
+          isCorrect = (eveOk && pastOk);
+        } else if (q.type === 'time_span') {
+          const uSpan = parseInt(document.getElementById(`clkInSpan-${idx}`).value, 10);
+          isCorrect = (uSpan === q.ansSpan);
         }
 
         if (isCorrect) {
@@ -4765,7 +5162,7 @@
       });
 
       addStars(correctCount * 2);
-      if (correctCount === 5) {
+      if (correctCount === clkQuizData.length) {
         addStars(10);
         playChime();
         fireConfetti();
@@ -4940,7 +5337,7 @@
     }
 
     // =========================================================
-    // QUIZ 3: PLUS & MINUS BIS 100 (5 ÜBUNGS-NUGGETS)
+    // QUIZ 3: PLUS & MINUS BIS 100 (INKL. BUCH S. 7, 8, 9, 10)
     // =========================================================
     let pmQuizData = [];
 
@@ -4950,10 +5347,10 @@
 
     function newPM100Quiz() {
       pmQuizData = [];
-      for (let i = 0; i < 5; i++) {
+      // Nuggets 1–3: Standard Plus & Minus mit Zehnerübergang
+      for (let i = 0; i < 3; i++) {
         const isPlus = (i % 2 === 0);
         if (isPlus) {
-          // Addition mit Zehnerübergang
           const a = Math.floor(Math.random() * 45) + 26;
           const b = Math.floor(Math.random() * 25) + 16;
           const ans = a + b;
@@ -4962,13 +5359,14 @@
           const stop1 = a + zB;
           pmQuizData.push({
             id: i,
+            type: 'std',
+            title: 'Addition mit Zehnerübergang (Buch S. 8)',
             op: '+',
             a, b, ans,
             question: `${a} + ${b} = ?`,
-            stepDesc: `1. Zehnerschritt: ${a} + ${zB} = ${stop1}. 2. Einerschritt: ${stop1} + ${eB} = ${ans}.`
+            stepDesc: `1. Zehnerschritt: ${a} + ${zB} = ${stop1}. 2. Einerschritt: ${stop1} + ${eB} = **${ans}**.`
           });
         } else {
-          // Subtraktion mit Zehnerübergang
           const a = Math.floor(Math.random() * 40) + 55;
           const b = Math.floor(Math.random() * 25) + 18;
           const ans = a - b;
@@ -4977,13 +5375,149 @@
           const stop1 = a - zB;
           pmQuizData.push({
             id: i,
+            type: 'std',
+            title: 'Subtraktion mit Zehnerübergang (Buch S. 9)',
             op: '-',
             a, b, ans,
             question: `${a} − ${b} = ?`,
-            stepDesc: `1. Zehnerschritt: ${a} − ${zB} = ${stop1}. 2. Einerschritt: ${stop1} − ${eB} = ${ans}.`
+            stepDesc: `1. Zehnerschritt: ${a} − ${zB} = ${stop1}. 2. Einerschritt: ${stop1} − ${eB} = **${ans}**.`
           });
         }
       }
+
+      // Nugget 4: „Tipp für die 9“ – Fast-Zehner-Trick (Buch S. 10 Aufg. 1 & 2)
+      const isNinePlus = Math.random() > 0.5;
+      const nineTen = [20, 30, 40][Math.floor(Math.random() * 3)];
+      const nineNum = nineTen - 1; // 19, 29 oder 39
+      if (isNinePlus) {
+        const start9 = Math.floor(Math.random() * 35) + 23;
+        const jumpStop = start9 + nineTen;
+        const final9 = jumpStop - 1;
+        pmQuizData.push({
+          id: 3,
+          type: 'nine_trick',
+          title: '🧠 „Tipp für die 9“ – Nachbarzehner-Trick (Buch S. 10)',
+          op: '+',
+          a: start9,
+          b: nineNum,
+          nineTen,
+          jumpStop,
+          ans: final9,
+          stepDesc: `Statt +${nineNum} rechnet man geschickt erst **+${nineTen}** (${start9} + ${nineTen} = ${jumpStop}) und dann **−1** zurück (${jumpStop} − 1 = **${final9}**).`
+        });
+      } else {
+        const start9 = Math.floor(Math.random() * 25) + 62;
+        const jumpStop = start9 - nineTen;
+        const final9 = jumpStop + 1;
+        pmQuizData.push({
+          id: 3,
+          type: 'nine_trick',
+          title: '🧠 „Tipp für die 9“ – Nachbarzehner-Trick (Buch S. 10)',
+          op: '-',
+          a: start9,
+          b: nineNum,
+          nineTen,
+          jumpStop,
+          ans: final9,
+          stepDesc: `Statt −${nineNum} rechnet man geschickt erst **−${nineTen}** (${start9} − ${nineTen} = ${jumpStop}) und dann **+1** vor (${jumpStop} + 1 = **${final9}**).`
+        });
+      }
+
+      // Nugget 5: „Regelwürmer“ (Buch S. 7)
+      const wormRules = [
+        { ruleTxt: 'Immer erst +10, dann −5.', d1: 10, d2: -5, start: 25 },
+        { ruleTxt: 'Immer erst +10, dann −5.', d1: 10, d2: -5, start: 43 },
+        { ruleTxt: 'Immer erst −10, dann +5.', d1: -10, d2: 5, start: 90 },
+        { ruleTxt: 'Immer erst +7, dann −2.', d1: 7, d2: -2, start: 24 }
+      ];
+      const wPick = wormRules[Math.floor(Math.random() * wormRules.length)];
+      const wSeq = [wPick.start];
+      for (let k = 0; k < 5; k++) {
+        const prev = wSeq[wSeq.length - 1];
+        wSeq.push(prev + (k % 2 === 0 ? wPick.d1 : wPick.d2));
+      }
+      pmQuizData.push({
+        id: 4,
+        type: 'rule_worm',
+        title: '🐛 Muster & Strukturen: Regelwürmer (Buch S. 7)',
+        ruleTxt: wPick.ruleTxt,
+        d1: wPick.d1,
+        d2: wPick.d2,
+        seq: wSeq, // 6 Glieder: [0..3] sichtbar, [4] und [5] gesucht
+        ans1: wSeq[4],
+        ans2: wSeq[5],
+        stepDesc: `Regel: ${wPick.ruleTxt} Von ${wSeq[3]} rechnet man ${wPick.d1 > 0 ? '+' + wPick.d1 : wPick.d1} = **${wSeq[4]}**, und danach ${wPick.d2 > 0 ? '+' + wPick.d2 : wPick.d2} = **${wSeq[5]}**.`
+      });
+
+      // Nugget 6: „Entdecker-Päckchen“ (Buch S. 8 & 9 Aufg. 4)
+      const packList = [
+        {
+          lines: ['70 − 36 = 34', '70 − 35 = 35', '70 − 34 = 36'],
+          prefix: '70 −',
+          ansB: 33,
+          ansRes: 37,
+          ruleHint: '1. Zahl bleibt gleich (70), 2. Zahl wird immer um 1 kleiner ➔ Das Ergebnis wird immer um 1 größer!'
+        },
+        {
+          lines: ['36 + 53 = 89', '46 + 43 = 89', '56 + 33 = 89'],
+          prefix: '66 +',
+          ansB: 23,
+          ansRes: 89,
+          ruleHint: '1. Zahl wird immer 10 mehr, 2. Zahl wird immer 10 weniger ➔ Die Summe bleibt immer gleich (89)!'
+        },
+        {
+          lines: ['79 − 24 = 55', '79 − 34 = 45', '79 − 44 = 35'],
+          prefix: '79 −',
+          ansB: 54,
+          ansRes: 25,
+          ruleHint: '1. Zahl bleibt gleich (79), 2. Zahl wird immer um 10 größer ➔ Die Differenz wird immer um 10 kleiner!'
+        }
+      ];
+      const pk = packList[Math.floor(Math.random() * packList.length)];
+      pmQuizData.push({
+        id: 5,
+        type: 'discover_pack',
+        title: '📜 Entdecker-Päckchen fortsetzen (Buch S. 8 & 9)',
+        lines: pk.lines,
+        prefix: pk.prefix,
+        ansB: pk.ansB,
+        ansRes: pk.ansRes,
+        stepDesc: `${pk.ruleHint} Deshalb heißt die nächste Zeile: **${pk.prefix} ${pk.ansB} = ${pk.ansRes}**.`
+      });
+
+      // Nugget 7: „Fehler-Detektiv Mia“ (Buch S. 10 Aufg. 8)
+      const miaCases = [
+        {
+          task: '46 + 35',
+          wrongTotal: 95,
+          step1: '46 + 4 = 60',
+          step2: '60 + 30 = 90',
+          step3: '90 + 5 = 95',
+          errExplain: 'Mia hat bei 35 Zehner und Einer vertauscht (erst +4 statt +30) und außerdem 46 + 4 = 60 statt 50 gerechnet!',
+          correctAns: 81,
+          correctWay: '46 + 30 = 76, 76 + 5 = 81'
+        },
+        {
+          task: '57 + 26',
+          wrongTotal: 93,
+          step1: '57 + 3 = 70',
+          step2: '70 + 20 = 90',
+          step3: '90 + 3 = 93',
+          errExplain: 'Mia hat 57 + 3 = 70 gerechnet (richtig wäre 60)!',
+          correctAns: 83,
+          correctWay: '57 + 20 = 77, 77 + 6 = 83'
+        }
+      ];
+      const mc = miaCases[Math.floor(Math.random() * miaCases.length)];
+      pmQuizData.push({
+        id: 6,
+        type: 'mia_error',
+        title: '🕵️‍♀️ Fehler-Detektiv: Was hat Mia falsch gemacht? (Buch S. 10)',
+        caseObj: mc,
+        ans: mc.correctAns,
+        stepDesc: `${mc.errExplain} Richtiger Rechenweg: **${mc.correctWay}**.`
+      });
+
       renderPM100Quiz();
     }
 
@@ -4994,8 +5528,8 @@
       let htmlStr = `
         <div class="quiz-header">
           <div>
-            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Plus & Minus bis 100</div>
-            <div style="font-size: 12px; color: #92400e;">Rechne mit Zehnerübergang im Kopf oder auf Papier und klicke auf „Prüfen & Lösen“!</div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 7 Schulbuch-Nuggets: Plus & Minus bis 100</div>
+            <div style="font-size: 12px; color: #92400e;">Mit 9er-Trick, Regelwürmern, Entdecker-Päckchen & Fehler-Detektiv Mia (Buch S. 7–10)!</div>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="solvePM100Quiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
@@ -5005,22 +5539,122 @@
       `;
 
       pmQuizData.forEach((q, idx) => {
-        htmlStr += `
-          <div class="quiz-nugget" id="pmNugget-${idx}">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1} (${q.op === '+' ? 'Addition' : 'Subtraktion'})</span>
-              <span id="pmStatus-${idx}" style="font-size: 16px;">⏳</span>
-            </div>
-            
+        let bodyHtml = '';
+
+        if (q.type === 'std') {
+          bodyHtml = `
             <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
               <span class="font-num">${q.question}</span>
               <input type="number" id="pmInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 80px;">
             </div>
+          `;
+        } else if (q.type === 'nine_trick') {
+          const isP = (q.op === '+');
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <span style="background: #d97706; color: #ffffff; font-size: 12px; font-weight: 900; padding: 5px 10px; border-radius: 8px; border: 2px solid #92400e; transform: rotate(-2deg);">🪧 Tipp für die 9</span>
+                <span style="font-size: 14px; font-weight: 800; color: #1e293b;">Rechne geschickt mit dem Nachbarzehner: <strong class="font-num">${q.a} ${q.op} ${q.b}</strong></span>
+              </div>
+              <svg width="340" height="68" viewBox="0 0 340 68" style="max-width: 100%; background: #f8fafc; border-radius: 10px; border: 1px solid #cbd5e1;">
+                <line x1="25" y1="52" x2="315" y2="52" stroke="#334155" stroke-width="2.5"/>
+                ${isP ? `
+                  <path d="M 45 52 Q 165 4 285 52" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+                  <text x="165" y="18" font-size="12" font-weight="900" fill="#1d4ed8" text-anchor="middle">+${q.nineTen}</text>
+                  <path d="M 285 52 Q 262 34 240 52" fill="none" stroke="#dc2626" stroke-width="2.2"/>
+                  <text x="262" y="36" font-size="11" font-weight="900" fill="#dc2626" text-anchor="middle">−1</text>
+                  <circle cx="45" cy="52" r="4" fill="#1e293b"/><text x="45" y="65" font-size="11" font-weight="800" text-anchor="middle">${q.a}</text>
+                  <circle cx="240" cy="52" r="4" fill="#16a34a"/><text x="240" y="65" font-size="11" font-weight="800" fill="#15803d" text-anchor="middle">?</text>
+                  <circle cx="285" cy="52" r="3.5" fill="#2563eb"/><text x="285" y="65" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">?</text>
+                ` : `
+                  <path d="M 285 52 Q 165 4 45 52" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+                  <text x="165" y="18" font-size="12" font-weight="900" fill="#dc2626" text-anchor="middle">−${q.nineTen}</text>
+                  <path d="M 45 52 Q 68 34 90 52" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+                  <text x="68" y="36" font-size="11" font-weight="900" fill="#1d4ed8" text-anchor="middle">+1</text>
+                  <circle cx="285" cy="52" r="4" fill="#1e293b"/><text x="285" y="65" font-size="11" font-weight="800" text-anchor="middle">${q.a}</text>
+                  <circle cx="45" cy="52" r="3.5" fill="#dc2626"/><text x="45" y="65" font-size="11" font-weight="800" fill="#dc2626" text-anchor="middle">?</text>
+                  <circle cx="90" cy="52" r="4" fill="#16a34a"/><text x="90" y="65" font-size="11" font-weight="800" fill="#15803d" text-anchor="middle">?</text>
+                `}
+              </svg>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: 800;">
+                <span>1. Schritt: <span class="font-num">${q.a} ${q.op} ${q.nineTen} =</span></span>
+                <input type="number" id="pmIn9Step-${idx}" class="quiz-input font-num" placeholder="?" style="width: 68px;">
+                <span>➔ 2. Schritt: <span class="font-num">${isP ? '− 1' : '+ 1'} =</span></span>
+                <input type="number" id="pmIn9Ans-${idx}" class="quiz-input font-num" placeholder="?" style="width: 68px;">
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'rule_worm') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="font-size: 13px; font-weight: 800; color: #334155;">
+                💬 Regel des Wurms: <span style="background:#fef3c7; color:#92400e; padding:3px 10px; border-radius:999px; border:1px solid #fcd34d;">„${q.ruleTxt}“</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap; background: #f0fdf4; padding: 12px; border-radius: 16px; border: 2px solid #86efac;">
+                <span style="font-size: 28px; margin-right: 4px;" title="Wurmkopf">🐛</span>
+                ${q.seq.slice(0, 4).map(n => `
+                  <div class="font-num" style="background:#ffffff; border:2px solid #22c55e; border-radius:12px; padding:6px 12px; font-size:16px; font-weight:900; color:#14532d;">${n}</div>
+                  <span style="color:#16a34a; font-weight:900;">➔</span>
+                `).join('')}
+                <input type="number" id="pmInWorm1-${idx}" class="quiz-input font-num" placeholder="?" style="width: 64px; border-color:#16a34a;">
+                <span style="color:#16a34a; font-weight:900;">➔</span>
+                <input type="number" id="pmInWorm2-${idx}" class="quiz-input font-num" placeholder="?" style="width: 64px; border-color:#16a34a;">
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'discover_pack') {
+          bodyHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+              <div style="background: #fffbeb; border: 2px solid #d97706; border-radius: 14px; padding: 10px 16px; font-family: ui-monospace, monospace; font-size: 16px; font-weight: 800; color: #1e293b; box-shadow: inset 0 0 8px rgba(245,158,11,0.1);">
+                ${q.lines.map(l => `<div>${l}</div>`).join('')}
+                <div style="color: #b45309; margin-top: 4px; border-top: 1px dashed #fcd34d; padding-top: 4px;">${q.prefix} ? = ?</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 13px; font-weight: 800; color: #475569;">Wie geht das Entdecker-Päckchen in Zeile 4 weiter?</span>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 900;" class="font-num">
+                  <span>${q.prefix}</span>
+                  <input type="number" id="pmInPackB-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                  <span>=</span>
+                  <input type="number" id="pmInPackRes-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'mia_error') {
+          const c = q.caseObj;
+          bodyHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+              <div style="background: #fef2f2; border: 2px solid #fca5a5; border-radius: 14px; padding: 10px 16px; font-family: ui-monospace, monospace; font-size: 15px; font-weight: 800; color: #7f1d1d;">
+                <div style="border-bottom: 1.5px solid #f87171; padding-bottom: 3px; margin-bottom: 4px;">${c.task} = ${c.wrongTotal} ❌</div>
+                <div>${c.step1}</div>
+                <div>${c.step2}</div>
+                <div>${c.step3}</div>
+                <div style="font-size: 11px; text-align: right; color: #b91c1c; margin-top: 4px;">Mias Heft</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px;">
+                <span style="font-size: 13px; font-weight: 800; color: #1e293b;">Mia hat sich verrechnet! Rechne die Aufgabe <strong>${c.task}</strong> richtig aus:</span>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 900;" class="font-num">
+                  <span>${c.task} =</span>
+                  <input type="number" id="pmInMiaAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 75px;">
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        htmlStr += `
+          <div class="quiz-nugget" id="pmNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.title}</span>
+              <span id="pmStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            ${bodyHtml}
 
             <!-- Aufklappbarer Lösungsweg -->
             <div id="pmSolution-${idx}" class="quiz-step-box hidden">
               <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Rechenweg:</div>
-              <div>${q.stepDesc} Ergebnis: <strong>${q.ans}</strong></div>
+              <div>${q.stepDesc}</div>
             </div>
           </div>
         `;
@@ -5037,8 +5671,26 @@
         const sol = document.getElementById(`pmSolution-${idx}`);
         sol.classList.remove('hidden');
 
-        const userVal = parseInt(document.getElementById(`pmInAns-${idx}`).value, 10);
-        const isCorrect = (userVal === q.ans);
+        let isCorrect = false;
+        if (q.type === 'std') {
+          const userVal = parseInt(document.getElementById(`pmInAns-${idx}`).value, 10);
+          isCorrect = (userVal === q.ans);
+        } else if (q.type === 'nine_trick') {
+          const uStep = parseInt(document.getElementById(`pmIn9Step-${idx}`).value, 10);
+          const uAns = parseInt(document.getElementById(`pmIn9Ans-${idx}`).value, 10);
+          isCorrect = (uStep === q.jumpStop && uAns === q.ans);
+        } else if (q.type === 'rule_worm') {
+          const w1 = parseInt(document.getElementById(`pmInWorm1-${idx}`).value, 10);
+          const w2 = parseInt(document.getElementById(`pmInWorm2-${idx}`).value, 10);
+          isCorrect = (w1 === q.ans1 && w2 === q.ans2);
+        } else if (q.type === 'discover_pack') {
+          const pB = parseInt(document.getElementById(`pmInPackB-${idx}`).value, 10);
+          const pRes = parseInt(document.getElementById(`pmInPackRes-${idx}`).value, 10);
+          isCorrect = (pB === q.ansB && pRes === q.ansRes);
+        } else if (q.type === 'mia_error') {
+          const mAns = parseInt(document.getElementById(`pmInMiaAns-${idx}`).value, 10);
+          isCorrect = (mAns === q.ans);
+        }
 
         if (isCorrect) {
           correctCount++;
@@ -5051,7 +5703,7 @@
       });
 
       addStars(correctCount * 2);
-      if (correctCount === 5) {
+      if (correctCount === pmQuizData.length) {
         addStars(10);
         playChime();
         fireConfetti();
@@ -5063,7 +5715,7 @@
     }
 
     // =========================================================
-    // QUIZ 4: MAL & GETEILT (5 ÜBUNGS-NUGGETS)
+    // QUIZ 4: MAL & GETEILT (6 BUCH-NUGGETS)
     // =========================================================
     let mdQuizData = [];
 
@@ -5074,36 +5726,94 @@
     function newMDQuiz() {
       mdQuizData = [];
       
-      // 2 Multiplikations-Aufgaben
-      for (let i = 0; i < 2; i++) {
-        const a = Math.floor(Math.random() * 6) + 4;
-        const b = Math.floor(Math.random() * 6) + 4;
-        const ans = a * b;
-        mdQuizData.push({
-          id: i,
-          type: 'mul',
-          a, b, ans,
-          question: `${a} × ${b} = ?`,
-          stepDesc: `${a} × ${b} = ${ans}. (Tipp: 5 × ${b} = ${5*b}, plus ${(a-5)*b} = ${ans})`
-        });
-      }
+      // 1. Multiplikations-Aufgabe
+      const a1 = Math.floor(Math.random() * 6) + 4;
+      const b1 = Math.floor(Math.random() * 6) + 4;
+      const ans1 = a1 * b1;
+      mdQuizData.push({
+        id: 0,
+        type: 'mul',
+        title: 'Multiplikation (Einmaleins)',
+        a: a1, b: b1, ans: ans1,
+        question: `${a1} × ${b1} = ?`,
+        stepDesc: `${a1} × ${b1} = ${ans1}. (Tipp über Sonnenaufgabe: 5 × ${b1} = ${5*b1}, ${a1 >= 5 ? 'plus' : 'minus'} ${Math.abs(a1-5)*b1} = ${ans1})`
+      });
 
-      // 3 Divisions-Aufgaben (2 mit Rest, 1 ohne Rest)
+      // 2. Divisions-Aufgabe mit Rest
       const divisors = [4, 5, 6, 7, 8];
-      for (let i = 2; i < 5; i++) {
-        const div = divisors[Math.floor(Math.random() * divisors.length)];
-        const withRest = (i !== 4);
-        const quot = Math.floor(Math.random() * 5) + 3;
-        const rest = withRest ? (Math.floor(Math.random() * (div - 1)) + 1) : 0;
-        const a = quot * div + rest;
-        mdQuizData.push({
-          id: i,
-          type: 'div',
-          a, div, quot, rest,
-          question: `${a} ÷ ${div} = ?`,
-          stepDesc: `Suche das größte Vielfache von ${div} vor ${a}: ${quot} × ${div} = ${quot * div}. Rest: ${a} − ${quot * div} = ${rest}. Ergebnis: ${quot} Rest ${rest}.`
-        });
-      }
+      const div2 = divisors[Math.floor(Math.random() * divisors.length)];
+      const quot2 = Math.floor(Math.random() * 5) + 3;
+      const rest2 = Math.floor(Math.random() * (div2 - 1)) + 1;
+      const a2 = quot2 * div2 + rest2;
+      mdQuizData.push({
+        id: 1,
+        type: 'div',
+        title: 'Division mit Rest (Aufteilen)',
+        a: a2, div: div2, quot: quot2, rest: rest2,
+        question: `${a2} ÷ ${div2} = ?`,
+        stepDesc: `Suche das größte Vielfache von ${div2} vor ${a2}: ${quot2} × ${div2} = ${quot2 * div2}. Rest: ${a2} − ${quot2 * div2} = ${rest2}. Ergebnis: ${quot2} Rest ${rest2}.`
+      });
+
+      // 3. NEU (Buch S. 11): „Malduin“ – Die Rechen-Maus (Tausch- & Umkehraufgaben)
+      const mPairs = [[3, 6], [4, 7], [6, 8], [3, 9], [4, 8], [6, 7], [7, 8], [5, 9]];
+      const [mA, mB] = mPairs[Math.floor(Math.random() * mPairs.length)];
+      const mProd = mA * mB;
+      mdQuizData.push({
+        id: 2,
+        type: 'malduin',
+        title: '🐭 „Malduin“ – Die Rechen-Maus (Buch S. 11)',
+        mA, mB, mProd,
+        stepDesc: `Im linken Ohr steht ${mA}, auf der Nase das Ergebnis ${mProd}. Also gehört ins rechte Ohr <strong>${mB}</strong> (denn ${mA} × ${mB} = ${mProd}). Im Bauch stehen die 4 Aufgaben der Aufgabenfamilie: ${mA}·${mB}=${mProd}, ${mB}·${mA}=${mProd}, ${mProd}:${mB}=${mA} und ${mProd}:${mA}=<strong>${mB}</strong>.`
+      });
+
+      // 4. NEU (Buch S. 12): „☀️ Sonnenaufgaben-Nachbar“ (Von Kernaufgaben ableiten)
+      const sunB = [4, 6, 7, 8, 9][Math.floor(Math.random() * 5)];
+      const isSix = Math.random() < 0.55; // 6×b (5×b + 1×b) oder 4×b (5×b - 1×b)
+      const targetA = isSix ? 6 : 4;
+      const sunAns = 5 * sunB;
+      const finalAns = targetA * sunB;
+      mdQuizData.push({
+        id: 3,
+        type: 'sun_neighbor',
+        title: '☀️ Mit Sonnenaufgaben rechnen (Buch S. 12)',
+        sunB, isSix, targetA, sunAns, finalAns,
+        stepDesc: `Die Sonnenaufgabe ☀️ 5 × ${sunB} = <strong>${sunAns}</strong> hilft dir! Für ${targetA} × ${sunB} rechnest du einfach ${sunAns} ${isSix ? '+' : '−'} ${sunB} = <strong>${finalAns}</strong>.`
+      });
+
+      // 5. NEU (Buch S. 13): „Verdoppeln & Halbieren“ (Sportfest-Sachaufgabe)
+      const dhCases = [
+        { item: 'Tennisschläger', base: 14, double: 28, halfOf: 24, half: 12 },
+        { item: 'Springseile', base: 16, double: 32, halfOf: 18, half: 9 },
+        { item: 'Basketbälle', base: 13, double: 26, halfOf: 22, half: 11 },
+        { item: 'Federbälle', base: 15, double: 30, halfOf: 28, half: 14 },
+        { item: 'Tischtennisbälle', base: 25, double: 50, halfOf: 36, half: 18 }
+      ];
+      const dh = dhCases[Math.floor(Math.random() * dhCases.length)];
+      mdQuizData.push({
+        id: 4,
+        type: 'double_half',
+        title: '🏃‍♂️ Verdoppeln & Halbieren (Buch S. 13)',
+        dh,
+        stepDesc: `Das Doppelte von ${dh.base} ist 2 × ${dh.base} = <strong>${dh.double}</strong>. Die Hälfte von ${dh.halfOf} ist ${dh.halfOf} ÷ 2 = <strong>${dh.half}</strong>.`
+      });
+
+      // 6. NEU (Buch S. 15): „Multi-Pack“ (4 Zahlenkarten ➔ 6 Ergebnisse der Größe nach)
+      const mpSets = [
+        { cards: [2, 3, 4, 5], prods: [6, 8, 10, 12, 15, 20], pairs: ['2·3=6', '2·4=8', '2·5=10', '3·4=12', '3·5=15', '4·5=20'] },
+        { cards: [2, 3, 5, 6], prods: [6, 10, 12, 15, 18, 30], pairs: ['2·3=6', '2·5=10', '2·6=12', '3·5=15', '3·6=18', '5·6=30'] },
+        { cards: [3, 4, 5, 6], prods: [12, 15, 18, 20, 24, 30], pairs: ['3·4=12', '3·5=15', '3·6=18', '4·5=20', '4·6=24', '5·6=30'] },
+        { cards: [2, 4, 5, 7], prods: [8, 10, 14, 20, 28, 35], pairs: ['2·4=8', '2·5=10', '2·7=14', '4·5=20', '4·7=28', '5·7=35'] }
+      ];
+      const mp = mpSets[Math.floor(Math.random() * mpSets.length)];
+      mdQuizData.push({
+        id: 5,
+        type: 'multipack',
+        title: '📦 „Multi-Pack“ – Zahlenkarten kombinieren (Buch S. 15)',
+        mp,
+        ans1: mp.prods[2],
+        ans2: mp.prods[5],
+        stepDesc: `Aus den 4 Karten (${mp.cards.join(', ')}) entstehen genau 6 Malaufgaben: ${mp.pairs.join(' | ')}. Sortiert heißen die Ergebnisse: ${mp.prods.join(', ')}.`
+      });
 
       renderMDQuiz();
     }
@@ -5115,8 +5825,8 @@
       let htmlStr = `
         <div class="quiz-header">
           <div>
-            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Mal & Geteilt</div>
-            <div style="font-size: 12px; color: #92400e;">Bei geteilt trage auch den Rest ein (wenn kein Rest bleibt, schreibe 0).</div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 6 Buch-Nuggets: Mal, Geteilt, Malduin & Sonnenaufgaben</div>
+            <div style="font-size: 12px; color: #92400e;">Mit Malduin-Rechenmaus, Sonnenaufgaben, Verdoppeln/Halbieren und Multi-Pack wie im Mathebuch!</div>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="solveMDQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
@@ -5126,14 +5836,10 @@
       `;
 
       mdQuizData.forEach((q, idx) => {
-        htmlStr += `
-          <div class="quiz-nugget" id="mdNugget-${idx}">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.type === 'mul' ? 'Multiplikation (Einmaleins)' : 'Division (Aufteilen)'}</span>
-              <span id="mdStatus-${idx}" style="font-size: 16px;">⏳</span>
-            </div>
-            
-            <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        let bodyHtml = '';
+        if (q.type === 'mul' || q.type === 'div') {
+          bodyHtml = `
+            <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <span class="font-num">${q.question}</span>
               ${q.type === 'mul' ? `
                 <input type="number" id="mdInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 80px;">
@@ -5143,6 +5849,111 @@
                 <input type="number" id="mdInRest-${idx}" class="quiz-input font-num" placeholder="0" style="width: 60px;">
               `}
             </div>
+          `;
+        } else if (q.type === 'malduin') {
+          bodyHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: center;">
+              <!-- Malduin Maus Card -->
+              <div style="background: #f0fdf4; border: 2px solid #4ade80; border-radius: 20px; padding: 12px 18px; display: flex; flex-direction: column; align-items: center; min-width: 230px; box-shadow: 0 3px 8px rgba(0,0,0,0.05);">
+                <div style="font-size: 11px; font-weight: 900; color: #15803d; margin-bottom: 6px;">🐭 MALDUIN (Aufgabenfamilie)</div>
+                <!-- Ohren -->
+                <div style="display: flex; justify-content: space-between; width: 170px; margin-bottom: -8px; z-index: 2;">
+                  <div class="font-num" style="width: 52px; height: 52px; border-radius: 50%; background: #fde68a; border: 3px solid #d97706; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #78350f;" title="Linkes Ohr (Faktor 1)">${q.mA}</div>
+                  <div style="width: 52px; height: 52px; border-radius: 50%; background: #fef3c7; border: 3px dashed #d97706; display: flex; align-items: center; justify-content: center;" title="Rechtes Ohr (Faktor 2)">
+                    <input type="number" id="mdInMaldEar-${idx}" class="quiz-input font-num" placeholder="?" style="width: 42px; height: 32px; padding: 2px; font-size: 16px; border: none; background: transparent;">
+                  </div>
+                </div>
+                <!-- Nase / Kopf (Produkt) -->
+                <div class="font-num" style="width: 78px; height: 48px; border-radius: 24px; background: #fca5a5; border: 3px solid #dc2626; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #7f1d1d; z-index: 3; margin-bottom: -6px;" title="Schnauze (Produkt)">${q.mProd}</div>
+                <!-- Bauch (4 Aufgaben) -->
+                <div class="font-num" style="background: #ffffff; border: 2.5px solid #22c55e; border-radius: 16px; padding: 10px 14px; width: 190px; font-size: 14px; font-weight: 800; color: #1e293b; display: flex; flex-direction: column; gap: 3px; text-align: center;">
+                  <div>${q.mA} · ${q.mB} = ${q.mProd}</div>
+                  <div>${q.mB} · ${q.mA} = ${q.mProd}</div>
+                  <div>${q.mProd} : ${q.mB} = ${q.mA}</div>
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 4px; color: #b45309;">
+                    <span>${q.mProd} : ${q.mA} =</span>
+                    <input type="number" id="mdInMaldBelly-${idx}" class="quiz-input font-num" placeholder="?" style="width: 48px; padding: 2px 4px; font-size: 14px;">
+                  </div>
+                </div>
+              </div>
+              <div style="flex: 1; min-width: 190px; font-size: 13px; color: #334155; font-weight: 700; line-height: 1.45;">
+                Bei <strong>Malduin</strong> stehen in den Ohren die beiden Faktoren und auf der Schnauze das Ergebnis (Produkt).<br><br>
+                👉 Ergänze die fehlende Zahl im <strong>rechten Ohr</strong> und die 4. Aufgabe im <strong>Bauch</strong>!
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'sun_neighbor') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 13px; font-weight: 800; color: #475569;">
+                Nutze zuerst die leichte ☀️ <strong>Sonnenaufgabe</strong> (mit 5), um die Nachbaraufgabe zu lösen:
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+                <div style="background: #fef9c3; border: 2px solid #eab308; border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 900;" class="font-num">
+                  <span>☀️ 5 × ${q.sunB} =</span>
+                  <input type="number" id="mdInSun1-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                </div>
+                <span style="font-size: 18px; font-weight: 900; color: #d97706;">➔ (${q.isSix ? `+ ${q.sunB}` : `− ${q.sunB}`}) ➔</span>
+                <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 900;" class="font-num">
+                  <span>🎯 ${q.targetA} × ${q.sunB} =</span>
+                  <input type="number" id="mdInSun2-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'double_half') {
+          const d = q.dh;
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 13px; font-weight: 700; color: #334155;">
+                In der Sporthalle werden <strong>${d.item}</strong> gezählt:
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+                <div style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800;">
+                  <span>✖️2 Das <strong>Doppelte</strong> von <span class="font-num">${d.base}</span> ist:</span>
+                  <input type="number" id="mdInDouble-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                </div>
+                <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800;">
+                  <span>➗2 Die <strong>Hälfte</strong> von <span class="font-num">${d.halfOf}</span> ist:</span>
+                  <input type="number" id="mdInHalf-${idx}" class="quiz-input font-num" placeholder="?" style="width: 66px;">
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'multipack') {
+          const mp = q.mp;
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 800; color: #334155;">Multipliziere jede Zahlenkarte mit jeder anderen:</span>
+                ${mp.cards.map(c => `<span class="font-num" style="background:#dbeafe; color:#1e40af; border:2px solid #3b82f6; border-radius:8px; padding:3px 10px; font-size:16px; font-weight:900;">${c}</span>`).join('')}
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: #f8fafc; padding: 10px 12px; border-radius: 12px; border: 1.5px solid #cbd5e1;">
+                <span style="font-size: 12px; font-weight: 800; color: #475569; margin-right: 4px;">Ergebnisse (sortiert):</span>
+                <span class="font-num" style="background:#fff; border:1.5px solid #94a3b8; border-radius:8px; padding:4px 10px; font-weight:900;">${mp.prods[0]}</span>
+                <span>,</span>
+                <span class="font-num" style="background:#fff; border:1.5px solid #94a3b8; border-radius:8px; padding:4px 10px; font-weight:900;">${mp.prods[1]}</span>
+                <span>,</span>
+                <input type="number" id="mdInMP1-${idx}" class="quiz-input font-num" placeholder="?" style="width: 58px; padding: 4px;" title="2. Karte × 4. Karte">
+                <span>,</span>
+                <span class="font-num" style="background:#fff; border:1.5px solid #94a3b8; border-radius:8px; padding:4px 10px; font-weight:900;">${mp.prods[3]}</span>
+                <span>,</span>
+                <span class="font-num" style="background:#fff; border:1.5px solid #94a3b8; border-radius:8px; padding:4px 10px; font-weight:900;">${mp.prods[4]}</span>
+                <span>,</span>
+                <input type="number" id="mdInMP2-${idx}" class="quiz-input font-num" placeholder="?" style="width: 58px; padding: 4px;" title="Größtes Produkt (3. Karte × 4. Karte)">
+              </div>
+            </div>
+          `;
+        }
+
+        htmlStr += `
+          <div class="quiz-nugget" id="mdNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.title}</span>
+              <span id="mdStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            ${bodyHtml}
 
             <!-- Aufklappbarer Lösungsweg -->
             <div id="mdSolution-${idx}" class="quiz-step-box hidden">
@@ -5168,10 +5979,26 @@
         if (q.type === 'mul') {
           const userVal = parseInt(document.getElementById(`mdInAns-${idx}`).value, 10);
           isCorrect = (userVal === q.ans);
-        } else {
+        } else if (q.type === 'div') {
           const userQuot = parseInt(document.getElementById(`mdInQuot-${idx}`).value, 10);
           const userRest = parseInt(document.getElementById(`mdInRest-${idx}`).value, 10) || 0;
           isCorrect = (userQuot === q.quot && userRest === q.rest);
+        } else if (q.type === 'malduin') {
+          const uEar = parseInt(document.getElementById(`mdInMaldEar-${idx}`).value, 10);
+          const uBelly = parseInt(document.getElementById(`mdInMaldBelly-${idx}`).value, 10);
+          isCorrect = (uEar === q.mB && uBelly === q.mB);
+        } else if (q.type === 'sun_neighbor') {
+          const uSun1 = parseInt(document.getElementById(`mdInSun1-${idx}`).value, 10);
+          const uSun2 = parseInt(document.getElementById(`mdInSun2-${idx}`).value, 10);
+          isCorrect = (uSun1 === q.sunAns && uSun2 === q.finalAns);
+        } else if (q.type === 'double_half') {
+          const uD = parseInt(document.getElementById(`mdInDouble-${idx}`).value, 10);
+          const uH = parseInt(document.getElementById(`mdInHalf-${idx}`).value, 10);
+          isCorrect = (uD === q.dh.double && uH === q.dh.half);
+        } else if (q.type === 'multipack') {
+          const u1 = parseInt(document.getElementById(`mdInMP1-${idx}`).value, 10);
+          const u2 = parseInt(document.getElementById(`mdInMP2-${idx}`).value, 10);
+          isCorrect = (u1 === q.ans1 && u2 === q.ans2);
         }
 
         if (isCorrect) {
@@ -5185,7 +6012,7 @@
       });
 
       addStars(correctCount * 2);
-      if (correctCount === 5) {
+      if (correctCount === mdQuizData.length) {
         addStars(10);
         playChime();
         fireConfetti();
@@ -5197,7 +6024,7 @@
     }
 
     // =========================================================
-    // QUIZ 5: RECHNEN BIS 1000 (5 ÜBUNGS-NUGGETS)
+    // QUIZ 5: RECHNEN BIS 1000 & GEHEIMSCHRIFT (8 BUCH-NUGGETS)
     // =========================================================
     let thQuizData = [];
 
@@ -5207,42 +6034,160 @@
 
     function newTHQuiz() {
       thQuizData = [];
-      for (let i = 0; i < 5; i++) {
-        const isPlus = (i < 3); // 3x Addition, 2x Subtraktion
-        if (isPlus) {
-          const a = Math.floor(Math.random() * 450) + 120;
-          const b = Math.floor(Math.random() * (950 - a)) + 50;
-          const ans = a + b;
-          const hB = Math.floor(b / 100) * 100;
-          const zB = Math.floor((b % 100) / 10) * 10;
-          const eB = b % 10;
-          const step1 = a + hB;
-          const step2 = step1 + zB;
-          thQuizData.push({
-            id: i,
-            op: '+',
-            a, b, ans,
-            question: `${a} + ${b} = ?`,
-            stepDesc: `1. Hunderter: ${a} + ${hB} = ${step1}. 2. Zehner: ${step1} + ${zB} = ${step2}. 3. Einer: ${step2} + ${eB} = ${ans}.`
-          });
-        } else {
-          const a = Math.floor(Math.random() * 500) + 400;
-          const b = Math.floor(Math.random() * (a - 100)) + 60;
-          const ans = a - b;
-          const hB = Math.floor(b / 100) * 100;
-          const zB = Math.floor((b % 100) / 10) * 10;
-          const eB = b % 10;
-          const step1 = a - hB;
-          const step2 = step1 - zB;
-          thQuizData.push({
-            id: i,
-            op: '-',
-            a, b, ans,
-            question: `${a} − ${b} = ?`,
-            stepDesc: `1. Hunderter: ${a} − ${hB} = ${step1}. 2. Zehner: ${step1} − ${zB} = ${step2}. 3. Einer: ${step2} − ${eB} = ${ans}.`
-          });
-        }
+
+      // 1. Addition bis 1000
+      const a1 = Math.floor(Math.random() * 450) + 120;
+      const b1 = Math.floor(Math.random() * (950 - a1)) + 50;
+      const ans1 = a1 + b1;
+      const hB1 = Math.floor(b1 / 100) * 100, zB1 = Math.floor((b1 % 100) / 10) * 10, eB1 = b1 % 10;
+      thQuizData.push({
+        id: 0,
+        type: 'std',
+        title: 'Addition bis 1000 (H-Z-E Schrittweise)',
+        op: '+', a: a1, b: b1, ans: ans1,
+        question: `${a1} + ${b1} = ?`,
+        stepDesc: `1. Hunderter: ${a1} + ${hB1} = ${a1 + hB1}. 2. Zehner: ${a1 + hB1} + ${zB1} = ${a1 + hB1 + zB1}. 3. Einer: ${a1 + hB1 + zB1} + ${eB1} = <strong>${ans1}</strong>.`
+      });
+
+      // 2. Subtraktion bis 1000
+      const a2 = Math.floor(Math.random() * 500) + 400;
+      const b2 = Math.floor(Math.random() * (a2 - 100)) + 60;
+      const ans2 = a2 - b2;
+      const hB2 = Math.floor(b2 / 100) * 100, zB2 = Math.floor((b2 % 100) / 10) * 10, eB2 = b2 % 10;
+      thQuizData.push({
+        id: 1,
+        type: 'std',
+        title: 'Subtraktion bis 1000 (H-Z-E Schrittweise)',
+        op: '-', a: a2, b: b2, ans: ans2,
+        question: `${a2} − ${b2} = ?`,
+        stepDesc: `1. Hunderter: ${a2} − ${hB2} = ${a2 - hB2}. 2. Zehner: ${a2 - hB2} − ${zB2} = ${a2 - hB2 - zB2}. 3. Einer: ${a2 - hB2 - zB2} − ${eB2} = <strong>${ans2}</strong>.`
+      });
+
+      // 3. NEU (Buch S. 19): Geheimschrift lesen (Rote Quadrate, blaue Striche, grüne Punkte)
+      const sh = Math.floor(Math.random() * 7) + 2;
+      const sz = Math.floor(Math.random() * 8) + 1;
+      const se = Math.floor(Math.random() * 8) + 1;
+      const sNum = sh * 100 + sz * 10 + se;
+      thQuizData.push({
+        id: 2,
+        type: 'secret_read',
+        title: '🕵️ Geheimschrift von Zahlix & Zahline lesen (Buch S. 19)',
+        sh, sz, se, ans: sNum,
+        svg: makeSecretCodeSVG(sh, sz, se),
+        stepDesc: `${sh} rote Hunderter-Quadrate (${sh * 100}) + ${sz} blaue Zehner-Striche (${sz * 10}) + ${se} grüne Einer-Punkte (${se}) = <strong>${sNum}</strong> (${numberToGermanWord(sNum)}).`
+      });
+
+      // 4. NEU (Buch S. 21): Rechnen mit der Geheimschrift (Durchstreichen / Dazumalen)
+      const isSecMinus = Math.random() < 0.6;
+      if (isSecMinus) {
+        const ch = Math.floor(Math.random() * 5) + 3;
+        const cz = Math.floor(Math.random() * 5) + 3;
+        const ce = Math.floor(Math.random() * 5) + 3;
+        const dh = Math.floor(Math.random() * 2) + 1;
+        const dz = Math.floor(Math.random() * 2) + 1;
+        const de = Math.floor(Math.random() * 2) + 1;
+        const startN = ch * 100 + cz * 10 + ce;
+        const subN = dh * 100 + dz * 10 + de;
+        const endN = startN - subN;
+        thQuizData.push({
+          id: 3,
+          type: 'secret_calc',
+          title: '✏️ Rechnen mit der Geheimschrift – Durchstreichen (Buch S. 21)',
+          isMinus: true,
+          startN, diffN: subN, ans: endN,
+          svg: makeSecretCodeSVG(ch, cz, ce, { strikeH: dh, strikeZ: dz, strikeE: de }),
+          stepDesc: `Zuerst waren es ${startN}. Durchgestrichen wurden ${dh} H, ${dz} Z und ${de} E (= ${subN}). Rechnung: ${startN} − ${subN} = <strong>${endN}</strong>.`
+        });
+      } else {
+        const ch = Math.floor(Math.random() * 4) + 2;
+        const cz = Math.floor(Math.random() * 4) + 2;
+        const ce = Math.floor(Math.random() * 4) + 2;
+        const dh = Math.floor(Math.random() * 2) + 1;
+        const dz = Math.floor(Math.random() * 2) + 1;
+        const de = Math.floor(Math.random() * 2) + 1;
+        const startN = ch * 100 + cz * 10 + ce;
+        const addN = dh * 100 + dz * 10 + de;
+        const endN = startN + addN;
+        thQuizData.push({
+          id: 3,
+          type: 'secret_calc',
+          title: '✏️ Rechnen mit der Geheimschrift – Dazumalen (Buch S. 21)',
+          isMinus: false,
+          startN, diffN: addN, ans: endN,
+          svg: makeSecretCodeSVG(ch, cz, ce, { addH: dh, addZ: dz, addE: de }),
+          stepDesc: `Oben stehen ${startN}, darunter wurden ${dh} H, ${dz} Z und ${de} E (= ${addN}) dazugemalt. Rechnung: ${startN} + ${addN} = <strong>${endN}</strong>.`
+        });
       }
+
+      // 5. NEU (Buch S. 20): Bündeln (23 Z = 230) & verdrehte Stellenwerte (5E + 7H + 2Z)
+      const tensCount = [14, 18, 23, 25, 32, 36, 45][Math.floor(Math.random() * 7)];
+      const bundleAns = tensCount * 10;
+      const scH = Math.floor(Math.random() * 8) + 1;
+      const scZ = Math.floor(Math.random() * 9);
+      const scE = Math.floor(Math.random() * 8) + 1;
+      const scrambleAns = scH * 100 + scZ * 10 + scE;
+      thQuizData.push({
+        id: 4,
+        type: 'bundle_scramble',
+        title: '🧩 Bündeln & Stellenwerte-Rätsel (Buch S. 20)',
+        tensCount, bundleAns,
+        scH, scZ, scE, scrambleAns,
+        stepDesc: `10 Zehner sind 1 Hunderter, also sind ${tensCount} Z = <strong>${bundleAns}</strong>. Beim Stellenwerte-Rätsel immer auf H, Z, E achten: ${scH} H (${scH*100}) + ${scZ} Z (${scZ*10}) + ${scE} E (${scE}) = <strong>${scrambleAns}</strong>.`
+      });
+
+      // 6. NEU (Buch S. 22): Ziffernkarten-Rekord mit Null-Falle
+      const dSets = [[5, 8, 0], [3, 7, 0], [4, 9, 0], [2, 6, 0], [1, 8, 0]];
+      const cards = dSets[Math.floor(Math.random() * dSets.length)];
+      const sortedDesc = [...cards].sort((a, b) => b - a);
+      const maxNum = sortedDesc[0] * 100 + sortedDesc[1] * 10 + sortedDesc[2];
+      // Kleinste dreistellige Zahl: 0 darf NICHT an der Hunderterstelle stehen!
+      const nonZeroAsc = cards.filter(c => c > 0).sort((a, b) => a - b);
+      const minNum = nonZeroAsc[0] * 100 + 0 * 10 + nonZeroAsc[1];
+      thQuizData.push({
+        id: 5,
+        type: 'digit_cards',
+        title: '🃏 Ziffernkarten-Rekord & Null-Falle (Buch S. 22)',
+        cards, maxNum, minNum,
+        stepDesc: `Größte Zahl (große Ziffern nach vorn): <strong>${maxNum}</strong>. Kleinste dreistellige Zahl (Achtung: 0 darf nicht an der Hunderterstelle stehen!): <strong>${minNum}</strong>.`
+      });
+
+      // 7. NEU (Buch S. 23): Stellentafel mit Plättchen & Quersumme
+      const qh = Math.floor(Math.random() * 5) + 2;
+      const qz = Math.floor(Math.random() * 5) + 1;
+      const qe = Math.floor(Math.random() * 6) + 1;
+      const qNum = qh * 100 + qz * 10 + qe;
+      const qSum = qh + qz + qe;
+      thQuizData.push({
+        id: 6,
+        type: 'stellentafel_qs',
+        title: '🔵 Stellentafel & Quersumme (Buch S. 23)',
+        qh, qz, qe, qNum, qSum,
+        tableHtml: makeStellentafelPlättchenHTML(qh, qz, qe),
+        stepDesc: `In der Stellentafel liegen ${qh} H, ${qz} Z und ${qe} E ➔ Zahl: <strong>${qNum}</strong>. Die Quersumme (Anzahl aller Plättchen) ist ${qh} + ${qz} + ${qe} = <strong>${qSum}</strong>.`
+      });
+
+      // 8. NEU (Buch S. 23): Plättchen-Detektiv (1 Plättchen dazulegen oder wegnehmen)
+      const ph = Math.floor(Math.random() * 5) + 3;
+      const pz = Math.floor(Math.random() * 5) + 2;
+      const pe = Math.floor(Math.random() * 5) + 2;
+      const pStart = ph * 100 + pz * 10 + pe;
+      const places = [
+        { name: 'Hunderterstelle (H)', delta: 100 },
+        { name: 'Zehnerstelle (Z)', delta: 10 },
+        { name: 'Einerstelle (E)', delta: 1 }
+      ];
+      const pl = places[Math.floor(Math.random() * places.length)];
+      const isAddPl = Math.random() < 0.5;
+      const pEnd = isAddPl ? (pStart + pl.delta) : (pStart - pl.delta);
+      const pNewQs = (ph + pz + pe) + (isAddPl ? 1 : -1);
+      thQuizData.push({
+        id: 7,
+        type: 'plaettchen_detective',
+        title: '🔍 Plättchen-Detektiv in der Stellentafel (Buch S. 23)',
+        pStart, placeName: pl.name, isAddPl, pEnd, pNewQs,
+        stepDesc: `Ausgangszahl: ${pStart} (Quersumme ${ph+pz+pe}). Wenn du an der ${pl.name} 1 Plättchen ${isAddPl ? 'dazulegst (+' + pl.delta + ')' : 'wegnimmst (−' + pl.delta + ')'}, heißt die neue Zahl <strong>${pEnd}</strong> und die neue Quersumme ist <strong>${pNewQs}</strong>.`
+      });
+
       renderTHQuiz();
     }
 
@@ -5253,8 +6198,8 @@
       let htmlStr = `
         <div class="quiz-header">
           <div>
-            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 5 Übungs-Nuggets: Plus & Minus bis 1000</div>
-            <div style="font-size: 12px; color: #92400e;">Rechne Hunderter, Zehner und Einer schrittweise zusammen und klicke auf „Prüfen & Lösen“!</div>
+            <div style="font-size: 15px; font-weight: 800; color: #78350f;">🎯 8 Buch-Nuggets: 1000er-Raum, Geheimschrift & Quersumme</div>
+            <div style="font-size: 12px; color: #92400e;">Alle Übungsformate aus dem Mathebuch (Zahlix & Zahline Geheimschrift, Bündeln, Ziffernkarten, Stellentafel & Quersumme)!</div>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="solveTHQuiz()" class="btn btn-primary" style="padding: 7px 14px; font-size: 13px;">✨ Prüfen & Lösen</button>
@@ -5264,22 +6209,126 @@
       `;
 
       thQuizData.forEach((q, idx) => {
-        htmlStr += `
-          <div class="quiz-nugget" id="thNugget-${idx}">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1} (${q.op === '+' ? 'Addition bis 1000' : 'Subtraktion bis 1000'})</span>
-              <span id="thStatus-${idx}" style="font-size: 16px;">⏳</span>
-            </div>
-            
+        let bodyHtml = '';
+        if (q.type === 'std') {
+          bodyHtml = `
             <div style="font-size: 18px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
               <span class="font-num">${q.question}</span>
               <input type="number" id="thInAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 90px;">
             </div>
+          `;
+        } else if (q.type === 'secret_read') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div>${q.svg}</div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 15px; font-weight: 800;">
+                <input type="number" id="thInSecH-${idx}" class="quiz-input font-num" placeholder="H" style="width: 52px; border-color: #dc2626;">
+                <span style="color:#dc2626; font-weight:900;">H +</span>
+                <input type="number" id="thInSecZ-${idx}" class="quiz-input font-num" placeholder="Z" style="width: 52px; border-color: #2563eb;">
+                <span style="color:#2563eb; font-weight:900;">Z +</span>
+                <input type="number" id="thInSecE-${idx}" class="quiz-input font-num" placeholder="E" style="width: 52px; border-color: #16a34a;">
+                <span style="color:#16a34a; font-weight:900;">E =</span>
+                <input type="number" id="thInSecTotal-${idx}" class="quiz-input font-num" placeholder="Zahl?" style="width: 85px;">
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'secret_calc') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 13px; font-weight: 700; color: #334155;">
+                ${q.isMinus ? 'Welche Minusaufgabe wurde hier durchgestrichen?' : 'Welche Plusaufgabe wurde hier untereinander gemalt?'}
+              </div>
+              <div>${q.svg}</div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 16px; font-weight: 900;" class="font-num">
+                <span>${q.startN} ${q.isMinus ? '−' : '+'}</span>
+                <input type="number" id="thInSecDiff-${idx}" class="quiz-input font-num" placeholder="?" style="width: 72px;">
+                <span>=</span>
+                <input type="number" id="thInSecCalcAns-${idx}" class="quiz-input font-num" placeholder="?" style="width: 82px;">
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'bundle_scramble') {
+          bodyHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+              <div style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800;">
+                <span>📦 Bündeln: <strong class="font-num" style="color:#1d4ed8;">${q.tensCount} Z</strong> =</span>
+                <input type="number" id="thInBundle-${idx}" class="quiz-input font-num" placeholder="?" style="width: 75px;">
+              </div>
+              <div style="background: #fef3c7; border: 1.5px solid #fcd34d; border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800;">
+                <span>🌀 Aufgepasst (verdreht!): <strong class="font-num"><span style="color:#16a34a;">${q.scE} E</span> + <span style="color:#dc2626;">${q.scH} H</span> + <span style="color:#2563eb;">${q.scZ} Z</span></strong> =</span>
+                <input type="number" id="thInScramble-${idx}" class="quiz-input font-num" placeholder="?" style="width: 75px;">
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'digit_cards') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 800; color: #334155;">Bilde aus diesen 3 Ziffernkarten dreistellige Zahlen:</span>
+                ${q.cards.map(c => `<span class="font-num" style="background:#fef3c7; color:#92400e; border:2px solid #f59e0b; border-radius:8px; padding:3px 12px; font-size:17px; font-weight:900;">${c}</span>`).join('')}
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 14px; font-weight: 800;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>🏆 Größte 3-stellige Zahl:</span>
+                  <input type="number" id="thInCardMax-${idx}" class="quiz-input font-num" placeholder="?" style="width: 78px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>🐣 Kleinste 3-stellige Zahl (ohne 0 vorn!):</span>
+                  <input type="number" id="thInCardMin-${idx}" class="quiz-input font-num" placeholder="?" style="width: 78px;">
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'stellentafel_qs') {
+          bodyHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: center;">
+              <div>${q.tableHtml}</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800;">
+                  <span>1. Welche Zahl liegt in der Stellentafel?</span>
+                  <input type="number" id="thInStNum-${idx}" class="quiz-input font-num" placeholder="Zahl" style="width: 82px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800;">
+                  <span>2. Wie groß ist die <strong>Quersumme</strong> (Summe der Ziffern)?</span>
+                  <input type="number" id="thInStQs-${idx}" class="quiz-input font-num" placeholder="QS" style="width: 68px;">
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === 'plaettchen_detective') {
+          bodyHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 14px; font-weight: 700; color: #1e293b; line-height: 1.45;">
+                In der Stellentafel liegt die Zahl <strong class="font-num" style="background:#e2e8f0; padding:2px 8px; border-radius:6px;">${q.pStart}</strong>.<br>
+                Du <strong>${q.isAddPl ? 'legst 1 Plättchen dazu' : 'nimmst 1 Plättchen weg'}</strong> an der <strong>${q.placeName}</strong>.
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 14px; font-weight: 800;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>👉 Neue Zahl:</span>
+                  <input type="number" id="thInPlNum-${idx}" class="quiz-input font-num" placeholder="?" style="width: 82px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>👉 Neue Quersumme:</span>
+                  <input type="number" id="thInPlQs-${idx}" class="quiz-input font-num" placeholder="?" style="width: 68px;">
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        htmlStr += `
+          <div class="quiz-nugget" id="thNugget-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #b45309;">Aufgabe ${idx + 1}: ${q.title}</span>
+              <span id="thStatus-${idx}" style="font-size: 16px;">⏳</span>
+            </div>
+            
+            ${bodyHtml}
 
             <!-- Aufklappbarer Lösungsweg -->
             <div id="thSolution-${idx}" class="quiz-step-box hidden">
-              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer H-Z-E Rechenweg:</div>
-              <div>${q.stepDesc} Ergebnis: <strong>${q.ans}</strong></div>
+              <div style="font-weight: 800; color: #b45309; margin-bottom: 2px;">Didaktischer Rechenweg:</div>
+              <div>${q.stepDesc}</div>
             </div>
           </div>
         `;
@@ -5296,8 +6345,37 @@
         const sol = document.getElementById(`thSolution-${idx}`);
         sol.classList.remove('hidden');
 
-        const userVal = parseInt(document.getElementById(`thInAns-${idx}`).value, 10);
-        const isCorrect = (userVal === q.ans);
+        let isCorrect = false;
+        if (q.type === 'std') {
+          const userVal = parseInt(document.getElementById(`thInAns-${idx}`).value, 10);
+          isCorrect = (userVal === q.ans);
+        } else if (q.type === 'secret_read') {
+          const uH = parseInt(document.getElementById(`thInSecH-${idx}`).value, 10);
+          const uZ = parseInt(document.getElementById(`thInSecZ-${idx}`).value, 10);
+          const uE = parseInt(document.getElementById(`thInSecE-${idx}`).value, 10);
+          const uTot = parseInt(document.getElementById(`thInSecTotal-${idx}`).value, 10);
+          isCorrect = (uTot === q.ans && (isNaN(uH) || (uH === q.sh && uZ === q.sz && uE === q.se)));
+        } else if (q.type === 'secret_calc') {
+          const uDiff = parseInt(document.getElementById(`thInSecDiff-${idx}`).value, 10);
+          const uAns = parseInt(document.getElementById(`thInSecCalcAns-${idx}`).value, 10);
+          isCorrect = (uDiff === q.diffN && uAns === q.ans);
+        } else if (q.type === 'bundle_scramble') {
+          const uB = parseInt(document.getElementById(`thInBundle-${idx}`).value, 10);
+          const uS = parseInt(document.getElementById(`thInScramble-${idx}`).value, 10);
+          isCorrect = (uB === q.bundleAns && uS === q.scrambleAns);
+        } else if (q.type === 'digit_cards') {
+          const uMax = parseInt(document.getElementById(`thInCardMax-${idx}`).value, 10);
+          const uMin = parseInt(document.getElementById(`thInCardMin-${idx}`).value, 10);
+          isCorrect = (uMax === q.maxNum && uMin === q.minNum);
+        } else if (q.type === 'stellentafel_qs') {
+          const uNum = parseInt(document.getElementById(`thInStNum-${idx}`).value, 10);
+          const uQs = parseInt(document.getElementById(`thInStQs-${idx}`).value, 10);
+          isCorrect = (uNum === q.qNum && uQs === q.qSum);
+        } else if (q.type === 'plaettchen_detective') {
+          const uNum = parseInt(document.getElementById(`thInPlNum-${idx}`).value, 10);
+          const uQs = parseInt(document.getElementById(`thInPlQs-${idx}`).value, 10);
+          isCorrect = (uNum === q.pEnd && uQs === q.pNewQs);
+        }
 
         if (isCorrect) {
           correctCount++;
@@ -5310,7 +6388,7 @@
       });
 
       addStars(correctCount * 2);
-      if (correctCount === 5) {
+      if (correctCount === thQuizData.length) {
         addStars(10);
         playChime();
         fireConfetti();

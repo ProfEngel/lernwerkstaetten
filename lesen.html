@@ -238,6 +238,19 @@
       box-shadow: 0 3px 8px rgba(139, 92, 246, 0.2);
     }
 
+    .grade-pill.active-custom {
+      border-color: #0284c7;
+      background: #e0f2fe;
+      color: #0369a1;
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.22);
+    }
+
+    input, textarea, select {
+      user-select: auto;
+      -webkit-user-select: auto;
+      font-family: inherit;
+    }
+
     /* Hauptnavigation */
     .nav-tabs {
       display: flex;
@@ -426,7 +439,7 @@
 
     <!-- Klassenstufen-Leiste (Wortschatz-Auswahl) -->
     <div class="grade-bar">
-      <div style="display: flex; align-items: center; gap: 6px;">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
         <span style="font-size: 12px; font-weight: 900; color: #475569; text-transform: uppercase;">📚 Wortschatz:</span>
         <span id="gradeDescBadge" style="font-size: 12px; font-weight: 800; color: #1e1b4b; background: #e2e8f0; padding: 2px 8px; border-radius: 8px;">1. Klasse</span>
       </div>
@@ -435,6 +448,101 @@
         <button id="gradeBtn-2" onclick="setGrade(2)" class="grade-pill">🟡 2. Klasse</button>
         <button id="gradeBtn-3" onclick="setGrade(3)" class="grade-pill">🟠 3. Klasse</button>
         <button id="gradeBtn-4" onclick="setGrade(4)" class="grade-pill">🟣 4. Klasse</button>
+        <button id="gradeBtn-custom" onclick="setGrade('custom')" class="grade-pill">⭐ Eigene Inhalte</button>
+        <button id="customStudioToggleBtn" onclick="toggleCustomPanel()" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; border-radius: 12px; background: #0284c7; box-shadow: 0 2px 8px rgba(2,132,199,0.25);">
+          📥 Eigene Wörter / Text & KI
+        </button>
+      </div>
+    </div>
+
+    <!-- EIGENE INHALTE & KI-VORLAGE STUDIO (AUSKLAPPBAR) -->
+    <div id="customContentPanel" class="hidden" style="background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); border: 2px solid #7dd3fc; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 6px 18px rgba(2, 132, 199, 0.1);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 1.5px solid #bae6fd; padding-bottom: 10px;">
+        <div>
+          <div style="font-size: 16px; font-weight: 900; color: #0c4a6e;">📥 Eigene Lernwörter, Lesetexte & KI-Import</div>
+          <div style="font-size: 12px; color: #0369a1; font-weight: 700;">Wähle zwischen dem unkomplizierten Direkt-Modus (einfach eintippen) oder dem KI-Profi-Import!</div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button id="custTabBtn-simple" onclick="switchCustomMode('simple')" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; background: #0284c7;">✍️ Einfach-Modus (Ohne KI)</button>
+          <button id="custTabBtn-ai" onclick="switchCustomMode('ai')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">🤖 KI-Vorlage & Datei-Upload</button>
+          <button onclick="toggleCustomPanel()" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Schließen">✖</button>
+        </div>
+      </div>
+
+      <!-- MODUS A: UNKOMPLIZIERTER EINFACH-MODUS (OHNE KI) -->
+      <div id="custSec-simple" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 12px; padding: 10px 12px; font-size: 12px; color: #0c4a6e; font-weight: 700; line-height: 1.45;">
+          💡 <strong>So unkompliziert geht's:</strong> Tippe oder kopiere einfach deine aktuellen Lernwörter und/oder einen Lesetext hier hinein. Die App erzeugt daraus <strong>automatisch</strong> die Silbenbögen, Blitzlese-Wörter, Quatschwörter, Lesetreppen (immer hinten ergänzt) und das Lese-Karaoke!
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 12px; font-weight: 800; color: #1e293b;">🏷️ Name des Lernpakets / Themas:</label>
+          <input type="text" id="customSimpleTitle" value="Meine Lernwörter & Text" placeholder="z.B. Lernwörter Woche 4: Feuerwehr" style="padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-weight: 700;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-size: 12px; font-weight: 800; color: #1e293b;">🔤 Eigene Wörter (Komma oder neue Zeile):</label>
+            <span style="font-size: 11px; color: #64748b;">Tipp: Einfach normal schreiben (z.B. <code>Feuerwehr</code>) oder mit Bindestrich für exakte Silben (<code>Feu-er-wehr</code>).</span>
+            <textarea id="customSimpleWords" rows="5" placeholder="Feu-er-wehr, Ret-tungs-wa-gen, Schlauch, Hel-fer, Blaulicht, Wasser, löschen" style="padding: 10px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 13.5px; line-height: 1.4; resize: vertical;"></textarea>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-size: 12px; font-weight: 800; color: #1e293b;">📖 Eigener Lesetext / Geschichte (für Karaoke & Treppen):</label>
+            <span style="font-size: 11px; color: #64748b;">Tipp: Kopiere einfach einen Text hinein. Sätze werden automatisch auch zu Lesetreppen!</span>
+            <textarea id="customSimpleStory" rows="5" placeholder="Die rote Feuerwehr fährt schnell durch die Stadt. Auf dem Dach blinkt das helle Blaulicht. Die mutigen Helfer rollen den langen Schlauch aus und löschen das Feuer." style="padding: 10px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 13.5px; line-height: 1.4; resize: vertical;"></textarea>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <button onclick="saveSimpleCustomContent()" class="btn btn-success" style="padding: 10px 18px; font-size: 14px;">
+            🚀 Sofort übernehmen & Üben starten!
+          </button>
+          <span id="customSimpleFeedback" style="font-size: 12.5px; font-weight: 800; color: #047857;"></span>
+        </div>
+      </div>
+
+      <!-- MODUS B: KI-VORLAGE & DATEI-UPLOAD (PROFI-MODUS) -->
+      <div id="custSec-ai" class="hidden" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: #f5f3ff; border: 1.5px solid #ddd6fe; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-size: 13px; font-weight: 900; color: #4c1d95;">1. Schritt: KI-Prompt-Vorlage kopieren</div>
+              <div style="font-size: 11.5px; color: #5b21b6;">Kopiere diese Vorlage, füge sie in ChatGPT, Claude oder Gemini ein und nenne dein Thema (oder lade ein Buchfoto hoch).</div>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button onclick="copyAIPromptTemplate()" class="btn btn-primary" style="padding: 7px 14px; font-size: 12px; background: #6d28d9;">
+                📋 KI-Vorlage kopieren
+              </button>
+              <button onclick="toggleAIPromptPreview()" class="btn btn-secondary" style="padding: 7px 10px; font-size: 12px;">
+                👁️ Vorlage zeigen
+              </button>
+            </div>
+          </div>
+          <span id="aiCopyFeedback" style="font-size: 12px; font-weight: 800; color: #047857;"></span>
+          <textarea id="aiPromptTemplateBox" readonly class="hidden" rows="7" style="width: 100%; font-family: ui-monospace, monospace; font-size: 11px; padding: 8px; border-radius: 10px; border: 1px solid #c4b5fd; background: #ffffff; color: #334155;"></textarea>
+        </div>
+
+        <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 13px; font-weight: 900; color: #1e293b;">2. Schritt: KI-Ergebnis einfügen oder JSON-Datei hochladen</div>
+          
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #f8fafc; padding: 8px 12px; border-radius: 10px; border: 1px dashed #94a3b8;">
+            <span style="font-size: 12px; font-weight: 800; color: #334155;">📂 Datei hochladen (.json / .txt):</span>
+            <input type="file" id="customJsonFileInput" accept=".json,.txt" onchange="handleCustomFileUpload(event)" style="font-size: 12px;">
+            <button onclick="exportCustomJson()" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px; margin-left: auto;">
+              💾 Aktuelles Paket als Datei speichern
+            </button>
+          </div>
+
+          <textarea id="customAIPasteBox" rows="5" placeholder="Oder füge den JSON-Block, den dir die KI erstellt hat, direkt hier ein..." style="width: 100%; font-family: ui-monospace, monospace; font-size: 12px; padding: 10px; border-radius: 10px; border: 1.5px solid #cbd5e1;"></textarea>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <button onclick="importAIJsonContent()" class="btn btn-success" style="padding: 9px 16px; font-size: 13px;">
+              📥 KI-Paket prüfen & übernehmen
+            </button>
+            <span id="customAIFeedback" style="font-size: 12.5px; font-weight: 800; color: #047857;"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -616,7 +724,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lesewerkstatt-offline-v2';
+        const CACHE_NAME = 'lesewerkstatt-offline-v3';
         const ASSETS = [
           './lesen.html',
           './manifest-lese.json',
@@ -1004,29 +1112,79 @@
             ]
           }
         ]
+      },
+      custom: {
+        label: "Eigene Inhalte: Feuerwehr & Einsatz",
+        words: [
+          { word: "Feuerwehr", syll: ["Feu", "er", "wehr"] },
+          { word: "Rettungswagen", syll: ["Ret", "tungs", "wa", "gen"] },
+          { word: "Schlauch", syll: ["Schlauch"] },
+          { word: "Blaulicht", syll: ["Blau", "licht"] },
+          { word: "Helfer", syll: ["Hel", "fer"] },
+          { word: "Wasser", syll: ["Was", "ser"] },
+          { word: "Sirene", syll: ["Si", "re", "ne"] },
+          { word: "löschen", syll: ["lö", "schen"] }
+        ],
+        nonsense: [
+          { text: "Feuerwehr", real: true, hint: "Ein echtes Wort!" },
+          { text: "Feuerwahr", real: false, hint: "Quatsch! Richtig heißt es: Feuerwehr." },
+          { text: "Blaulicht", real: true, hint: "Ein echtes Wort!" },
+          { text: "Blaulucht", real: false, hint: "Quatsch! Richtig heißt es: Blaulicht." },
+          { text: "Sirene", real: true, hint: "Ein echtes Wort!" },
+          { text: "Sirone", real: false, hint: "Quatsch! Richtig heißt es: Sirene." }
+        ],
+        pyramids: [
+          [
+            "Die rote Feuerwehr",
+            "Die rote Feuerwehr fährt.",
+            "Die rote Feuerwehr fährt schnell.",
+            "Die rote Feuerwehr fährt schnell durch die Stadt."
+          ],
+          [
+            "Die mutigen Helfer",
+            "Die mutigen Helfer rollen",
+            "Die mutigen Helfer rollen den langen Schlauch.",
+            "Die mutigen Helfer rollen den langen Schlauch aus."
+          ]
+        ],
+        stories: [
+          {
+            title: "Die Feuerwehr im Einsatz",
+            text: "Die rote Feuerwehr fährt schnell durch die Stadt. Auf dem Dach blinkt das helle Blaulicht. Die mutigen Helfer rollen den langen Schlauch aus und löschen das Feuer.",
+            questions: [
+              { q: "Was blinkt auf dem Dach?", options: ["Das helle Blaulicht", "Eine grüne Lampe", "Ein Stern"], correct: 0 },
+              { q: "Was rollen die Helfer aus?", options: ["Einen Teppich", "Den langen Schlauch", "Ein Seil"], correct: 1 }
+            ]
+          }
+        ]
       }
     };
 
     // =========================================================
-    // KLASSENSTUFEN-WECHSEL
+    // KLASSENSTUFEN-WECHSEL & EIGENE INHALTE STUDIO
     // =========================================================
     function setGrade(g) {
       currentGrade = g;
-      [1, 2, 3, 4].forEach(x => {
+      [1, 2, 3, 4, 'custom'].forEach(x => {
         const btn = document.getElementById(`gradeBtn-${x}`);
         if (btn) btn.className = (x === g) ? `grade-pill active-${x}` : 'grade-pill';
       });
       const desc = document.getElementById('gradeDescBadge');
-      if (desc) desc.textContent = `${g}. Klasse`;
+      if (desc) {
+        desc.textContent = (g === 'custom') ? (WORDS_DB.custom.label || '⭐ Eigene Inhalte') : `${g}. Klasse`;
+      }
       
       playTone(550, 'sine', 0.06);
 
       // Aktualisiere alle Module für die neue Klasse
+      currentPyramidIdx = 0;
+      currentStoryIdx = 0;
       resetFlashWord();
       nextSyllableWord();
       nextNonsenseWord();
-      nextPyramid();
-      nextKaraokeStory();
+      renderPyramid();
+      stopKaraokePlay();
+      renderKaraokeStory();
     }
 
     // =========================================================
@@ -1165,7 +1323,9 @@
     }
 
     function nextSyllableWord() {
-      const db = WORDS_DB[currentGrade].words.filter(w => w.syll.length > 1);
+      const allWords = WORDS_DB[currentGrade].words;
+      const multi = allWords.filter(w => w.syll && w.syll.length > 1);
+      const db = multi.length > 0 ? multi : allWords;
       currentSyllWord = db[Math.floor(Math.random() * db.length)];
       renderCurrentSyllableWord();
       initSyllablePuzzle();
@@ -1504,9 +1664,527 @@
     }
 
     // =========================================================
+    // EIGENE INHALTE STUDIO & KI-IMPORT LOGIK
+    // =========================================================
+    const CUSTOM_STORAGE_KEY = 'lesewerkstatt_custom_db_v1';
+
+    const AI_PROMPT_TEMPLATE = `Du bist ein Grundschuldidaktik-Experte. Erstelle aus meinem Text / Thema ein Lernpaket für unsere Lese-Werkstatt-App im folgenden JSON-Format.
+
+WICHTIGE DIDAKTISCHE REGELN:
+1. "words": Wichtige Wörter aus dem Text, als Silben-Array getrennt (z.B. ["Feu", "er", "wehr"]).
+2. "nonsense": Wortpaare aus dem richtigen Wort ("real") und einem minimal veränderten Quatschwort ("fake", nur 1-2 Buchstaben verändert, z.B. "Feuerwahr"), um genaues Lesen statt Raten zu trainieren.
+3. "pyramids": Lesetreppen mit je 4 Zeilen. ZWINGENDE REGEL: Jede Zeile MUSS exakt mit dem Text der vorherigen Zeile beginnen, neue Wörter dürfen NUR HINTEN am Satzende ergänzt werden (niemals Wörter mittendrin einschieben!).
+4. "stories": Der Lesetext für Lese-Karaoke mit 2-3 Verständnisfragen ("q"), je 3 Antwortmöglichkeiten ("opts") und dem Index der richtigen Antwort ("a": 0, 1 oder 2).
+
+Antworte NUR mit diesem validen JSON-Block:
+
+{
+  "title": "Mein eigenes Thema",
+  "words": [
+    ["Feu", "er", "wehr"],
+    ["Ret", "tungs", "wa", "gen"],
+    ["Blau", "licht"]
+  ],
+  "nonsense": [
+    { "real": "Feuerwehr", "fake": "Feuerwahr" },
+    { "real": "Blaulicht", "fake": "Blaulucht" }
+  ],
+  "pyramids": [
+    [
+      "Die rote Feuerwehr",
+      "Die rote Feuerwehr fährt.",
+      "Die rote Feuerwehr fährt schnell.",
+      "Die rote Feuerwehr fährt schnell zum Einsatz."
+    ]
+  ],
+  "stories": [
+    {
+      "title": "Überschrift des Textes",
+      "text": "Hier steht der gesamte Lesetext...",
+      "questions": [
+        {
+          "q": "Frage 1 zum Text?",
+          "opts": ["Richtige Antwort", "Falsche Antwort A", "Falsche Antwort B"],
+          "a": 0
+        }
+      ]
+    }
+  ]
+}`;
+
+    function toggleCustomPanel() {
+      const panel = document.getElementById('customContentPanel');
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+      const tplBox = document.getElementById('aiPromptTemplateBox');
+      if (tplBox && !tplBox.value) tplBox.value = AI_PROMPT_TEMPLATE;
+      playTone(520, 'sine', 0.05);
+    }
+
+    function switchCustomMode(mode) {
+      const btnSimple = document.getElementById('custTabBtn-simple');
+      const btnAi = document.getElementById('custTabBtn-ai');
+      const secSimple = document.getElementById('custSec-simple');
+      const secAi = document.getElementById('custSec-ai');
+
+      if (mode === 'simple') {
+        btnSimple.className = 'btn btn-primary';
+        btnSimple.style.background = '#0284c7';
+        btnAi.className = 'btn btn-secondary';
+        btnAi.style.background = '';
+        secSimple.classList.remove('hidden');
+        secAi.classList.add('hidden');
+      } else {
+        btnAi.className = 'btn btn-primary';
+        btnAi.style.background = '#6d28d9';
+        btnSimple.className = 'btn btn-secondary';
+        btnSimple.style.background = '';
+        secAi.classList.remove('hidden');
+        secSimple.classList.add('hidden');
+        const tplBox = document.getElementById('aiPromptTemplateBox');
+        if (tplBox && !tplBox.value) tplBox.value = AI_PROMPT_TEMPLATE;
+      }
+      playTone(500, 'sine', 0.04);
+    }
+
+    // Intelligenter deutscher Silbentrenner für den unkomplizierten Modus
+    function autoSplitGermanSyllables(rawInput) {
+      const cleaned = rawInput.trim().replace(/[.,!?;:"„“()]/g, '');
+      if (!cleaned) return null;
+
+      // Falls der Nutzer bereits Trennstriche (- oder | oder ·) eingegeben hat:
+      if (/[-|·]/.test(cleaned)) {
+        const parts = cleaned.split(/[-|·]+/).map(s => s.trim()).filter(Boolean);
+        if (parts.length > 0) {
+          return { word: parts.join(''), syll: parts };
+        }
+      }
+
+      const w = cleaned;
+      if (w.length <= 3) return { word: w, syll: [w] };
+
+      // Bekannte deutsche Vorsilben erkennen
+      const prefixes = ['schwie', 'unter', 'über', 'durch', 'wider', 'wieder', 'hinter', 'ent', 'emp', 'ver', 'zer', 'miss', 'ge', 'be', 'er', 'vor', 'mit', 'auf', 'ein', 'aus', 'ab', 'an', 'um', 'un', 'zu', 'bei', 'nach'];
+      let prefixFound = '';
+      let rest = w;
+      const lowerW = w.toLowerCase();
+      for (const p of prefixes) {
+        if (lowerW.startsWith(p) && w.length - p.length >= 3) {
+          const after = lowerW.slice(p.length);
+          if (/[aeiouäöüy]/.test(after)) {
+            prefixFound = w.slice(0, p.length);
+            rest = w.slice(p.length);
+            break;
+          }
+        }
+      }
+
+      function splitCore(str) {
+        // Mehrgrapheme schützen
+        const tokens = [];
+        let i = 0;
+        while (i < str.length) {
+          const rem = str.slice(i).toLowerCase();
+          if (rem.startsWith('sch')) { tokens.push(str.slice(i, i + 3)); i += 3; }
+          else if (/^(ch|ck|ph|th|qu|pf|tz|st|sp|ei|ai|au|eu|äu|ie)/.test(rem)) {
+            const m = rem.match(/^(ch|ck|ph|th|qu|pf|tz|st|sp|ei|ai|au|eu|äu|ie)/)[0];
+            tokens.push(str.slice(i, i + m.length));
+            i += m.length;
+          } else {
+            tokens.push(str[i]);
+            i++;
+          }
+        }
+
+        const isVowelTok = (t) => /[aeiouäöüy]/i.test(t);
+        const sylls = [];
+        let cur = '';
+        for (let k = 0; k < tokens.length; k++) {
+          cur += tokens[k];
+          // Prüfe, ob aktueller Teil schon einen Vokal hat und später noch ein Vokal folgt
+          const hasV = isVowelTok(cur);
+          const futureHasV = tokens.slice(k + 1).some(isVowelTok);
+          if (hasV && futureHasV) {
+            const next1 = tokens[k + 1];
+            const next2 = tokens[k + 2];
+            // Vokal + Konsonant + Vokal -> Trennung vor dem Konsonanten (z.B. Na-se, Ro-se)
+            if (!isVowelTok(next1) && next2 && isVowelTok(next2)) {
+              sylls.push(cur);
+              cur = '';
+            }
+            // Vokal + Konsonant1 + Konsonant2 + Vokal -> Trennung zwischen Konsonant1 und Konsonant2 (z.B. Win-ter, Som-mer)
+            else if (isVowelTok(tokens[k]) && !isVowelTok(next1) && next2 && !isVowelTok(next2)) {
+              cur += next1;
+              k++;
+              sylls.push(cur);
+              cur = '';
+            }
+            // Zwei Vokaltokens nacheinander (z.B. Bau-ar-beit)
+            else if (isVowelTok(tokens[k]) && isVowelTok(next1)) {
+              sylls.push(cur);
+              cur = '';
+            }
+          }
+        }
+        if (cur) {
+          if (sylls.length > 0 && !isVowelTok(cur)) {
+            sylls[sylls.length - 1] += cur;
+          } else {
+            sylls.push(cur);
+          }
+        }
+        return sylls;
+      }
+
+      const resultSylls = prefixFound ? [prefixFound, ...splitCore(rest)] : splitCore(w);
+      return { word: w, syll: resultSylls.length > 0 ? resultSylls : [w] };
+    }
+
+    function createFakeWord(realWord) {
+      if (realWord.length < 3) return realWord + 'o';
+      // Typische Lesefallen: Vokal vertauschen oder Doppelkonsonant vereinfachen oder Buchstabendreher
+      const swapMap = [
+        ['ei', 'ie'], ['ie', 'ei'], ['au', 'ua'], ['eu', 'au'],
+        ['sch', 'ch'], ['nn', 'n'], ['mm', 'm'], ['ll', 'l'], ['ss', 's'], ['tt', 't'], ['ff', 'f'], ['ck', 'k'], ['tz', 'z'],
+        ['a', 'o'], ['e', 'i'], ['i', 'e'], ['o', 'u'], ['u', 'o']
+      ];
+      for (const [from, to] of swapMap) {
+        const idx = realWord.toLowerCase().lastIndexOf(from);
+        if (idx > 0) {
+          const fake = realWord.slice(0, idx) + to + realWord.slice(idx + from.length);
+          if (fake.toLowerCase() !== realWord.toLowerCase()) return fake;
+        }
+      }
+      return realWord.slice(0, -1) + (realWord.endsWith('e') ? 'o' : 'e');
+    }
+
+    function buildPyramidsFromText(text, wordsList) {
+      const pyramids = [];
+      const sentences = (text || '')
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.split(/\s+/).length >= 4);
+
+      sentences.slice(0, 5).forEach(sent => {
+        const cleanSent = sent.replace(/[.!?]+$/, '').trim();
+        const wArr = cleanSent.split(/\s+/);
+        if (wArr.length >= 4) {
+          // 4 Stufen bauen, die immer strikt hinten neue Wörter anhängen
+          const s1 = wArr.slice(0, 2).join(' ');
+          const cut2 = Math.max(3, Math.floor(wArr.length * 0.5));
+          const cut3 = Math.max(cut2 + 1, Math.floor(wArr.length * 0.75));
+          const s2 = wArr.slice(0, Math.min(wArr.length, cut2)).join(' ') + '.';
+          const s3 = wArr.slice(0, Math.min(wArr.length, cut3)).join(' ') + '.';
+          const s4 = wArr.join(' ') + '.';
+          const uniqueRows = [s1];
+          [s2, s3, s4].forEach(r => {
+            if (r.replace(/\.$/, '') !== uniqueRows[uniqueRows.length - 1].replace(/\.$/, '')) {
+              uniqueRows.push(r);
+            }
+          });
+          if (uniqueRows.length >= 2) pyramids.push(uniqueRows);
+        }
+      });
+
+      if (pyramids.length === 0 && wordsList.length > 0) {
+        const w1 = wordsList[0].word;
+        const w2 = (wordsList[1] || wordsList[0]).word;
+        pyramids.push([
+          `Ich lese`,
+          `Ich lese das Wort ${w1}.`,
+          `Ich lese das Wort ${w1} und ${w2}.`,
+          `Ich lese das Wort ${w1} und ${w2} heute super schnell.`
+        ]);
+      }
+      return pyramids;
+    }
+
+    function saveSimpleCustomContent() {
+      const titleInput = (document.getElementById('customSimpleTitle').value || 'Meine eigenen Inhalte').trim();
+      const rawWordsTxt = (document.getElementById('customSimpleWords').value || '').trim();
+      const rawStoryTxt = (document.getElementById('customSimpleStory').value || '').trim();
+
+      let rawWordTokens = rawWordsTxt
+        .split(/[\n,;]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      // Falls keine eigenen Wörter eingetragen wurden, automatisch wichtige Wörter aus dem Lesetext extrahieren!
+      if (rawWordTokens.length === 0 && rawStoryTxt) {
+        const extracted = rawStoryTxt
+          .replace(/[.,!?;:"„“()]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length >= 4);
+        rawWordTokens = [...new Set(extracted)].slice(0, 20);
+      }
+
+      if (rawWordTokens.length === 0 && !rawStoryTxt) {
+        const fb = document.getElementById('customSimpleFeedback');
+        fb.style.color = '#dc2626';
+        fb.textContent = '⚠️ Bitte gib mindestens ein paar Wörter oder einen kurzen Lesetext ein.';
+        return;
+      }
+
+      const words = rawWordTokens.map(autoSplitGermanSyllables).filter(Boolean);
+      const nonsense = [];
+      words.slice(0, 15).forEach(wObj => {
+        nonsense.push({ text: wObj.word, real: true, hint: 'Ein echtes Wort!' });
+        const fake = createFakeWord(wObj.word);
+        nonsense.push({ text: fake, real: false, hint: `Quatsch! Richtig heißt es: ${wObj.word}.` });
+      });
+
+      const storyText = rawStoryTxt || words.map(w => w.word).join('. ') + '.';
+      const pyramids = buildPyramidsFromText(storyText, words);
+
+      // Automatische Verständnisfragen für den eigenen Text generieren
+      const firstWord = words[0] ? words[0].word : 'Feuerwehr';
+      const questions = [
+        {
+          q: 'Welches dieser Wörter kam im Text / in deinen Lernwörtern vor?',
+          options: [firstWord, 'Raumschiffkapitän', 'Tiefseetaucher'],
+          correct: 0
+        },
+        {
+          q: 'Hast du den gesamten Text flüssig und genau bis zum Ende gelesen?',
+          options: ['Ja, komplett gelesen!', 'Nein, noch nicht', 'Nur das erste Wort'],
+          correct: 0
+        }
+      ];
+
+      WORDS_DB.custom = {
+        label: `⭐ ${titleInput}`,
+        words,
+        nonsense,
+        pyramids,
+        stories: [
+          {
+            title: titleInput,
+            text: storyText,
+            questions
+          }
+        ]
+      };
+
+      try {
+        localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(WORDS_DB.custom));
+      } catch (e) {}
+
+      const fb = document.getElementById('customSimpleFeedback');
+      fb.style.color = '#047857';
+      fb.textContent = `✅ Gespeichert! (${words.length} Wörter & ${pyramids.length} Lesetreppen bereit)`;
+
+      setGrade('custom');
+      playSuccessFanfare();
+      fireConfetti();
+      setTimeout(() => {
+        document.getElementById('customContentPanel').classList.add('hidden');
+      }, 900);
+    }
+
+    function copyAIPromptTemplate() {
+      const tplBox = document.getElementById('aiPromptTemplateBox');
+      if (tplBox) tplBox.value = AI_PROMPT_TEMPLATE;
+      const fb = document.getElementById('aiCopyFeedback');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(AI_PROMPT_TEMPLATE).then(() => {
+          fb.textContent = '✅ KI-Prompt-Vorlage in die Zwischenablage kopiert! Jetzt einfach in ChatGPT/Claude/Gemini einfügen.';
+          playChime();
+        }).catch(() => {
+          if (tplBox) {
+            tplBox.classList.remove('hidden');
+            tplBox.select();
+            document.execCommand('copy');
+            fb.textContent = '✅ Vorlage markiert & kopiert!';
+          }
+        });
+      } else if (tplBox) {
+        tplBox.classList.remove('hidden');
+        tplBox.select();
+        document.execCommand('copy');
+        fb.textContent = '✅ Vorlage markiert & kopiert!';
+      }
+    }
+
+    function toggleAIPromptPreview() {
+      const tplBox = document.getElementById('aiPromptTemplateBox');
+      if (!tplBox) return;
+      tplBox.value = AI_PROMPT_TEMPLATE;
+      tplBox.classList.toggle('hidden');
+    }
+
+    function applyImportedCustomPackage(parsed) {
+      const title = parsed.title || parsed.label || 'KI-Lernpaket';
+      const rawWords = Array.isArray(parsed.words) ? parsed.words : [];
+      const words = rawWords.map(item => {
+        if (Array.isArray(item)) {
+          return { word: item.join(''), syll: item };
+        } else if (typeof item === 'string') {
+          return autoSplitGermanSyllables(item);
+        } else if (item && item.word && Array.isArray(item.syll)) {
+          return item;
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (words.length === 0) {
+        throw new Error('Keine gültigen Wörter ("words") im Paket gefunden.');
+      }
+
+      const nonsense = [];
+      if (Array.isArray(parsed.nonsense)) {
+        parsed.nonsense.forEach(n => {
+          if (n && typeof n.real === 'string' && typeof n.fake === 'string') {
+            nonsense.push({ text: n.real, real: true, hint: 'Ein echtes Wort!' });
+            nonsense.push({ text: n.fake, real: false, hint: `Quatsch! Richtig heißt es: ${n.real}.` });
+          } else if (n && typeof n.text === 'string') {
+            nonsense.push({ text: n.text, real: !!n.real, hint: n.hint || '' });
+          }
+        });
+      }
+      if (nonsense.length === 0) {
+        words.slice(0, 10).forEach(wObj => {
+          nonsense.push({ text: wObj.word, real: true, hint: 'Ein echtes Wort!' });
+          nonsense.push({ text: createFakeWord(wObj.word), real: false, hint: `Quatsch! Richtig heißt es: ${wObj.word}.` });
+        });
+      }
+
+      let pyramids = [];
+      if (Array.isArray(parsed.pyramids) && parsed.pyramids.length > 0) {
+        pyramids = parsed.pyramids.filter(p => Array.isArray(p) && p.length >= 2);
+      }
+
+      let stories = [];
+      if (Array.isArray(parsed.stories) && parsed.stories.length > 0) {
+        stories = parsed.stories.map(st => ({
+          title: st.title || title,
+          text: st.text || '',
+          questions: Array.isArray(st.questions) ? st.questions.map(q => ({
+            q: q.q || 'Frage zum Text:',
+            options: Array.isArray(q.opts) ? q.opts : (Array.isArray(q.options) ? q.options : ['Ja', 'Nein']),
+            correct: typeof q.a === 'number' ? q.a : (typeof q.correct === 'number' ? q.correct : 0)
+          })) : []
+        }));
+      }
+
+      if (stories.length === 0) {
+        stories = [{
+          title,
+          text: words.map(w => w.word).join(' '),
+          questions: [{ q: 'Hast du alle Wörter gelesen?', options: ['Ja!', 'Noch nicht'], correct: 0 }]
+        }];
+      }
+
+      if (pyramids.length === 0) {
+        pyramids = buildPyramidsFromText(stories[0].text, words);
+      }
+
+      WORDS_DB.custom = {
+        label: title.startsWith('⭐') ? title : `⭐ ${title}`,
+        words,
+        nonsense,
+        pyramids,
+        stories
+      };
+
+      try {
+        localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(WORDS_DB.custom));
+      } catch (e) {}
+
+      // Synchronisiere auch die Felder im Einfach-Modus
+      const simpleTitle = document.getElementById('customSimpleTitle');
+      const simpleWords = document.getElementById('customSimpleWords');
+      const simpleStory = document.getElementById('customSimpleStory');
+      if (simpleTitle) simpleTitle.value = title.replace(/^⭐\s*/, '');
+      if (simpleWords) simpleWords.value = words.map(w => w.syll.join('-')).join(', ');
+      if (simpleStory && stories[0]) simpleStory.value = stories[0].text;
+    }
+
+    function importAIJsonContent() {
+      const raw = (document.getElementById('customAIPasteBox').value || '').trim();
+      const fb = document.getElementById('customAIFeedback');
+      if (!raw) {
+        fb.style.color = '#dc2626';
+        fb.textContent = '⚠️ Bitte füge zuerst den JSON-Code der KI in das Textfeld ein.';
+        return;
+      }
+
+      try {
+        // Extrahiere JSON auch dann, wenn Markdown-Backticks ```json drumherum stehen
+        const firstBrace = raw.indexOf('{');
+        const lastBrace = raw.lastIndexOf('}');
+        const jsonCandidate = (firstBrace !== -1 && lastBrace !== -1) ? raw.slice(firstBrace, lastBrace + 1) : raw;
+        const parsed = JSON.parse(jsonCandidate);
+        applyImportedCustomPackage(parsed);
+
+        fb.style.color = '#047857';
+        fb.textContent = `✅ KI-Paket „${WORDS_DB.custom.label}“ erfolgreich geladen!`;
+        setGrade('custom');
+        playSuccessFanfare();
+        fireConfetti();
+        setTimeout(() => {
+          document.getElementById('customContentPanel').classList.add('hidden');
+        }, 900);
+      } catch (err) {
+        fb.style.color = '#dc2626';
+        fb.textContent = '❌ Fehler beim Lesen des JSON-Codes: ' + err.message;
+      }
+    }
+
+    function handleCustomFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const box = document.getElementById('customAIPasteBox');
+        if (box) box.value = content;
+        importAIJsonContent();
+      };
+      reader.readAsText(file);
+    }
+
+    function exportCustomJson() {
+      const dataStr = JSON.stringify(WORDS_DB.custom, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lesewerkstatt-eigenes-paket.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function loadSavedCustomDB() {
+      try {
+        const saved = localStorage.getItem(CUSTOM_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.words) && parsed.words.length > 0) {
+            WORDS_DB.custom = parsed;
+          }
+        }
+      } catch (e) {}
+
+      // Fülle die Eingabefelder mit dem aktuellen eigenen Paket vor
+      const c = WORDS_DB.custom;
+      if (c) {
+        const simpleTitle = document.getElementById('customSimpleTitle');
+        const simpleWords = document.getElementById('customSimpleWords');
+        const simpleStory = document.getElementById('customSimpleStory');
+        if (simpleTitle) simpleTitle.value = (c.label || '').replace(/^⭐\s*/, '');
+        if (simpleWords && Array.isArray(c.words)) simpleWords.value = c.words.map(w => w.syll.join('-')).join(', ');
+        if (simpleStory && Array.isArray(c.stories) && c.stories[0]) simpleStory.value = c.stories[0].text;
+      }
+    }
+
+    // =========================================================
     // INITIALISIERUNG BEIM LADEN
     // =========================================================
     window.addEventListener('DOMContentLoaded', () => {
+      loadSavedCustomDB();
       setGrade(1);
     });
   </script>
