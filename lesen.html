@@ -428,7 +428,10 @@
       </div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <a href="./index.html" class="btn btn-secondary" style="text-decoration: none; font-size: 13px;">
-          🎒 Zur Mathe-Werkstatt
+          🎒 Mathe
+        </a>
+        <a href="./musik.html" class="btn btn-secondary" style="text-decoration: none; font-size: 13px; background: #fce7f3; color: #9d174d; border: 1.5px solid #fbcfe8;">
+          🎵 Musik
         </a>
         <div class="star-pill">
           <span>⭐</span>
@@ -724,10 +727,15 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lesewerkstatt-offline-v3';
+        const CACHE_NAME = 'lesewerkstatt-offline-v4';
         const ASSETS = [
+          './',
+          './index.html',
           './lesen.html',
+          './musik.html',
+          './manifest.json',
           './manifest-lese.json',
+          './manifest-musik.json',
           './apple-touch-icon-lese.png',
           './favicon-lese-32x32.png',
           './icon-lese-192.png',

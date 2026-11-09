@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Musik-Werkstatt – Grundschule Klasse 3</title>
+  
+  <!-- PWA & Mobile Icons -->
+  <link rel="manifest" href="./manifest-musik.json">
+  <meta name="theme-color" content="#db2777">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MusikWerkstatt">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --primary: #db2777;
+      --primary-hover: #be185d;
+      --bg: #fdf2f8;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 16px) calc(var(--safe-left) + 12px);
+      background: var(--bg);
+      color: #1e293b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input, select, button {
+      font-family: inherit;
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+
+    .font-num {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 2px solid #fbcfe8;
+    }
+
+    /* Navigation */
+    .nav-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    @media (max-width: 680px) {
+      .nav-bar {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 6px;
+      }
+      #tabBtn-wagon { grid-column: span 3; }
+      #tabBtn-quiz { grid-column: span 3; }
+      #tabBtn-piano { grid-column: span 3; }
+      #tabBtn-songs { grid-column: span 3; }
+      #tabBtn-detective { grid-column: span 6; }
+      .nav-tab {
+        padding: 6px 3px !important;
+        font-size: 11.5px !important;
+        border-radius: 14px !important;
+      }
+    }
+
+    .nav-tab {
+      background: #fdf2f8;
+      border: 2px solid transparent;
+      color: #831843;
+      padding: 10px 6px;
+      border-radius: 18px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-tab.active {
+      background: #db2777;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
+      border-color: #be185d;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 9px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary { background: #db2777; color: #fff; }
+    .btn-primary:hover { background: #be185d; }
+    .btn-secondary { background: #f1f5f9; color: #334155; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+
+    /* Waggon Styles */
+    .train-track {
+      background: #e2e8f0;
+      height: 12px;
+      border-radius: 6px;
+      position: relative;
+      margin-top: 14px;
+      border-bottom: 3px solid #64748b;
+    }
+    .train-track::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 0; right: 0;
+      height: 4px;
+      background: repeating-linear-gradient(90deg, #94a3b8 0px, #94a3b8 8px, transparent 8px, transparent 20px);
+    }
+
+    .wagon-box {
+      background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 100%);
+      border: 3px solid #0284c7;
+      border-radius: 18px 18px 10px 10px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .wagon-roof {
+      height: 16px;
+      background: #0369a1;
+      border-radius: 16px 16px 0 0;
+      border-bottom: 2px solid #075985;
+    }
+    .wagon-body {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      min-height: 160px;
+      background: #f8fafc;
+      border-left: 3px solid #0284c7;
+      border-right: 3px solid #0284c7;
+      position: relative;
+    }
+    .wagon-slot {
+      border-right: 1.5px dashed #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 6px 4px;
+      position: relative;
+      transition: background-color 0.15s ease;
+    }
+    .wagon-slot:last-child {
+      border-right: none;
+    }
+    .wagon-slot.beat-active {
+      background: #fef08a !important;
+    }
+    .wagon-bottom-plank {
+      height: 38px;
+      background: #e2e8f0;
+      border-top: 2px solid #94a3b8;
+      border-bottom: 3px solid #475569;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+    }
+    .wagon-wheels {
+      display: flex;
+      justify-content: space-around;
+      padding: 0 20px;
+      margin-top: -8px;
+      z-index: 2;
+    }
+    .wheel {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #64748b 0%, #1e293b 80%);
+      border: 3px solid #334155;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .wheel::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Klaviatur (Piano) */
+    .keyboard-wrapper {
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      display: flex;
+      justify-content: center;
+      background: #0f172a;
+      padding: 12px 14px 20px 14px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      border: 3px solid #334155;
+      overflow-x: auto;
+    }
+    .piano-keys {
+      display: flex;
+      position: relative;
+      height: 180px;
+    }
+    .key-white {
+      width: 52px;
+      height: 180px;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 85%, #e2e8f0 100%);
+      border: 1.5px solid #94a3b8;
+      border-radius: 0 0 8px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 12px;
+      font-weight: 900;
+      font-size: 16px;
+      color: #334155;
+      transition: all 0.08s ease;
+      z-index: 1;
+      box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .key-white:active, .key-white.active {
+      background: #fef08a !important;
+      transform: translateY(3px);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .key-black {
+      width: 32px;
+      height: 110px;
+      background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+      border: 1.5px solid #000000;
+      border-radius: 0 0 6px 6px;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      transition: all 0.08s ease;
+    }
+    .key-black:active, .key-black.active {
+      background: #475569 !important;
+      transform: translateY(2px);
+    }
+
+    /* Boomwhacker / Note Colors */
+    .note-c1 { color: #dc2626; }
+    .note-d1 { color: #ea580c; }
+    .note-e1 { color: #eab308; }
+    .note-f1 { color: #16a34a; }
+    .note-g1 { color: #0284c7; }
+    .note-a1 { color: #4338ca; }
+    .note-h1 { color: #9333ea; }
+    .note-c2 { color: #be123c; }
+
+    /* Metronom Nadel */
+    @keyframes pendulum {
+      0% { transform: rotate(-25deg); }
+      50% { transform: rotate(25deg); }
+      100% { transform: rotate(-25deg); }
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-shell">
+    
+    <!-- HEADER -->
+    <header class="card" style="padding: 12px 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #fce7f3; padding-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 44px; height: 44px; border-radius: 14px; background: #db2777; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 3px 8px rgba(219, 39, 119, 0.4);">
+            🎵
+          </div>
+          <div>
+            <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #831843; line-height: 1.1;">Musik-Werkstatt</h1>
+            <span style="font-size: 11px; color: #9d174d; font-weight: 700;">Grundschule Klasse 3 • Zählzeiten • Noten-Waggons • Klaviatur</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <a href="./index.html" class="btn btn-secondary" style="text-decoration: none; padding: 6px 12px; font-size: 12.5px; font-weight: 800; background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a;" title="Zur Mathe-Werkstatt">
+            🎒 Mathe
+          </a>
+          <a href="./lesen.html" class="btn btn-secondary" style="text-decoration: none; padding: 6px 12px; font-size: 12.5px; font-weight: 800; background: #e0e7ff; color: #3730a3; border: 1.5px solid #c7d2fe;" title="Zur Lese-Werkstatt">
+            📖 Lesen
+          </a>
+          <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 4px 10px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 18px;">⭐</span>
+            <span id="starCounter" class="font-num" style="font-weight: 800; color: #9d174d; font-size: 16px;">0</span>
+          </div>
+          <button id="soundToggleBtn" onclick="toggleAudio()" class="btn btn-secondary" style="padding: 6px 10px; font-size: 16px;" title="Ton umschalten">
+            <span id="soundIcon">🔊</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="nav-bar">
+        <button id="tabBtn-wagon" onclick="switchMusicTab('wagon')" class="nav-tab active" title="Noten-Waggons & Metronom">
+          <span style="font-size: 16px;">🚂</span> <span>Noten-Waggons</span>
+        </button>
+        <button id="tabBtn-quiz" onclick="switchMusicTab('quiz')" class="nav-tab" title="Zählzeiten einkreisen (Arbeitsblatt)">
+          <span style="font-size: 16px;">📝</span> <span>Zählzeiten-Quiz</span>
+        </button>
+        <button id="tabBtn-piano" onclick="switchMusicTab('piano')" class="nav-tab" title="Klaviatur & Violinschlüssel">
+          <span style="font-size: 16px;">🎹</span> <span>Klaviatur & Noten</span>
+        </button>
+        <button id="tabBtn-songs" onclick="switchMusicTab('songs')" class="nav-tab" title="Lieder-Jukebox & Mitspielen">
+          <span style="font-size: 16px;">🎶</span> <span>Lieder-Jukebox</span>
+        </button>
+        <button id="tabBtn-detective" onclick="switchMusicTab('detective')" class="nav-tab" title="Töne-Detektiv">
+          <span style="font-size: 16px;">🕵️</span> <span>Töne-Detektiv</span>
+        </button>
+      </nav>
+    </header>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 1: NOTEN-WAGGONS, FIGUREN & METRONOM -->
+    <!-- ========================================================= -->
+    <main id="tab-wagon" class="card" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Didaktische Figuren-Vorstellung nach den Heft-Bildern -->
+      <div style="background: #fff1f2; border: 2px solid #fecdd3; border-radius: 20px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 14px; font-weight: 900; color: #9f1239; display: flex; align-items: center; gap: 6px;">
+          <span>🚂</span> <span>Der 4/4-Takt-Zug: Die drei Noten-Figuren</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+          
+          <!-- Figur 1: Herr Taoao -->
+          <div style="background: #ffffff; border: 2px solid #fda4af; border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 12px;">
+            <svg width="70" height="75" viewBox="0 0 100 110" id="svgFigureTaoao"></svg>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <strong style="color: #9f1239; font-size: 14px;">Herr Taoao (Ganze Note)</strong>
+              <span style="font-size: 12px; color: #475569; font-weight: 700;">⏱️ <strong>4 Schläge</strong> lang: <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">1 (2 3 4)</span></span>
+              <span style="font-size: 11.5px; color: #881337; font-weight: 600;">Füllt den <strong>ganzen Waggon</strong> ganz allein!</span>
+              <div style="font-size: 12px; font-weight: 800; color: #db2777;">🗣️ Sprich: „Taoao“</div>
+            </div>
+          </div>
+
+          <!-- Figur 2: Herr Tao -->
+          <div style="background: #ffffff; border: 2px solid #fda4af; border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 12px;">
+            <svg width="55" height="75" viewBox="0 0 80 110" id="svgFigureTao"></svg>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <strong style="color: #9f1239; font-size: 14px;">Herr Tao (Halbe Note)</strong>
+              <span style="font-size: 12px; color: #475569; font-weight: 700;">⏱️ <strong>2 Schläge</strong> lang: <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">1 (2)</span> oder <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">3 (4)</span></span>
+              <span style="font-size: 11.5px; color: #881337; font-weight: 600;">Füllt genau den <strong>halben Waggon</strong> (2 Plätze).</span>
+              <div style="font-size: 12px; font-weight: 800; color: #db2777;">🗣️ Sprich: „Tao“</div>
+            </div>
+          </div>
+
+          <!-- Figur 3: Mädchen Ta -->
+          <div style="background: #ffffff; border: 2px solid #fda4af; border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 12px;">
+            <svg width="45" height="75" viewBox="0 0 60 110" id="svgFigureTa"></svg>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <strong style="color: #9f1239; font-size: 14px;">Mädchen Ta (Viertelnote)</strong>
+              <span style="font-size: 12px; color: #475569; font-weight: 700;">⏱️ <strong>1 Schlag</strong> lang: <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">1</span>, <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">2</span>, <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">3</span>, <span class="font-num" style="background:#fef08a; padding:1px 6px; border-radius:6px; font-weight:800;">4</span></span>
+              <span style="font-size: 11.5px; color: #881337; font-weight: 600;">Braucht genau <strong>1 Platz</strong> im Waggon.</span>
+              <div style="font-size: 12px; font-weight: 800; color: #db2777;">🗣️ Sprich: „Ta“</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Vorlagen-Auswahl (wie auf dem Arbeitsblatt Foto 1) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase;">Waggon-Kombination wählen:</span>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+          <button onclick="setWagonPreset('whole')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-whole">1x Taoao</button>
+          <button onclick="setWagonPreset('halves')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-halves">2x Tao</button>
+          <button onclick="setWagonPreset('quarters')" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-quarters">4x Ta</button>
+          <button onclick="setWagonPreset('half_quarters')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-half_quarters">Tao + 2 Ta</button>
+          <button onclick="setWagonPreset('quarters_half')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-quarters_half">2 Ta + Tao</button>
+          <button onclick="setWagonPreset('sync')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" id="wpPreset-sync">Ta + Tao + Ta</button>
+          <button onclick="clearWagonCustom()" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #fee2e2; color: #b91c1c;">✨ Selbst bauen</button>
+        </div>
+      </div>
+
+      <!-- DER INTERAKTIVE WAGGON MIT 4 ZÄHLZEITEN -->
+      <div style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 24px; padding: 18px 20px; display: flex; flex-direction: column; position: relative;">
+        
+        <!-- Waggon Kopf & Taktanzeige -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px; font-weight: 900; background: #0284c7; color: white; padding: 2px 10px; border-radius: 10px;">4/4</span>
+            <span style="font-size: 14px; font-weight: 800; color: #1e293b;" id="wagonTitle">Waggon: 4 Viertelnoten (Ta - Ta - Ta - Ta)</span>
+          </div>
+          <div id="wagonSpeakingBadge" style="font-size: 16px; font-weight: 900; color: #db2777; background: #fdf2f8; padding: 4px 12px; border-radius: 999px; border: 1.5px solid #fbcfe8;">
+            🗣️ Bereit
+          </div>
+        </div>
+
+        <!-- Der eigentliche Waggon -->
+        <div class="wagon-box">
+          <div class="wagon-roof"></div>
+          
+          <!-- Die 4 Abteile mit Figuren -->
+          <div class="wagon-body" id="wagonSlotGrid">
+            <!-- Wird per JS dynamisch mit Figuren gerendert -->
+          </div>
+
+          <!-- Untere Planke mit Noten & Zählzeiten wie im Arbeitsblatt -->
+          <div class="wagon-bottom-plank" id="wagonPlankNotes">
+            <!-- Wird per JS gerendert -->
+          </div>
+        </div>
+
+        <!-- Räder und Schienen -->
+        <div class="wagon-wheels">
+          <div class="wheel"></div>
+          <div class="wheel"></div>
+        </div>
+        <div class="train-track"></div>
+
+        <!-- Selbstbau-Palette (wenn 'Selbst bauen' aktiv) -->
+        <div id="wagonBuilderPalette" class="hidden" style="margin-top: 14px; background: #ffffff; border: 2px dashed #db2777; border-radius: 16px; padding: 10px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="font-size: 13px; font-weight: 800; color: #831843;">
+            🛠️ Klicke Figuren an, um den Waggon zu füllen (<span id="wagonBeatsCount" class="font-num" style="color:#db2777;">0 / 4</span> Schläge):
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button onclick="addFigureToWagon('whole')" class="btn btn-secondary" style="border: 1.5px solid #cbd5e1; font-size: 12px;">+ Herr Taoao (4 Schläge)</button>
+            <button onclick="addFigureToWagon('half')" class="btn btn-secondary" style="border: 1.5px solid #cbd5e1; font-size: 12px;">+ Herr Tao (2 Schläge)</button>
+            <button onclick="addFigureToWagon('quarter')" class="btn btn-secondary" style="border: 1.5px solid #cbd5e1; font-size: 12px;">+ Mädchen Ta (1 Schlag)</button>
+            <button onclick="clearWagonCustom()" class="btn btn-secondary" style="font-size: 12px; color: #dc2626;">🗑️ Leeren</button>
+          </div>
+        </div>
+
+        <!-- Metronom Steuerung -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; padding-top: 12px; border-top: 1.5px solid #e2e8f0;">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="wagonPlayBtn" onclick="toggleWagonPlayback()" class="btn btn-primary" style="padding: 10px 20px; font-size: 15px;">
+              ▶️ Waggon im Takt abspielen
+            </button>
+            <button onclick="clapAlong()" class="btn btn-secondary" style="padding: 10px 16px; font-size: 14px; background: #fef08a; color: #854d0e; border: 1.5px solid #facc15;">
+              👏 Mitklatschen!
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 6px 12px; border-radius: 14px; border: 1.5px solid #cbd5e1;">
+            <span style="font-size: 12px; font-weight: 800; color: #475569;">⏱️ Metronom-Tempo:</span>
+            <span id="wagonBpmLabel" class="font-num" style="font-weight: 900; color: #db2777; width: 60px;">80 BPM</span>
+            <input type="range" id="wagonBpmSlider" min="50" max="140" value="80" step="5" oninput="setWagonBpm(this.value)" style="accent-color: #db2777; cursor: pointer; width: 90px;">
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 2: ZÄHLZEITEN-QUIZ (ARBEITSBLATT ZUM EINKREISEN) -->
+    <!-- ========================================================= -->
+    <main id="tab-quiz" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 20px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <h2 style="margin: 0; font-size: 17px; font-weight: 900; color: #78350f;">📝 Arbeitsblatt: Zählzeiten einkreisen</h2>
+          <div style="font-size: 12px; color: #92400e; font-weight: 700;">
+            Klicke auf die Zählzeiten, die <strong>gehalten</strong> werden, um sie einzukreisen wie im Musikheft!
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button onclick="checkQuizBeats()" class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;">✨ Prüfen & Lösen</button>
+          <button onclick="newQuizBeats()" class="btn btn-secondary" style="padding: 7px 12px; font-size: 13px;">🎲 Neue Takte</button>
+        </div>
+      </div>
+
+      <div id="quizContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- 4 Takt-Aufgaben werden per JS generiert -->
+      </div>
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 3: KLAVIATUR & VIOLINSCHLÜSSEL -->
+    <!-- ========================================================= -->
+    <main id="tab-piano" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Merksprüche & Ton-Info -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #fdf2f8; border: 2px solid #fbcfe8; border-radius: 18px; padding: 10px 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 26px;">🎼</span>
+          <div>
+            <div style="font-size: 15px; font-weight: 900; color: #831843;">Violinschlüssel & Töne (c' bis c'')</div>
+            <div style="font-size: 12px; color: #9d174d; font-weight: 700;">Tippe auf eine Note oder spiele die Taste auf der Klaviatur unten!</div>
+          </div>
+        </div>
+        <!-- Instrument Umschaltung -->
+        <div style="display: flex; gap: 4px; background: #ffffff; padding: 4px; border-radius: 12px; border: 1.5px solid #fbcfe8;">
+          <button id="instBtn-piano" onclick="setInstrument('piano')" class="btn btn-primary" style="padding: 5px 10px; font-size: 11.5px;">🎹 Klavier</button>
+          <button id="instBtn-bells" onclick="setInstrument('bells')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px;">🔔 Glockenspiel</button>
+        </div>
+      </div>
+
+      <!-- Notenlinien SVG Display -->
+      <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative;">
+        <svg id="sheetMusicSvg" width="700" height="150" viewBox="0 0 700 150" style="max-width: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04));"></svg>
+        
+        <!-- Aktive Tonkarte mit Boomwhacker-Farbe -->
+        <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 16px; padding: 6px 18px;">
+          <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Aktueller Ton:</span>
+          <span id="currentNoteNameBadge" class="font-num" style="font-size: 26px; font-weight: 900; color: #dc2626;">c'</span>
+          <span id="currentNoteSyllable" style="font-size: 13px; font-weight: 800; color: #475569;">(Ton C – Hilfslinie unter den 5 Linien)</span>
+        </div>
+
+        <!-- Merksprüche Leiste -->
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-size: 12px; font-weight: 800;">
+          <span style="background: #f0fdf4; color: #166534; padding: 4px 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
+            📏 Auf den Linien: <strong>E</strong>in <strong>G</strong>uter <strong>B</strong>äcker <strong>D</strong>arf <strong>F</strong>eiern (e - g - h - d - f)
+          </span>
+          <span style="background: #eff6ff; color: #1e40af; padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe;">
+            🕳️ Zwischenräume: <strong>F - A - C - E</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- DIE KLAVIATUR (C1 bis C2) -->
+      <div class="keyboard-wrapper">
+        <div class="piano-keys" id="pianoKeysContainer">
+          <!-- Tasten werden per JS mit Notennamen & Frequenzen erzeugt -->
+        </div>
+      </div>
+
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 4: LIEDER-JUKEBOX (ALLE MEINE ENTCHEN ETC.) -->
+    <!-- ========================================================= -->
+    <main id="tab-songs" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Song-Auswahl Leiste -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #fffbeb; border: 2px solid #fde68a; border-radius: 18px; padding: 10px 14px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 24px;">🎶</span>
+          <div>
+            <h2 style="margin: 0; font-size: 16px; font-weight: 900; color: #78350f;" id="songTitle">Alle meine Entchen</h2>
+            <span style="font-size: 11px; color: #92400e; font-weight: 700;">Höre zu oder lerne es Taste für Taste selbst auf der Klaviatur!</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button onclick="selectSong(0)" class="btn btn-primary" style="padding: 5px 10px; font-size: 11.5px;" id="songBtn-0">🦆 Entchen</button>
+          <button onclick="selectSong(1)" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px;" id="songBtn-1">🌲 Kuckuck</button>
+          <button onclick="selectSong(2)" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px;" id="songBtn-2">👦 Hänschen</button>
+          <button onclick="selectSong(3)" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px;" id="songBtn-3">🔔 Bruder Jakob</button>
+          <button onclick="selectSong(4)" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px;" id="songBtn-4">⭐ Freude</button>
+        </div>
+      </div>
+
+      <!-- Lied-Notenzeile mit Noten-Wanderer -->
+      <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <svg id="songSheetSvg" width="720" height="130" viewBox="0 0 720 130" style="max-width: 100%;"></svg>
+        
+        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <!-- Aktueller Liedtext -->
+          <div id="songLyricBadge" style="font-size: 18px; font-weight: 900; color: #0284c7; background: #e0f2fe; padding: 6px 16px; border-radius: 12px; border: 1.5px solid #bae6fd;">
+            „Al-le mei-ne Ent-chen“
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button id="songPlayBtn" onclick="toggleSongPlay()" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">
+              ▶️ Lied vorspielen
+            </button>
+            <button id="songPracticeBtn" onclick="startSongPractice()" class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px; background: #dcfce7; color: #166534; border: 1.5px solid #86efac;">
+              🎹 Schritt für Schritt mitspielen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Klaviatur fürs Lied mit Leuchtanzeige -->
+      <div class="keyboard-wrapper">
+        <div class="piano-keys" id="songPianoKeysContainer">
+          <!-- Wird gerendert -->
+        </div>
+      </div>
+
+    </main>
+
+
+    <!-- ========================================================= -->
+    <!-- MODUL 5: TÖNE-DETEKTIV (NOTEN-QUIZ) -->
+    <!-- ========================================================= -->
+    <main id="tab-detective" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 20px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 26px;">🕵️</span>
+          <div>
+            <h2 style="margin: 0; font-size: 17px; font-weight: 900; color: #166534;">Töne-Detektiv: Noten erkennen</h2>
+            <span style="font-size: 12px; color: #15803d; font-weight: 700;">Welche Note ist hier im Notensystem versteckt?</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="detScoreBadge" class="font-num" style="background: #ffffff; color: #15803d; padding: 4px 10px; border-radius: 10px; font-weight: 900; border: 1.5px solid #86efac;">Punkte: 0</span>
+          <button onclick="newDetectiveTask()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">🎲 Nächste Note</button>
+        </div>
+      </div>
+
+      <!-- Quiz Notenzeile -->
+      <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+        <svg id="detSheetSvg" width="340" height="150" viewBox="0 0 340 150" style="max-width: 100%;"></svg>
+        <button onclick="playDetectiveNote()" class="btn btn-secondary" style="padding: 7px 16px; font-size: 13px; border: 1.5px solid #cbd5e1;">
+          🔊 Ton nochmal anhören
+        </button>
+
+        <!-- 4 Auswahl-Buttons -->
+        <div id="detChoicesGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 440px;">
+          <!-- Dynamische Buttons -->
+        </div>
+
+        <div id="detFeedbackBox" class="hidden" style="font-size: 14px; font-weight: 800; padding: 8px 16px; border-radius: 12px;"></div>
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT & AUDIO ENGINE -->
+  <!-- ========================================================= -->
+  <script>
+    // =========================================================
+    // INLINE SERVICE WORKER (100% OFFLINE)
+    // =========================================================
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'musikwerkstatt-offline-v1';
+        const ASSETS = [
+          './',
+          './index.html',
+          './lesen.html',
+          './musik.html',
+          './manifest.json',
+          './manifest-lese.json',
+          './manifest-musik.json',
+          './apple-touch-icon.png',
+          './favicon-32x32.png',
+          './icon-192.png',
+          './icon-512.png'
+        ];
+        self.addEventListener('install', e => {
+          e.waitUntil(
+            caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
+          );
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(
+            caches.keys().then(keys => Promise.all(
+              keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+            )).then(() => clients.claim())
+          );
+        });
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            fetch(e.request)
+              .then(res => {
+                if (res && res.status === 200 && e.request.method === 'GET') {
+                  const resClone = res.clone();
+                  caches.open(CACHE_NAME).then(c => c.put(e.request, resClone));
+                }
+                return res;
+              })
+              .catch(() => caches.match(e.request).then(cached => cached || caches.match('./musik.html')))
+          );
+        });
+      `;
+      try {
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      } catch (err) {}
+    }
+
+    // =========================================================
+    // WEB AUDIO SYNTHESIZER (KLAVIER & METRONOM)
+    // =========================================================
+    let audioCtx = null;
+    let isSoundOn = true;
+    let currentInstrument = 'piano'; // 'piano' or 'bells'
+
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      isSoundOn = !isSoundOn;
+      document.getElementById('soundIcon').textContent = isSoundOn ? '🔊' : '🔇';
+    }
+
+    function setInstrument(inst) {
+      currentInstrument = inst;
+      document.getElementById('instBtn-piano').className = (inst === 'piano') ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('instBtn-bells').className = (inst === 'bells') ? 'btn btn-primary' : 'btn btn-secondary';
+      playTone(inst === 'piano' ? 261.63 : 523.25, 0.4);
+    }
+
+    // Warmer Klavierklang / Glockenspielklang
+    function playTone(freq, duration = 0.5, type = 'piano') {
+      if (!isSoundOn) return;
+      try {
+        const ctx = getAudio();
+        const now = ctx.currentTime;
+        
+        // 2 Oszillatoren für vollen Sound
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        if (currentInstrument === 'bells') {
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+          osc1.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq * 2.75, now); // Metallischer Oberton
+          gainNode.gain.setValueAtTime(0.4, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration * 1.5);
+        } else {
+          // Klavier-Simulation mit Attack & Decay
+          osc1.type = 'triangle';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq * 2, now);
+          gainNode.gain.setValueAtTime(0.35, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        }
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration * 1.5);
+        osc2.stop(now + duration * 1.5);
+      } catch (e) {}
+    }
+
+    // Metronom-Klick (hoch für 1, tief für 2, 3, 4)
+    function playMetronomeClick(isFirstBeat = false) {
+      if (!isSoundOn) return;
+      try {
+        const ctx = getAudio();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isFirstBeat ? 1000 : 700, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      if (!isSoundOn) return;
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 0.4), idx * 75);
+      });
+    }
+
+    function addStars(n) {
+      const el = document.getElementById('starCounter');
+      if (el) el.textContent = parseInt(el.textContent, 10) + n;
+    }
+
+    // =========================================================
+    // KONFETTI-FEUERWERK
+    // =========================================================
+    const confCanvas = document.getElementById('confettiCanvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confetti = [];
+
+    function resizeConf() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConf);
+    resizeConf();
+
+    function fireConfetti() {
+      confetti = [];
+      const cols = ['#db2777', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'];
+      for (let i = 0; i < 70; i++) {
+        confetti.push({
+          x: confCanvas.width / 2 + (Math.random() * 200 - 100),
+          y: confCanvas.height / 3 + (Math.random() * 80 - 40),
+          vx: (Math.random() - 0.5) * 12,
+          vy: Math.random() * -10 - 2,
+          size: Math.random() * 8 + 4,
+          col: cols[Math.floor(Math.random() * cols.length)],
+          rot: Math.random() * 360,
+          speed: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function drawConfetti() {
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      let alive = false;
+      confetti.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35;
+        p.rot += p.speed;
+        p.alpha -= 0.014;
+        if (p.alpha > 0 && p.y < confCanvas.height) {
+          alive = true;
+          confCtx.save();
+          confCtx.translate(p.x, p.y);
+          confCtx.rotate((p.rot * Math.PI) / 180);
+          confCtx.fillStyle = p.col;
+          confCtx.globalAlpha = Math.max(0, p.alpha);
+          confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          confCtx.restore();
+        }
+      });
+      if (alive) requestAnimationFrame(drawConfetti);
+      else confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+    }
+
+    // =========================================================
+    // NAVIGATION TABS
+    // =========================================================
+    function switchMusicTab(id) {
+      ['wagon', 'quiz', 'piano', 'songs', 'detective'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) btn.classList.remove('active');
+      });
+      const activeSec = document.getElementById(`tab-${id}`);
+      const activeBtn = document.getElementById(`tabBtn-${id}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      stopWagonPlayback();
+      stopSongPlay();
+      playTone(523.25, 0.08);
+
+      if (id === 'piano') renderSheetMusic();
+      if (id === 'songs') renderSongSheet();
+      if (id === 'quiz' && quizItems.length === 0) newQuizBeats();
+      if (id === 'detective') newDetectiveTask();
+    }
+
+    // =========================================================
+    // SVG FIGUREN GENERATOR (TAOAO, TAO, TA nach den Heft-Fotos)
+    // =========================================================
+    function drawTaoaoFigureSVG(w = 90, h = 100) {
+      return `
+        <!-- Herr Taoao (Ganze Note - 4 Schläge, breit, hockend) -->
+        <g transform="translate(5, 5)">
+          <!-- Arme auf Knien gestützt -->
+          <ellipse cx="45" cy="55" rx="38" ry="24" fill="#93c5fd" stroke="#1d4ed8" stroke-width="2.5"/>
+          <!-- Hosenträger -->
+          <line x1="28" y1="36" x2="25" y2="72" stroke="#1e3a8a" stroke-width="3"/>
+          <line x1="62" y1="36" x2="65" y2="72" stroke="#1e3a8a" stroke-width="3"/>
+          <!-- Beine hockend -->
+          <path d="M 12 60 Q 5 75 14 84 L 28 84 Q 22 72 26 62" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+          <path d="M 78 60 Q 85 75 76 84 L 62 84 Q 68 72 64 62" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+          <!-- Schuhe -->
+          <ellipse cx="18" cy="85" rx="10" ry="4" fill="#0f172a"/>
+          <ellipse cx="72" cy="85" rx="10" ry="4" fill="#0f172a"/>
+          <!-- Kopf -->
+          <ellipse cx="45" cy="30" rx="16" ry="14" fill="#fed7aa" stroke="#c2410c" stroke-width="2"/>
+          <!-- Augen & Schnurrbart -->
+          <circle cx="40" cy="28" r="2" fill="#0f172a"/>
+          <circle cx="50" cy="28" r="2" fill="#0f172a"/>
+          <path d="M 37 36 Q 45 40 53 36 Q 45 34 37 36" fill="#78350f"/>
+          <!-- Schwarze Melone (Hut) -->
+          <ellipse cx="45" cy="18" rx="18" ry="4" fill="#0f172a"/>
+          <path d="M 32 18 C 32 6, 58 6, 58 18 Z" fill="#0f172a"/>
+        </g>
+      `;
+    }
+
+    function drawTaoFigureSVG() {
+      return `
+        <!-- Herr Tao (Halbe Note - 2 Schläge, mittelgroß) -->
+        <g transform="translate(5, 5)">
+          <!-- Körper -->
+          <ellipse cx="32" cy="55" rx="22" ry="20" fill="#93c5fd" stroke="#1d4ed8" stroke-width="2"/>
+          <!-- Hosenträger -->
+          <line x1="22" y1="40" x2="20" y2="70" stroke="#1e3a8a" stroke-width="2.5"/>
+          <line x1="42" y1="40" x2="44" y2="70" stroke="#1e3a8a" stroke-width="2.5"/>
+          <!-- Beine -->
+          <path d="M 16 64 L 10 82 L 20 82" stroke="#334155" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M 48 64 L 54 82 L 44 82" stroke="#334155" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- Schuhe -->
+          <ellipse cx="14" cy="83" rx="7" ry="3" fill="#0f172a"/>
+          <ellipse cx="50" cy="83" rx="7" ry="3" fill="#0f172a"/>
+          <!-- Kopf -->
+          <ellipse cx="32" cy="32" rx="13" ry="12" fill="#fed7aa" stroke="#c2410c" stroke-width="1.8"/>
+          <!-- Gesicht -->
+          <circle cx="28" cy="30" r="1.5" fill="#0f172a"/>
+          <circle cx="36" cy="30" r="1.5" fill="#0f172a"/>
+          <path d="M 26 36 Q 32 39 38 36" fill="#78350f" stroke="#78350f" stroke-width="1.5"/>
+          <!-- Brauner Zylinder / Hut -->
+          <ellipse cx="32" cy="22" rx="14" ry="3.5" fill="#78350f"/>
+          <rect x="23" y="10" width="18" height="12" rx="2" fill="#92400e" stroke="#78350f" stroke-width="1.5"/>
+        </g>
+      `;
+    }
+
+    function drawTaFigureSVG() {
+      return `
+        <!-- Mädchen Ta (Viertelnote - 1 Schlag, stehend) -->
+        <g transform="translate(2, 5)">
+          <!-- Roter Rock -->
+          <path d="M 22 52 L 10 78 L 34 78 Z" fill="#e11d48" stroke="#be123c" stroke-width="1.8"/>
+          <!-- Gelbe Jacke -->
+          <rect x="15" y="38" width="14" height="16" rx="3" fill="#fde047" stroke="#ca8a04" stroke-width="1.8"/>
+          <!-- Beine & Schuhe -->
+          <line x1="17" y1="78" x2="17" y2="88" stroke="#334155" stroke-width="2"/>
+          <line x1="27" y1="78" x2="27" y2="88" stroke="#334155" stroke-width="2"/>
+          <ellipse cx="15" cy="89" rx="5" ry="2.5" fill="#0f172a"/>
+          <ellipse cx="29" cy="89" rx="5" ry="2.5" fill="#0f172a"/>
+          <!-- Kopf & Zöpfe -->
+          <ellipse cx="22" cy="26" rx="9" ry="9" fill="#fed7aa" stroke="#c2410c" stroke-width="1.5"/>
+          <circle cx="19" cy="25" r="1.2" fill="#0f172a"/>
+          <circle cx="25" cy="25" r="1.2" fill="#0f172a"/>
+          <path d="M 19 30 Q 22 33 25 30" stroke="#e11d48" stroke-width="1.2" fill="none"/>
+          <!-- Brauner Damenhut -->
+          <ellipse cx="22" cy="18" rx="12" ry="3" fill="#854d0e"/>
+          <path d="M 15 18 C 15 10, 29 10, 29 18 Z" fill="#a16207"/>
+        </g>
+      `;
+    }
+
+    // Setze statische SVG Figuren in die Header-Karten
+    function initStaticFigures() {
+      const elTaoao = document.getElementById('svgFigureTaoao');
+      const elTao = document.getElementById('svgFigureTao');
+      const elTa = document.getElementById('svgFigureTa');
+      if (elTaoao) elTaoao.innerHTML = drawTaoaoFigureSVG();
+      if (elTao) elTao.innerHTML = drawTaoFigureSVG();
+      if (elTa) elTa.innerHTML = drawTaFigureSVG();
+    }
+
+    // =========================================================
+    // MODUL 1: NOTEN-WAGGONS LOGIK
+    // =========================================================
+    // Waggon Konfiguration: Array von 4 Schlägen
+    // 'whole': 1 Note über 4 Schläge
+    // 'half': Note über 2 Schläge
+    // 'quarter': Note über 1 Schlag
+    let currentWagonItems = [
+      { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+      { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+      { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+      { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' }
+    ];
+
+    let wagonTimer = null;
+    let wagonBeatIndex = 0;
+    let wagonPlaying = false;
+    let wagonBpm = 80;
+
+    function setWagonPreset(preset) {
+      document.getElementById('wagonBuilderPalette').classList.add('hidden');
+      ['whole', 'halves', 'quarters', 'half_quarters', 'quarters_half', 'sync'].forEach(p => {
+        const btn = document.getElementById(`wpPreset-${p}`);
+        if (btn) btn.className = (p === preset) ? 'btn btn-primary' : 'btn btn-secondary';
+      });
+
+      if (preset === 'whole') {
+        currentWagonItems = [{ type: 'whole', beats: 4, name: 'Taoao', color: '#be123c' }];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 1 Ganze Note (Herr Taoao – 4 Schläge)';
+      } else if (preset === 'halves') {
+        currentWagonItems = [
+          { type: 'half', beats: 2, name: 'Tao', color: '#1d4ed8' },
+          { type: 'half', beats: 2, name: 'Tao', color: '#1d4ed8' }
+        ];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 2 Halbe Noten (Herr Tao + Herr Tao – je 2 Schläge)';
+      } else if (preset === 'quarters') {
+        currentWagonItems = [
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' }
+        ];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 4 Viertelnoten (Ta - Ta - Ta - Ta)';
+      } else if (preset === 'half_quarters') {
+        currentWagonItems = [
+          { type: 'half', beats: 2, name: 'Tao', color: '#1d4ed8' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' }
+        ];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 1 Halbe + 2 Viertel (Tao - Ta - Ta)';
+      } else if (preset === 'quarters_half') {
+        currentWagonItems = [
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'half', beats: 2, name: 'Tao', color: '#1d4ed8' }
+        ];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 2 Viertel + 1 Halbe (Ta - Ta - Tao)';
+      } else if (preset === 'sync') {
+        currentWagonItems = [
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' },
+          { type: 'half', beats: 2, name: 'Tao', color: '#1d4ed8' },
+          { type: 'quarter', beats: 1, name: 'Ta', color: '#db2777' }
+        ];
+        document.getElementById('wagonTitle').textContent = 'Waggon: 1 Viertel + 1 Halbe + 1 Viertel (Ta - Tao - Ta)';
+      }
+
+      renderWagon();
+      playTone(440, 0.1);
+    }
+
+    function clearWagonCustom() {
+      currentWagonItems = [];
+      document.getElementById('wagonBuilderPalette').classList.remove('hidden');
+      document.getElementById('wagonTitle').textContent = 'Waggon: Eigener Rhythmus-Baukasten';
+      renderWagon();
+    }
+
+    function addFigureToWagon(type) {
+      const totalBeats = currentWagonItems.reduce((acc, it) => acc + it.beats, 0);
+      let beats = 1;
+      let name = 'Ta';
+      let color = '#db2777';
+      if (type === 'whole') { beats = 4; name = 'Taoao'; color = '#be123c'; }
+      if (type === 'half') { beats = 2; name = 'Tao'; color = '#1d4ed8'; }
+
+      if (totalBeats + beats > 4) {
+        alert('Der Waggon ist schon voll! Er fasst genau 4 Schläge im 4/4-Takt.');
+        return;
+      }
+
+      currentWagonItems.push({ type, beats, name, color });
+      renderWagon();
+      playTone(520, 0.1);
+    }
+
+    function renderWagon() {
+      const grid = document.getElementById('wagonSlotGrid');
+      const plank = document.getElementById('wagonPlankNotes');
+      if (!grid || !plank) return;
+
+      grid.innerHTML = '';
+      plank.innerHTML = '';
+
+      let currentBeat = 1;
+      const totalBeats = currentWagonItems.reduce((acc, it) => acc + it.beats, 0);
+      const counterEl = document.getElementById('wagonBeatsCount');
+      if (counterEl) counterEl.textContent = `${totalBeats} / 4`;
+
+      currentWagonItems.forEach((item, itemIdx) => {
+        // Slot Container für Figur
+        const slot = document.createElement('div');
+        slot.className = 'wagon-slot';
+        slot.id = `wslot-${itemIdx}`;
+        slot.style.gridColumn = `span ${item.beats}`;
+
+        let figureSvg = '';
+        if (item.type === 'whole') {
+          figureSvg = `<svg width="180" height="120" viewBox="0 0 100 110">${drawTaoaoFigureSVG()}</svg>`;
+        } else if (item.type === 'half') {
+          figureSvg = `<svg width="80" height="110" viewBox="0 0 80 110">${drawTaoFigureSVG()}</svg>`;
+        } else {
+          figureSvg = `<svg width="55" height="110" viewBox="0 0 60 110">${drawTaFigureSVG()}</svg>`;
+        }
+
+        slot.innerHTML = `
+          <div style="font-size: 13px; font-weight: 900; color: ${item.color}; margin-bottom: 2px;">„${item.name}“</div>
+          ${figureSvg}
+        `;
+        grid.appendChild(slot);
+
+        // Plank Notenzeichen & Zählzeiten wie im Arbeitsblatt
+        const plankCell = document.createElement('div');
+        plankCell.style.gridColumn = `span ${item.beats}`;
+        plankCell.style.display = 'flex';
+        plankCell.style.flexDirection = 'column';
+        plankCell.style.alignItems = 'center';
+        plankCell.style.justifyContent = 'center';
+        plankCell.style.borderRight = (itemIdx < currentWagonItems.length - 1) ? '1.5px solid #cbd5e1' : 'none';
+
+        // Notensymbol SVG
+        let noteSymbol = '';
+        if (item.type === 'whole') {
+          noteSymbol = `
+            <svg width="24" height="20" viewBox="0 0 30 24">
+              <ellipse cx="15" cy="12" rx="9" ry="6" fill="none" stroke="#1e293b" stroke-width="2.5"/>
+            </svg>
+          `;
+        } else if (item.type === 'half') {
+          noteSymbol = `
+            <svg width="24" height="22" viewBox="0 0 30 26">
+              <ellipse cx="12" cy="18" rx="7" ry="5" fill="none" stroke="#1e293b" stroke-width="2.2"/>
+              <line x1="19" y1="18" x2="19" y2="4" stroke="#1e293b" stroke-width="2.2"/>
+            </svg>
+          `;
+        } else {
+          noteSymbol = `
+            <svg width="24" height="22" viewBox="0 0 30 26">
+              <ellipse cx="12" cy="18" rx="7" ry="5" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+              <line x1="19" y1="18" x2="19" y2="4" stroke="#1e293b" stroke-width="2.2"/>
+            </svg>
+          `;
+        }
+
+        // Zählzeiten-Text z.B. 1(2 3 4) oder 1(2)
+        let beatsText = '';
+        if (item.beats === 4) beatsText = '1 ( 2 3 4 )';
+        else if (item.beats === 2) beatsText = `${currentBeat} ( ${currentBeat + 1} )`;
+        else beatsText = `${currentBeat}`;
+
+        plankCell.innerHTML = `
+          <div style="display:flex; align-items:center; gap:4px;">
+            ${noteSymbol}
+            <span class="font-num" style="font-size: 13px; font-weight: 900; color: #1e293b;">${beatsText}</span>
+          </div>
+        `;
+        plank.appendChild(plankCell);
+
+        currentBeat += item.beats;
+      });
+    }
+
+    function setWagonBpm(val) {
+      wagonBpm = parseInt(val, 10);
+      document.getElementById('wagonBpmLabel').textContent = `${wagonBpm} BPM`;
+      if (wagonPlaying) {
+        stopWagonPlayback();
+        startWagonPlayback();
+      }
+    }
+
+    function toggleWagonPlayback() {
+      if (wagonPlaying) stopWagonPlayback();
+      else startWagonPlayback();
+    }
+
+    function startWagonPlayback() {
+      const totalBeats = currentWagonItems.reduce((acc, it) => acc + it.beats, 0);
+      if (totalBeats !== 4) {
+        alert('Bitte fülle den Waggon zuerst auf genau 4 Schläge!');
+        return;
+      }
+
+      wagonPlaying = true;
+      wagonBeatIndex = 0;
+      document.getElementById('wagonPlayBtn').textContent = '⏹️ Stopp';
+      document.getElementById('wagonPlayBtn').className = 'btn btn-secondary';
+
+      const intervalMs = (60 / wagonBpm) * 1000;
+      playWagonStep();
+      wagonTimer = setInterval(playWagonStep, intervalMs);
+    }
+
+    function stopWagonPlayback() {
+      wagonPlaying = false;
+      clearInterval(wagonTimer);
+      const btn = document.getElementById('wagonPlayBtn');
+      if (btn) {
+        btn.textContent = '▶️ Waggon im Takt abspielen';
+        btn.className = 'btn btn-primary';
+      }
+      // Bereinige Highlights
+      document.querySelectorAll('.wagon-slot').forEach(s => s.classList.remove('beat-active'));
+      const badge = document.getElementById('wagonSpeakingBadge');
+      if (badge) badge.textContent = '🗣️ Bereit';
+    }
+
+    function playWagonStep() {
+      const beatNum = (wagonBeatIndex % 4) + 1;
+      playMetronomeClick(beatNum === 1);
+
+      // Finde heraus, welches Item auf diesem Beat aktiv ist
+      let accBeats = 0;
+      let activeItem = null;
+      let activeItemIdx = 0;
+      let isFirstBeatOfNote = false;
+
+      for (let i = 0; i < currentWagonItems.length; i++) {
+        const item = currentWagonItems[i];
+        if (beatNum > accBeats && beatNum <= accBeats + item.beats) {
+          activeItem = item;
+          activeItemIdx = i;
+          isFirstBeatOfNote = (beatNum === accBeats + 1);
+          break;
+        }
+        accBeats += item.beats;
+      }
+
+      // Visuelles Highlight
+      document.querySelectorAll('.wagon-slot').forEach((s, idx) => {
+        if (idx === activeItemIdx) s.classList.add('beat-active');
+        else s.classList.remove('beat-active');
+      });
+
+      if (activeItem) {
+        const badge = document.getElementById('wagonSpeakingBadge');
+        if (isFirstBeatOfNote) {
+          // Neuer Ton erklingt!
+          const noteFreq = (activeItem.type === 'whole') ? 261.63 : (activeItem.type === 'half' ? 329.63 : 392.00);
+          playTone(noteFreq, (60 / wagonBpm) * activeItem.beats * 0.95);
+          if (badge) badge.textContent = `🗣️ „${activeItem.name}! (${beatNum})“`;
+        } else {
+          if (badge) badge.textContent = `⏱️ gehalten... (${beatNum})`;
+        }
+      }
+
+      wagonBeatIndex++;
+    }
+
+    function clapAlong() {
+      playMetronomeClick(false);
+      playTone(800, 0.05);
+      const badge = document.getElementById('wagonSpeakingBadge');
+      if (badge) badge.textContent = '👏 Geklatscht!';
+      addStars(1);
+    }
+
+    // =========================================================
+    // MODUL 2: ZÄHLZEITEN-QUIZ (ARBEITSBLATT ZUM EINKREISEN)
+    // =========================================================
+    const QUIZ_PRESETS = [
+      {
+        id: 1,
+        title: "1 Ganze Note",
+        notesSvg: `<ellipse cx="80" cy="30" rx="9" ry="6" fill="none" stroke="#1e293b" stroke-width="2.5"/>`,
+        heldIndices: [2, 3, 4], // 2, 3, 4 werden gehalten -> 1(2 3 4)
+        solutionTxt: "1 ( 2 3 4 ) – Bei der Ganzen Note erklingt der Schlag auf 1, die Zählzeiten 2, 3 und 4 werden gehalten!"
+      },
+      {
+        id: 2,
+        title: "2 Halbe Noten",
+        notesSvg: `
+          <ellipse cx="50" cy="30" rx="7" ry="5" fill="none" stroke="#1e293b" stroke-width="2.2"/><line x1="57" y1="30" x2="57" y2="10" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="110" cy="30" rx="7" ry="5" fill="none" stroke="#1e293b" stroke-width="2.2"/><line x1="117" y1="30" x2="117" y2="10" stroke="#1e293b" stroke-width="2"/>
+        `,
+        heldIndices: [2, 4], // 1 (2) 3 (4)
+        solutionTxt: "1 ( 2 ) 3 ( 4 ) – Jede Halbe Note dauert 2 Schläge. Gehalten werden 2 und 4!"
+      },
+      {
+        id: 3,
+        title: "4 Viertelnoten",
+        notesSvg: `
+          <ellipse cx="35" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="41" y1="30" x2="41" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="65" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="71" y1="30" x2="71" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="95" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="101" y1="30" x2="101" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="125" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="131" y1="30" x2="131" y2="12" stroke="#1e293b" stroke-width="2"/>
+        `,
+        heldIndices: [], // keine wird gehalten, alle angeschlagen -> 1 2 3 4
+        solutionTxt: "1 2 3 4 – Jede Viertelnote bekommt genau einen Schlag. Keine Zahl wird eingekreist!"
+      },
+      {
+        id: 4,
+        title: "1 Halbe + 2 Viertel",
+        notesSvg: `
+          <ellipse cx="45" cy="30" rx="7" ry="5" fill="none" stroke="#1e293b" stroke-width="2.2"/><line x1="52" y1="30" x2="52" y2="10" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="90" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="96" y1="30" x2="96" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="125" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="131" y1="30" x2="131" y2="12" stroke="#1e293b" stroke-width="2"/>
+        `,
+        heldIndices: [2], // 1 (2) 3 4
+        solutionTxt: "1 ( 2 ) 3 4 – Die Halbe Note klingt auf 1 und wird auf 2 gehalten. 3 und 4 sind eigene Viertelschläge!"
+      },
+      {
+        id: 5,
+        title: "2 Viertel + 1 Halbe",
+        notesSvg: `
+          <ellipse cx="35" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="41" y1="30" x2="41" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="70" cy="30" rx="6" ry="4.5" fill="#1e293b"/><line x1="76" y1="30" x2="76" y2="12" stroke="#1e293b" stroke-width="2"/>
+          <ellipse cx="115" cy="30" rx="7" ry="5" fill="none" stroke="#1e293b" stroke-width="2.2"/><line x1="122" y1="30" x2="122" y2="10" stroke="#1e293b" stroke-width="2"/>
+        `,
+        heldIndices: [4], // 1 2 3 (4)
+        solutionTxt: "1 2 3 ( 4 ) – Schlag auf 1 und 2, dann erklingt die Halbe Note auf 3 und wird auf 4 gehalten!"
+      }
+    ];
+
+    let quizItems = [];
+
+    function newQuizBeats() {
+      // Wähle 3 zufällige Aufgaben aus
+      const shuffled = [...QUIZ_PRESETS].sort(() => Math.random() - 0.5);
+      quizItems = shuffled.slice(0, 3);
+      renderQuizBeats();
+    }
+
+    function renderQuizBeats() {
+      const cont = document.getElementById('quizContainer');
+      if (!cont) return;
+
+      cont.innerHTML = quizItems.map((q, qIdx) => `
+        <div style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;" id="qItemCard-${qIdx}">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #831843; font-size: 14px;">Takt ${qIdx + 1}: ${q.title}</strong>
+            <span id="qStatus-${qIdx}" style="font-size: 16px;">⏳</span>
+          </div>
+
+          <!-- 5 Notenlinien mit Noten -->
+          <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 6px; display: flex; justify-content: center;">
+            <svg width="220" height="60" viewBox="0 0 160 50">
+              <!-- 5 Linien -->
+              <line x1="10" y1="10" x2="150" y2="10" stroke="#94a3b8" stroke-width="1.2"/>
+              <line x1="10" y1="18" x2="150" y2="18" stroke="#94a3b8" stroke-width="1.2"/>
+              <line x1="10" y1="26" x2="150" y2="26" stroke="#94a3b8" stroke-width="1.2"/>
+              <line x1="10" y1="34" x2="150" y2="34" stroke="#94a3b8" stroke-width="1.2"/>
+              <line x1="10" y1="42" x2="150" y2="42" stroke="#94a3b8" stroke-width="1.2"/>
+              <!-- Taktstriche -->
+              <line x1="10" y1="10" x2="10" y2="42" stroke="#64748b" stroke-width="2"/>
+              <line x1="150" y1="10" x2="150" y2="42" stroke="#64748b" stroke-width="2"/>
+              ${q.notesSvg}
+            </svg>
+          </div>
+
+          <!-- 4 Zählzeiten-Buttons zum Einkreisen -->
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+            <span style="font-size: 11.5px; font-weight: 700; color: #64748b;">Tippe auf die gehaltenen Zählzeiten, um sie einzukreisen:</span>
+            <div style="display: flex; gap: 12px;">
+              ${[1, 2, 3, 4].map(b => `
+                <button onclick="toggleQuizBeat(${qIdx}, ${b})" id="qbBtn-${qIdx}-${b}" class="font-num" style="width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid #94a3b8; background: #ffffff; font-size: 18px; font-weight: 900; color: #1e293b; cursor: pointer; transition: all 0.15s ease;">
+                  ${b}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Didaktische Lösung -->
+          <div id="qSolutionBox-${qIdx}" class="hidden" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; color: #166534;">
+            💡 ${q.solutionTxt}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Speichere ausgewählte Kreise: { "qIdx-b": true/false }
+    const quizUserSelections = {};
+
+    function toggleQuizBeat(qIdx, b) {
+      const key = `${qIdx}-${b}`;
+      quizUserSelections[key] = !quizUserSelections[key];
+      const btn = document.getElementById(`qbBtn-${qIdx}-${b}`);
+      if (btn) {
+        if (quizUserSelections[key]) {
+          btn.style.borderColor = '#db2777';
+          btn.style.background = '#fce7f3';
+          btn.style.color = '#9d174d';
+          btn.style.transform = 'scale(1.1)';
+        } else {
+          btn.style.borderColor = '#94a3b8';
+          btn.style.background = '#ffffff';
+          btn.style.color = '#1e293b';
+          btn.style.transform = 'scale(1)';
+        }
+      }
+      playTone(400 + b * 50, 0.05);
+    }
+
+    function checkQuizBeats() {
+      let correctCount = 0;
+      quizItems.forEach((q, qIdx) => {
+        const card = document.getElementById(`qItemCard-${qIdx}`);
+        const status = document.getElementById(`qStatus-${qIdx}`);
+        const sol = document.getElementById(`qSolutionBox-${qIdx}`);
+        if (sol) sol.classList.remove('hidden');
+
+        // Prüfe ob für 1, 2, 3, 4 genau die heldIndices angewählt wurden
+        let allCorrect = true;
+        [1, 2, 3, 4].forEach(b => {
+          const isHeldExpected = q.heldIndices.includes(b);
+          const isUserHeld = !!quizUserSelections[`${qIdx}-${b}`];
+          if (isHeldExpected !== isUserHeld) allCorrect = false;
+        });
+
+        if (allCorrect) {
+          correctCount++;
+          if (card) { card.style.borderColor = '#10b981'; card.style.background = '#f0fdf4'; }
+          if (status) status.textContent = '✅ Richtig eingekreist!';
+        } else {
+          if (card) { card.style.borderColor = '#ef4444'; card.style.background = '#fef2f2'; }
+          if (status) status.textContent = '❌ Fast!';
+        }
+      });
+
+      addStars(correctCount * 2);
+      if (correctCount === quizItems.length) {
+        addStars(5);
+        playChime();
+        fireConfetti();
+      } else if (correctCount > 0) {
+        playChime();
+      } else {
+        playTone(280, 0.2);
+      }
+    }
+
+    // =========================================================
+    // MODUL 3: KLAVIATUR & VIOLINSCHLÜSSEL LOGIK
+    // =========================================================
+    const PIANO_NOTES = [
+      { name: "c'", key: "c1", freq: 261.63, color: "#dc2626", label: "C (Hilfslinie unten)", y: 110, hasLine: true },
+      { name: "d'", key: "d1", freq: 293.66, color: "#ea580c", label: "D (unter 1. Linie)", y: 100, hasLine: false },
+      { name: "e'", key: "e1", freq: 329.63, color: "#eab308", label: "E (1. Notenlinie)", y: 90, hasLine: false },
+      { name: "f'", key: "f1", freq: 349.23, color: "#16a34a", label: "F (1. Zwischenraum)", y: 80, hasLine: false },
+      { name: "g'", key: "g1", freq: 392.00, color: "#0284c7", label: "G (2. Notenlinie)", y: 70, hasLine: false },
+      { name: "a'", key: "a1", freq: 440.00, color: "#4338ca", label: "A (2. Zwischenraum)", y: 60, hasLine: false },
+      { name: "h'", key: "h1", freq: 493.88, color: "#9333ea", label: "H (3. Notenlinie)", y: 50, hasLine: false },
+      { name: "c''", key: "c2", freq: 523.25, color: "#be123c", label: "C (3. Zwischenraum)", y: 40, hasLine: false }
+    ];
+
+    let currentActiveNote = PIANO_NOTES[0];
+
+    function renderSheetMusic(targetNote = currentActiveNote) {
+      const svg = document.getElementById('sheetMusicSvg');
+      if (!svg) return;
+
+      const y = targetNote.y;
+      const col = targetNote.color;
+
+      svg.innerHTML = `
+        <!-- 5 Notenlinien -->
+        <line x1="40" y1="50" x2="660" y2="50" stroke="#475569" stroke-width="2"/>
+        <line x1="40" y1="60" x2="660" y2="60" stroke="#475569" stroke-width="2"/>
+        <line x1="40" y1="70" x2="660" y2="70" stroke="#475569" stroke-width="2"/>
+        <line x1="40" y1="80" x2="660" y2="80" stroke="#475569" stroke-width="2"/>
+        <line x1="40" y1="90" x2="660" y2="90" stroke="#475569" stroke-width="2"/>
+
+        <!-- Violinschlüssel (Treble Clef) -->
+        <text x="50" y="88" font-size="64" font-family="serif" fill="#1e293b" pointer-events="none">𝄞</text>
+
+        <!-- Hilfslinie bei c' -->
+        ${targetNote.hasLine ? `<line x1="325" y1="110" x2="375" y2="110" stroke="#1e293b" stroke-width="2.5"/>` : ''}
+
+        <!-- Die aktive Note -->
+        <g transform="translate(350, ${y})">
+          <ellipse cx="0" cy="0" rx="14" ry="10" fill="${col}" stroke="#0f172a" stroke-width="2.5" transform="rotate(-15)"/>
+          <line x1="12" y1="-2" x2="12" y2="-45" stroke="#0f172a" stroke-width="2.5"/>
+          <text x="0" y="4" font-size="11" font-weight="900" fill="#ffffff" text-anchor="middle">${targetNote.name.replace(/[']/g, '')}</text>
+        </g>
+      `;
+
+      const badge = document.getElementById('currentNoteNameBadge');
+      const syll = document.getElementById('currentNoteSyllable');
+      if (badge) {
+        badge.textContent = targetNote.name;
+        badge.style.color = targetNote.color;
+      }
+      if (syll) syll.textContent = `(${targetNote.label})`;
+    }
+
+    function initPianoKeys(containerId = 'pianoKeysContainer', isSongMode = false) {
+      const cont = document.getElementById(containerId);
+      if (!cont) return;
+      cont.innerHTML = '';
+
+      PIANO_NOTES.forEach((n, idx) => {
+        const keyEl = document.createElement('div');
+        keyEl.className = 'key-white';
+        keyEl.id = `${isSongMode ? 'sk' : 'pk'}-${n.key}`;
+        keyEl.innerHTML = `
+          <span style="font-size:11px; color:${n.color}; font-weight:900;">${n.name}</span>
+          <span>${n.name.charAt(0).toUpperCase()}</span>
+        `;
+        keyEl.onclick = () => {
+          triggerPianoNote(n, isSongMode);
+        };
+        cont.appendChild(keyEl);
+      });
+
+      // Schwarze Tasten (Dekoration / akustisch spielbar)
+      const blackPositions = [36, 88, 192, 244, 296];
+      const blackFreqs = [277.18, 311.13, 369.99, 415.30, 466.16];
+      blackPositions.forEach((leftPos, bIdx) => {
+        const bKey = document.createElement('div');
+        bKey.className = 'key-black';
+        bKey.style.left = `${leftPos}px`;
+        bKey.onclick = () => {
+          playTone(blackFreqs[bIdx], 0.35);
+          bKey.classList.add('active');
+          setTimeout(() => bKey.classList.remove('active'), 180);
+        };
+        cont.appendChild(bKey);
+      });
+    }
+
+    function triggerPianoNote(noteObj, isSongMode = false) {
+      currentActiveNote = noteObj;
+      playTone(noteObj.freq, 0.45);
+      renderSheetMusic(noteObj);
+
+      const keyId = `${isSongMode ? 'sk' : 'pk'}-${noteObj.key}`;
+      const el = document.getElementById(keyId);
+      if (el) {
+        el.classList.add('active');
+        setTimeout(() => el.classList.remove('active'), 220);
+      }
+
+      if (isSongMode && songPracticing) {
+        onSongPracticeKeyHit(noteObj.key);
+      }
+    }
+
+    // =========================================================
+    // MODUL 4: LIEDER-JUKEBOX LOGIK
+    // =========================================================
+    const SONGS_DB = [
+      {
+        id: 0,
+        title: "Alle meine Entchen",
+        notes: [
+          { k: 'c1', d: 1, lyr: 'Al-' }, { k: 'd1', d: 1, lyr: 'le' }, { k: 'e1', d: 1, lyr: 'mei-' }, { k: 'f1', d: 1, lyr: 'ne' },
+          { k: 'g1', d: 2, lyr: 'Ent-' }, { k: 'g1', d: 2, lyr: 'chen' },
+          { k: 'a1', d: 1, lyr: 'schwim-' }, { k: 'a1', d: 1, lyr: 'men' }, { k: 'a1', d: 1, lyr: 'auf' }, { k: 'a1', d: 1, lyr: 'dem' },
+          { k: 'g1', d: 4, lyr: 'See,' },
+          { k: 'f1', d: 1, lyr: 'Köpf-' }, { k: 'f1', d: 1, lyr: 'chen' }, { k: 'f1', d: 1, lyr: 'in' }, { k: 'f1', d: 1, lyr: 'das' },
+          { k: 'e1', d: 2, lyr: 'Was-' }, { k: 'e1', d: 2, lyr: 'ser,' },
+          { k: 'd1', d: 1, lyr: 'Schwänz-' }, { k: 'd1', d: 1, lyr: 'chen' }, { k: 'd1', d: 1, lyr: 'in' }, { k: 'd1', d: 1, lyr: 'die' },
+          { k: 'c1', d: 4, lyr: 'Höh.' }
+        ]
+      },
+      {
+        id: 1,
+        title: "Kuckuck, Kuckuck",
+        notes: [
+          { k: 'g1', d: 2, lyr: 'Kuc-' }, { k: 'e1', d: 2, lyr: 'kuck,' },
+          { k: 'g1', d: 2, lyr: 'Kuc-' }, { k: 'e1', d: 2, lyr: 'kuck,' },
+          { k: 'g1', d: 1, lyr: 'rufts' }, { k: 'f1', d: 1, lyr: 'aus' }, { k: 'e1', d: 1, lyr: 'dem' }, { k: 'd1', d: 1, lyr: 'dem' },
+          { k: 'c1', d: 4, lyr: 'Wald!' }
+        ]
+      },
+      {
+        id: 2,
+        title: "Hänschen klein",
+        notes: [
+          { k: 'g1', d: 2, lyr: 'Häns-' }, { k: 'e1', d: 2, lyr: 'chen' },
+          { k: 'e1', d: 4, lyr: 'klein,' },
+          { k: 'f1', d: 2, lyr: 'ging' }, { k: 'd1', d: 2, lyr: 'al-' },
+          { k: 'd1', d: 4, lyr: 'lein' },
+          { k: 'c1', d: 1, lyr: 'in' }, { k: 'd1', d: 1, lyr: 'die' }, { k: 'e1', d: 1, lyr: 'wei-' }, { k: 'f1', d: 1, lyr: 'te' },
+          { k: 'g1', d: 2, lyr: 'Welt' }, { k: 'g1', d: 2, lyr: 'hin-' },
+          { k: 'g1', d: 4, lyr: 'ein.' }
+        ]
+      },
+      {
+        id: 3,
+        title: "Bruder Jakob",
+        notes: [
+          { k: 'c1', d: 1, lyr: 'Bru-' }, { k: 'd1', d: 1, lyr: 'der' }, { k: 'e1', d: 1, lyr: 'Ja-' }, { k: 'c1', d: 1, lyr: 'kob,' },
+          { k: 'c1', d: 1, lyr: 'Bru-' }, { k: 'd1', d: 1, lyr: 'der' }, { k: 'e1', d: 1, lyr: 'Ja-' }, { k: 'c1', d: 1, lyr: 'kob,' },
+          { k: 'e1', d: 1, lyr: 'schläfst' }, { k: 'f1', d: 1, lyr: 'du' }, { k: 'g1', d: 2, lyr: 'noch?' }
+        ]
+      },
+      {
+        id: 4,
+        title: "Freude schöner Götterfunken",
+        notes: [
+          { k: 'e1', d: 1, lyr: 'Freu-' }, { k: 'e1', d: 1, lyr: 'de,' }, { k: 'f1', d: 1, lyr: 'schö-' }, { k: 'g1', d: 1, lyr: 'ner' },
+          { k: 'g1', d: 1, lyr: 'Göt-' }, { k: 'f1', d: 1, lyr: 'ter-' }, { k: 'e1', d: 1, lyr: 'fun-' }, { k: 'd1', d: 1, lyr: 'ken,' },
+          { k: 'c1', d: 1, lyr: 'Toch-' }, { k: 'c1', d: 1, lyr: 'ter' }, { k: 'd1', d: 1, lyr: 'aus' }, { k: 'e1', d: 1, lyr: 'E-' },
+          { k: 'e1', d: 2, lyr: 'ly-' }, { k: 'd1', d: 2, lyr: 'si-' }, { k: 'd1', d: 4, lyr: 'um!' }
+        ]
+      }
+    ];
+
+    let currentSongIdx = 0;
+    let songPlaying = false;
+    let songNoteIdx = 0;
+    let songTimer = null;
+    let songPracticing = false;
+
+    function selectSong(idx) {
+      stopSongPlay();
+      currentSongIdx = idx;
+      [0, 1, 2, 3, 4].forEach(i => {
+        const btn = document.getElementById(`songBtn-${i}`);
+        if (btn) btn.className = (i === idx) ? 'btn btn-primary' : 'btn btn-secondary';
+      });
+      document.getElementById('songTitle').textContent = SONGS_DB[idx].title;
+      renderSongSheet();
+    }
+
+    function renderSongSheet() {
+      const svg = document.getElementById('songSheetSvg');
+      if (!svg) return;
+
+      const song = SONGS_DB[currentSongIdx];
+      let notesSvg = '';
+      const stepX = 640 / (song.notes.length + 1);
+
+      song.notes.forEach((nt, idx) => {
+        const nObj = PIANO_NOTES.find(p => p.key === nt.k) || PIANO_NOTES[0];
+        const cx = 55 + idx * stepX;
+        const cy = nObj.y;
+        const isCurrent = (idx === songNoteIdx);
+
+        notesSvg += `
+          <g id="sngNote-${idx}" transform="translate(${cx}, ${cy})">
+            <!-- Hilfslinie falls c' -->
+            ${nObj.hasLine ? `<line x1="-12" y1="0" x2="12" y2="0" stroke="#0f172a" stroke-width="2"/>` : ''}
+            <ellipse cx="0" cy="0" rx="9" ry="6" fill="${isCurrent ? '#facc15' : nObj.color}" stroke="#0f172a" stroke-width="2" transform="rotate(-15)"/>
+            <line x1="8" y1="-2" x2="8" y2="-28" stroke="#0f172a" stroke-width="2"/>
+            <text x="0" y="24" font-size="10" font-weight="900" fill="#475569" text-anchor="middle">${nt.lyr}</text>
+          </g>
+        `;
+      });
+
+      svg.innerHTML = `
+        <!-- 5 Notenlinien -->
+        <line x1="20" y1="50" x2="700" y2="50" stroke="#64748b" stroke-width="1.8"/>
+        <line x1="20" y1="60" x2="700" y2="60" stroke="#64748b" stroke-width="1.8"/>
+        <line x1="20" y1="70" x2="700" y2="70" stroke="#64748b" stroke-width="1.8"/>
+        <line x1="20" y1="80" x2="700" y2="80" stroke="#64748b" stroke-width="1.8"/>
+        <line x1="20" y1="90" x2="700" y2="90" stroke="#64748b" stroke-width="1.8"/>
+        <text x="25" y="86" font-size="52" font-family="serif" fill="#1e293b">𝄞</text>
+        ${notesSvg}
+      `;
+    }
+
+    function toggleSongPlay() {
+      if (songPlaying) stopSongPlay();
+      else startSongPlay();
+    }
+
+    function startSongPlay() {
+      songPracticing = false;
+      songPlaying = true;
+      songNoteIdx = 0;
+      document.getElementById('songPlayBtn').textContent = '⏹️ Stopp';
+      document.getElementById('songPlayBtn').className = 'btn btn-secondary';
+      playNextSongNote();
+    }
+
+    function stopSongPlay() {
+      songPlaying = false;
+      songPracticing = false;
+      clearTimeout(songTimer);
+      const btn = document.getElementById('songPlayBtn');
+      if (btn) {
+        btn.textContent = '▶️ Lied vorspielen';
+        btn.className = 'btn btn-primary';
+      }
+      renderSongSheet();
+    }
+
+    function playNextSongNote() {
+      if (!songPlaying) return;
+      const song = SONGS_DB[currentSongIdx];
+      if (songNoteIdx >= song.notes.length) {
+        stopSongPlay();
+        addStars(5);
+        playChime();
+        fireConfetti();
+        return;
+      }
+
+      const nt = song.notes[songNoteIdx];
+      const nObj = PIANO_NOTES.find(p => p.key === nt.k);
+      if (nObj) {
+        triggerPianoNote(nObj, true);
+        document.getElementById('songLyricBadge').textContent = `🗣️ „${nt.lyr}“ (Ton: ${nObj.name})`;
+      }
+      renderSongSheet();
+
+      const beatMs = 420;
+      const durationMs = nt.d * beatMs;
+      songNoteIdx++;
+      songTimer = setTimeout(playNextSongNote, durationMs);
+    }
+
+    function startSongPractice() {
+      stopSongPlay();
+      songPracticing = true;
+      songNoteIdx = 0;
+      renderSongSheet();
+      highlightPracticeKey();
+      document.getElementById('songLyricBadge').textContent = '👉 Drücke die blinkende Taste auf der Klaviatur!';
+    }
+
+    function highlightPracticeKey() {
+      const song = SONGS_DB[currentSongIdx];
+      if (songNoteIdx >= song.notes.length) {
+        songPracticing = false;
+        document.getElementById('songLyricBadge').textContent = '🎉 Toll gemacht! Du hast das ganze Lied gespielt!';
+        addStars(10);
+        playChime();
+        fireConfetti();
+        return;
+      }
+
+      const nt = song.notes[songNoteIdx];
+      const keyId = `sk-${nt.k}`;
+      const el = document.getElementById(keyId);
+      if (el) {
+        el.style.background = '#fef08a';
+        setTimeout(() => { if (el) el.style.background = ''; }, 600);
+      }
+    }
+
+    function onSongPracticeKeyHit(keyHit) {
+      const song = SONGS_DB[currentSongIdx];
+      const expected = song.notes[songNoteIdx];
+      if (expected && expected.k === keyHit) {
+        document.getElementById('songLyricBadge').textContent = `✅ Richtig! „${expected.lyr}“`;
+        songNoteIdx++;
+        addStars(1);
+        renderSongSheet();
+        setTimeout(highlightPracticeKey, 200);
+      }
+    }
+
+    // =========================================================
+    // MODUL 5: TÖNE-DETEKTIV QUIZ
+    // =========================================================
+    let detCurrentNote = null;
+    let detScore = 0;
+
+    function newDetectiveTask() {
+      detCurrentNote = PIANO_NOTES[Math.floor(Math.random() * PIANO_NOTES.length)];
+      renderDetectiveSheet();
+      renderDetectiveChoices();
+      playTone(detCurrentNote.freq, 0.45);
+      const fb = document.getElementById('detFeedbackBox');
+      if (fb) fb.className = 'hidden';
+    }
+
+    function renderDetectiveSheet() {
+      const svg = document.getElementById('detSheetSvg');
+      if (!svg || !detCurrentNote) return;
+
+      svg.innerHTML = `
+        <line x1="20" y1="50" x2="320" y2="50" stroke="#475569" stroke-width="2"/>
+        <line x1="20" y1="60" x2="320" y2="60" stroke="#475569" stroke-width="2"/>
+        <line x1="20" y1="70" x2="320" y2="70" stroke="#475569" stroke-width="2"/>
+        <line x1="20" y1="80" x2="320" y2="80" stroke="#475569" stroke-width="2"/>
+        <line x1="20" y1="90" x2="320" y2="90" stroke="#475569" stroke-width="2"/>
+        <text x="30" y="88" font-size="58" font-family="serif" fill="#1e293b">𝄞</text>
+        ${detCurrentNote.hasLine ? `<line x1="165" y1="110" x2="205" y2="110" stroke="#1e293b" stroke-width="2.5"/>` : ''}
+        <ellipse cx="185" cy="${detCurrentNote.y}" rx="12" ry="8.5" fill="#db2777" stroke="#0f172a" stroke-width="2" transform="rotate(-15 185 ${detCurrentNote.y})"/>
+      `;
+    }
+
+    function renderDetectiveChoices() {
+      const grid = document.getElementById('detChoicesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      // Wähle 4 Antwortmöglichkeiten (inkl. richtiger Antwort)
+      const options = [detCurrentNote];
+      while (options.length < 4) {
+        const r = PIANO_NOTES[Math.floor(Math.random() * PIANO_NOTES.length)];
+        if (!options.includes(r)) options.push(r);
+      }
+      options.sort(() => Math.random() - 0.5);
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary';
+        btn.style.padding = '12px 6px';
+        btn.style.fontSize = '18px';
+        btn.style.fontWeight = '900';
+        btn.innerHTML = `<span>${opt.name}</span>`;
+        btn.onclick = () => selectDetectiveChoice(opt, btn);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectDetectiveChoice(chosen, btnEl) {
+      const fb = document.getElementById('detFeedbackBox');
+      const isCorrect = (chosen.key === detCurrentNote.key);
+
+      if (isCorrect) {
+        detScore++;
+        document.getElementById('detScoreBadge').textContent = `Punkte: ${detScore}`;
+        btnEl.style.background = '#dcfce7';
+        btnEl.style.borderColor = '#16a34a';
+        btnEl.style.color = '#15803d';
+        fb.className = '';
+        fb.style.background = '#f0fdf4';
+        fb.style.color = '#15803d';
+        fb.textContent = `🎉 Bravo! Das ist ${detCurrentNote.name} (${detCurrentNote.label}).`;
+        playChime();
+        addStars(2);
+        if (detScore % 5 === 0) fireConfetti();
+        setTimeout(newDetectiveTask, 1500);
+      } else {
+        btnEl.style.background = '#fee2e2';
+        btnEl.style.borderColor = '#ef4444';
+        btnEl.style.color = '#991b1b';
+        fb.className = '';
+        fb.style.background = '#fef2f2';
+        fb.style.color = '#991b1b';
+        fb.textContent = `Fast! Höre genau hin oder nutze den Merkspruch.`;
+        playTone(260, 0.2);
+      }
+    }
+
+    function playDetectiveNote() {
+      if (detCurrentNote) playTone(detCurrentNote.freq, 0.5);
+    }
+
+    // =========================================================
+    // INITIALISIERUNG BEI LADEN
+    // =========================================================
+    window.onload = function() {
+      initStaticFigures();
+      setWagonPreset('quarters');
+      initPianoKeys('pianoKeysContainer', false);
+      initPianoKeys('songPianoKeysContainer', true);
+      renderSheetMusic();
+      renderSongSheet();
+    };
+  </script>
+</body>
+</html>
