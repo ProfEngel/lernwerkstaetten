@@ -80,7 +80,7 @@
     /* Navigation */
     .nav-bar {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 6px;
     }
     @media (max-width: 680px) {
@@ -90,9 +90,10 @@
       }
       #tabBtn-clock { grid-column: span 3; }
       #tabBtn-money { grid-column: span 3; }
-      #tabBtn-plusminus { grid-column: span 2; }
-      #tabBtn-thousand { grid-column: span 2; }
-      #tabBtn-multidiv { grid-column: span 2; }
+      #tabBtn-plusminus { grid-column: span 3; }
+      #tabBtn-thousand { grid-column: span 3; }
+      #tabBtn-multidiv { grid-column: span 3; }
+      #tabBtn-wordproblems { grid-column: span 3; }
       .nav-tab {
         padding: 6px 3px !important;
         font-size: 12px !important;
@@ -745,6 +746,79 @@
       z-index: 99999;
     }
 
+    /* Sachaufgaben 3D Lernkarten & Liste */
+    .flashcard-scene {
+      perspective: 1200px;
+      width: 100%;
+      min-height: 400px;
+      cursor: pointer;
+    }
+    .flashcard {
+      width: 100%;
+      min-height: 400px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+      border-radius: 24px;
+    }
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 24px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .flashcard-front {
+      background: linear-gradient(145deg, #ffffff 0%, #fffdf7 100%);
+      border: 3px solid #fcd34d;
+    }
+    .flashcard-back {
+      background: linear-gradient(145deg, #f0fdf4 0%, #ffffff 100%);
+      border: 3px solid #4ade80;
+      transform: rotateY(180deg);
+    }
+    @media (max-width: 600px) {
+      .flashcard-scene, .flashcard {
+        min-height: 480px;
+      }
+      .flashcard-face {
+        padding: 16px;
+      }
+    }
+    .wp-filter-pill {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .wp-filter-pill:hover {
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+    .wp-filter-pill.active {
+      background: #f59e0b;
+      border-color: #d97706;
+      color: #ffffff;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -851,6 +925,13 @@
         </button>
         <button id="tabBtn-multidiv" onclick="switchModule('multidiv')" class="nav-tab" title="Mal & Geteilt">
           <span style="font-size: 16px;">✖➗</span> <span>Mal & Geteilt</span>
+        </button>
+        <button id="tabBtn-wordproblems" onclick="switchModule('wordproblems')" class="nav-tab" title="Sachaufgaben Klasse 3">
+          <span style="font-size: 16px;">💡📝</span>
+          <span style="display: flex; flex-direction: column; align-items: center; line-height: 1.15;">
+            <span>Sachaufgaben</span>
+            <span style="font-size: 10px; font-weight: 800; opacity: 0.9;">Klasse 3</span>
+          </span>
         </button>
       </nav>
     </header>
@@ -1499,6 +1580,119 @@
       </div>
     </main>
 
+
+    <!-- ========================================================= -->
+    <!-- MODUL 6: SACHAUFGABEN KLASSE 3 (LERNKARTEN) -->
+    <!-- ========================================================= -->
+    <main id="mod-wordproblems" class="card hidden" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Header & Progress -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #fffbeb; padding: 12px 16px; border-radius: 18px; border: 2px solid #fde68a;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 44px; height: 44px; border-radius: 14px; background: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 3px 8px rgba(245, 158, 11, 0.4);">
+            💡
+          </div>
+          <div>
+            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #78350f; line-height: 1.2;">Sachaufgaben – Lernkarten (3. Klasse)</h2>
+            <div style="font-size: 12px; color: #92400e; font-weight: 600;">Frage (F), Rechenweg (R) & Antwortsatz (A) • Tippe auf die Karte zum Umdrehen</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <!-- Fortschrittsbalken -->
+          <div style="display: flex; flex-direction: column; gap: 4px; min-width: 160px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #78350f;">
+              <span>Lernfortschritt:</span>
+              <span id="wpProgressLabel" class="font-num">0 / 34 gemeistert</span>
+            </div>
+            <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; border: 1px solid #cbd5e1;">
+              <div id="wpProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 999px; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Modus-Umschalter: Lernkarte vs. Liste -->
+          <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 14px;">
+            <button id="wpViewBtn-card" onclick="setWordProblemView('card')" class="btn btn-primary" style="padding: 5px 11px; font-size: 11.5px;">🎴 Lernkarte</button>
+            <button id="wpViewBtn-list" onclick="setWordProblemView('list')" class="btn btn-secondary" style="padding: 5px 11px; font-size: 11.5px;">🗂️ Alle Karten</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter-Pills nach Themen/Kategorien -->
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: #f8fafc; padding: 8px 12px; border-radius: 16px; border: 1.5px solid #e2e8f0;">
+        <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-right: 2px;">Kategorie:</span>
+        <button id="wpFilter-all" onclick="filterWordProblems('all')" class="wp-filter-pill active">🌟 Alle (34)</button>
+        <button id="wpFilter-geld" onclick="filterWordProblems('geld')" class="wp-filter-pill">🛒 Geld & Einkaufen</button>
+        <button id="wpFilter-sport" onclick="filterWordProblems('sport')" class="wp-filter-pill">⚽ Sport & Bewegung</button>
+        <button id="wpFilter-teilen" onclick="filterWordProblems('teilen')" class="wp-filter-pill">👥 Gerecht Teilen</button>
+        <button id="wpFilter-schule" onclick="filterWordProblems('schule')" class="wp-filter-pill">🎒 Schule & Basteln</button>
+        <button id="wpFilter-feiern" onclick="filterWordProblems('feiern')" class="wp-filter-pill">🎉 Feste & Feiern</button>
+        <button id="wpFilter-natur" onclick="filterWordProblems('natur')" class="wp-filter-pill">🌳 Tiere & Natur</button>
+        <button id="wpFilter-mastered" onclick="filterWordProblems('mastered')" class="wp-filter-pill">🏆 Gemeistert</button>
+        <button id="wpFilter-open" onclick="filterWordProblems('open')" class="wp-filter-pill">🔄 Noch offen</button>
+      </div>
+
+      <!-- ANSICHT 1: EINZEL-LERNKARTE (FOKUS) -->
+      <div id="wpSec-card" style="display: flex; flex-direction: column; gap: 12px;">
+        
+        <!-- Karten-Steuerungsleiste oben -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <button onclick="prevWordProblem()" class="btn btn-secondary" style="padding: 7px 14px; font-size: 13px;" title="Vorherige Aufgabe">◀ Zurück</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span id="wpCardIndexBadge" class="font-num" style="background: #f1f5f9; color: #475569; font-size: 13px; font-weight: 800; padding: 4px 12px; border-radius: 12px; border: 1px solid #cbd5e1;">Karte 1 von 34</span>
+            <button onclick="randomWordProblem()" class="btn btn-secondary" style="padding: 6px 11px; font-size: 13px;" title="Zufällige Aufgabe">🎲 Zufall</button>
+          </div>
+          <button onclick="nextWordProblem()" class="btn btn-secondary" style="padding: 7px 14px; font-size: 13px;" title="Nächste Aufgabe">Weiter ▶</button>
+        </div>
+
+        <!-- 3D Flashcard Container -->
+        <div class="flashcard-scene" onclick="onCardClick(event)">
+          <div id="wpFlashcard" class="flashcard">
+            <!-- Vorder- und Rückseite werden per renderWordProblemCard() befüllt -->
+          </div>
+        </div>
+
+        <!-- Karten-Steuerungsleiste unten -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button onclick="flipWordProblemCard()" class="btn btn-primary" style="padding: 9px 18px; font-size: 14px;">
+              🔄 Karte umdrehen (Lösung / Frage)
+            </button>
+            <button id="wpSpeakBtn" onclick="speakCurrentWordProblem()" class="btn btn-secondary" style="padding: 9px 14px; font-size: 13px;">
+              🔊 Aufgabe vorlesen
+            </button>
+            <button onclick="toggleScratchpad()" class="btn btn-secondary" style="padding: 9px 14px; font-size: 13px;">
+              📝 Rechen-Schmierzettel
+            </button>
+          </div>
+          
+          <button onclick="toggleWordProblemMasteryCurrent()" id="wpMasteryQuickBtn" class="btn btn-secondary" style="padding: 8px 14px; font-size: 12.5px;">
+            ⭐ Als gemeistert markieren
+          </button>
+        </div>
+
+        <!-- Rechen-Schmierzettel (Kariert) -->
+        <div id="wpScratchpadBox" class="hidden" style="background: #ffffff; border: 2px dashed #94a3b8; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px); background-size: 16px 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 800; color: #475569;">📝 Dein digitaler Rechen-Schmierzettel (hier kannst du Nebenrechnungen notieren):</span>
+            <button onclick="clearScratchpad()" class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;">🗑️ Löschen</button>
+          </div>
+          <textarea id="wpScratchpadText" placeholder="Schreibe hier deine Nebenrechnungen auf... z. B. 4 · 3 = 12&#10;5 · 2 = 10&#10;12 + 10 = 22..." rows="4" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px; font-family: ui-monospace, monospace; font-size: 15px; font-weight: 700; background: rgba(255,255,255,0.9); line-height: 1.4; resize: vertical;"></textarea>
+        </div>
+
+      </div>
+
+      <!-- ANSICHT 2: ALLE AUFGABEN ALS LISTE (ÜBERSICHT) -->
+      <div id="wpSec-list" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: #475569;">
+          <span>Klicke auf eine Aufgabe, um den Lösungsweg aufzuklappen oder zur Lernkarte zu springen:</span>
+          <span id="wpListCountBadge" class="font-num" style="background: #f1f5f9; padding: 2px 8px; border-radius: 8px; font-weight: 800;">34 Aufgaben</span>
+        </div>
+        <div id="wpListContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+    </main>
+
   </div>
 
 
@@ -1508,7 +1702,7 @@
     // =========================================================
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'lernwerkstatt-offline-v15';
+        const CACHE_NAME = 'lernwerkstatt-offline-v16';
         const ASSETS = [
           './',
           './index.html',
@@ -1659,7 +1853,7 @@
     // NAVIGATION & GLOBALE STERNE
     // =========================================================
     function switchModule(id) {
-      ['clock', 'money', 'plusminus', 'thousand', 'multidiv'].forEach(m => {
+      ['clock', 'money', 'plusminus', 'thousand', 'multidiv', 'wordproblems'].forEach(m => {
         const el = document.getElementById(`mod-${m}`);
         const tab = document.getElementById(`tabBtn-${m}`);
         if (el) el.classList.add('hidden');
@@ -1673,6 +1867,7 @@
       if (id === 'plusminus') setTimeout(renderPMLine, 40);
       if (id === 'multidiv') setTimeout(renderMDLine, 40);
       if (id === 'thousand') setTimeout(renderTHLine, 40);
+      if (id === 'wordproblems') setTimeout(renderWordProblemCard, 40);
     }
 
     function addStars(n) {
@@ -6400,6 +6595,1069 @@
     }
 
     // =========================================================
+    // MODUL 6: SACHAUFGABEN KLASSE 3 (34 LERNKARTEN)
+    // =========================================================
+    const WP_STORAGE_KEY = 'mathe_sachaufgaben_mastered_v1';
+
+    const WORD_PROBLEMS_DB = [
+      {
+        id: 1,
+        title: "Tim auf dem Klassenfest",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🛒",
+        text: "Tim kauft für ein Klassenfest 4 Packungen Saft zu je 3 € und 5 Tüten Brezeln zu je 2 €. Er bezahlt mit einem 50-€-Schein.",
+        question: "Wie viel Geld bekommt Tim zurück?",
+        steps: [
+          "1. Kosten für den Saft: 4 · 3 € = 12 €",
+          "2. Kosten für die Brezeln: 5 · 2 € = 10 €",
+          "3. Gesamtkosten zusammenrechnen: 12 € + 10 € = 22 €",
+          "4. Wechselgeld vom 50-€-Schein: 50 € − 22 € = 28 €"
+        ],
+        answer: "Tim bekommt 28 € zurück.",
+        expectedAnswer: 28,
+        unit: "€",
+        tip: "Signalwörter beachten: „je 3 €“ bedeutet Malnehmen (·), „bekommt zurück“ bedeutet Minusrechnen (−)."
+      },
+      {
+        id: 2,
+        title: "Tennisbälle in der Turnhalle",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "🎾",
+        text: "In der Turnhalle liegen 43 Tennisbälle. Die Lehrerin packt immer 6 Bälle in eine Dose.",
+        question: "Wie viele Dosen kann sie ganz füllen und wie viele Bälle bleiben übrig?",
+        steps: [
+          "1. Suche das größte Vielfache der 6er-Reihe vor 43: 7 · 6 = 42",
+          "2. Division mit Rest: 43 : 6 = 7 Rest 1"
+        ],
+        answer: "Sie kann 7 Dosen füllen, und es bleibt 1 Ball übrig.",
+        expectedAnswer: 7,
+        unit: "Dosen (Rest 1)",
+        tip: "Hier teilst du mit Rest: 42 Bälle passen genau in 7 Dosen. Von 42 bis 43 fehlt 1 Ball."
+      },
+      {
+        id: 3,
+        title: "Murmeln gerecht teilen",
+        category: "teilen",
+        categoryLabel: "👥 Gerecht Teilen",
+        icon: "🔮",
+        text: "Mia hat 15 Murmeln und ihr Bruder Ben hat 9 Murmeln. Sie werfen alle Murmeln zusammen und teilen sie gerecht unter sich auf.",
+        question: "Wie viele Murmeln bekommt jedes Kind?",
+        steps: [
+          "1. Alle Murmeln zusammenlegen: 15 + 9 = 24 Murmeln",
+          "2. Gerecht auf 2 Kinder aufteilen: 24 : 2 = 12 Murmeln"
+        ],
+        answer: "Jedes Kind bekommt 12 Murmeln.",
+        expectedAnswer: 12,
+        unit: "Murmeln",
+        tip: "Zuerst mit Plusrechnen alles zusammenwerfen (+), dann durch 2 Kinder teilen (: 2)."
+      },
+      {
+        id: 4,
+        title: "Kuchenbasar in der Schule",
+        category: "feiern",
+        categoryLabel: "🎉 Feste & Feiern",
+        icon: "🧁",
+        text: "Für den Schulkuchenbasar backt Oma 3 Bleche Muffins mit je 12 Muffins. Am Vormittag verkaufen die Kinder 28 Muffins.",
+        question: "Wie viele Muffins sind noch übrig?",
+        steps: [
+          "1. Gesamtzahl der Muffins auf den 3 Blechen: 3 · 12 = 36 Muffins",
+          "2. Verkaufte Muffins abziehen: 36 − 28 = 8 Muffins"
+        ],
+        answer: "Es sind noch 8 Muffins übrig.",
+        expectedAnswer: 8,
+        unit: "Muffins",
+        tip: "Erst die Gesamtzahl berechnen (3 · 10 = 30, 3 · 2 = 6 ➔ 36), dann die 28 verkauften abziehen."
+      },
+      {
+        id: 5,
+        title: "Wandertag mit dem Bus",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "🚌",
+        text: "26 Kinder und 2 Lehrkräfte fahren mit dem Bus zum Waldmuseum. Eine Fahrkarte kostet für jeden 3 €.",
+        question: "Wie viel Euro kosten alle Fahrkarten zusammen?",
+        steps: [
+          "1. Alle Personen zusammenzählen: 26 Kinder + 2 Lehrkräfte = 28 Personen",
+          "2. Gesamtkosten berechnen: 28 · 3 € = 84 € (20 · 3 = 60 €, 8 · 3 = 24 €, 60 + 24 = 84 €)"
+        ],
+        answer: "Alle Fahrkarten kosten zusammen 84 €.",
+        expectedAnswer: 84,
+        unit: "€",
+        tip: "Aufgepasst: Zähle unbedingt die beiden Lehrkräfte zu den 26 Kindern dazu (28 Personen)!"
+      },
+      {
+        id: 6,
+        title: "Buntstifte für Gruppentische",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "✏️",
+        text: "Der Hausmeister verteilt 58 neue Buntstifte gleichmäßig an 8 Gruppentische. Die restlichen Stifte behält er als Reserve.",
+        question: "Wie viele Stifte bekommt jeder Tisch und wie viele Stifte bleiben in der Reserve?",
+        steps: [
+          "1. Größte 8er-Zahl vor 58 suchen: 7 · 8 = 56",
+          "2. Teilen mit Rest: 58 : 8 = 7 Rest 2"
+        ],
+        answer: "Jeder Tisch bekommt 7 Stifte, und 2 Stifte bleiben als Reserve.",
+        expectedAnswer: 7,
+        unit: "Stifte (Rest 2)",
+        tip: "Gehe die 8er-Reihe durch: 8, 16, 24, 32, 40, 48, 56. Von 56 bis 58 bleiben 2 Stifte übrig."
+      },
+      {
+        id: 7,
+        title: "Einkauf im Schreibwarenladen",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🎨",
+        text: "Leonie kauft 3 Hefte zu je 2 € und einen Tuschkasten für 14 €. Sie bezahlt mit einem 25-€-Gutschein.",
+        question: "Wie viel Euro bleiben vom Gutschein noch übrig?",
+        steps: [
+          "1. Kosten für die Hefte: 3 · 2 € = 6 €",
+          "2. Gesamteinkauf: 14 € (Tuschkasten) + 6 € (Hefte) = 20 €",
+          "3. Restbetrag vom Gutschein: 25 € − 20 € = 5 €"
+        ],
+        answer: "Vom Gutschein bleiben noch 5 € übrig.",
+        expectedAnswer: 5,
+        unit: "€",
+        tip: "Erst die Kosten für alle Hefte ausrechnen, zum Tuschkasten addieren und dann vom Gutschein abziehen."
+      },
+      {
+        id: 8,
+        title: "Apfelernte im Schulgarten",
+        category: "natur",
+        categoryLabel: "🌳 Tiere & Natur",
+        icon: "🍎",
+        text: "Die Garten-AG erntet 4 Kisten mit je 15 kg Äpfeln. 18 kg werden sofort zu frischem Apfelsaft gepresst.",
+        question: "Wie viele Kilogramm Äpfel bleiben noch zum Essen übrig?",
+        steps: [
+          "1. Gesamte Ernte in 4 Kisten: 4 · 15 kg = 60 kg (2 · 15 = 30, das Doppelte sind 60)",
+          "2. Verpresste Äpfel abziehen: 60 kg − 18 kg = 42 kg"
+        ],
+        answer: "Es bleiben noch 42 kg Äpfel zum Essen übrig.",
+        expectedAnswer: 42,
+        unit: "kg",
+        tip: "Verdopplungstrick bei 4 · 15 kg: 2 · 15 = 30 kg, nochmal verdoppeln = 60 kg."
+      },
+      {
+        id: 9,
+        title: "Schwimmunterricht im Hallenbad",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "🏊‍♂️",
+        text: "Im Schwimmbecken üben 34 Kinder. Der Schwimmlehrer teilt sie in 4 gleich große Bahnen ein. Die restlichen Kinder springen vom Brett.",
+        question: "Wie viele Kinder schwimmen auf jeder Bahn und wie viele springen vom Brett?",
+        steps: [
+          "1. Größte 4er-Zahl vor 34 suchen: 8 · 4 = 32",
+          "2. Geteilt mit Rest: 34 : 4 = 8 Rest 2"
+        ],
+        answer: "Auf jeder Bahn schwimmen 8 Kinder, und 2 Kinder springen vom Brett.",
+        expectedAnswer: 8,
+        unit: "Kinder (Rest 2)",
+        tip: "32 Kinder verteilen sich gleichmäßig auf 4 Bahnen (8 pro Bahn). Es bleiben 2 Kinder übrig."
+      },
+      {
+        id: 10,
+        title: "Taschengeld sparen",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🪙",
+        text: "Felix spart jeden Monat 8 € von seinem Taschengeld. Nach 6 Monaten schenkt ihm seine Oma noch 20 € dazu.",
+        question: "Wie viel Euro hat Felix jetzt insgesamt gespart?",
+        steps: [
+          "1. Erspartes aus 6 Monaten berechnen: 6 · 8 € = 48 €",
+          "2. Omas Geschenk dazuzählen: 48 € + 20 € = 68 €"
+        ],
+        answer: "Felix hat jetzt insgesamt 68 € gespart.",
+        expectedAnswer: 68,
+        unit: "€",
+        tip: "Zuerst die 6 Monate malnehmen (6 · 8 = 48 €), dann das Geschenk mit Plus addieren."
+      },
+      {
+        id: 11,
+        title: "Geburtstags-Tüten packen",
+        category: "feiern",
+        categoryLabel: "🎉 Feste & Feiern",
+        icon: "🎁",
+        text: "Zum Geburtstag packt Sara Mitgebsel-Tüten für ihre 7 Gäste. In jede Tüte steckt sie 4 Sticker und 3 Bonbons.",
+        question: "Wie viele Teile packt Sara insgesamt in alle 7 Tüten?",
+        steps: [
+          "1. Teile in einer einzelnen Tüte: 4 + 3 = 7 Teile",
+          "2. Teile in allen 7 Tüten: 7 · 7 = 49 Teile"
+        ],
+        answer: "Sara packt insgesamt 49 Teile in alle 7 Tüten.",
+        expectedAnswer: 49,
+        unit: "Teile",
+        tip: "Eine Quadratzahl hilft: 7 Tüten mal 7 Teile pro Tüte ergibt 7 · 7 = 49 Teile."
+      },
+      {
+        id: 12,
+        title: "Tierfütterung im Streichelzoo",
+        category: "natur",
+        categoryLabel: "🌳 Tiere & Natur",
+        icon: "🐐",
+        text: "Die Tierpflegerin hat 52 Karotten. Sie gibt den 6 Ziegen jeweils gleich viele Karotten. Den Rest bekommen die Kaninchen.",
+        question: "Wie viele Karotten erhält jede Ziege und wie viele bleiben für die Kaninchen?",
+        steps: [
+          "1. Größte 6er-Zahl vor 52: 8 · 6 = 48",
+          "2. Karotten aufteilen mit Rest: 52 : 6 = 8 Rest 4"
+        ],
+        answer: "Jede Ziege erhält 8 Karotten, und 4 Karotten bleiben für die Kaninchen.",
+        expectedAnswer: 8,
+        unit: "Karotten (Rest 4)",
+        tip: "6 · 8 = 48 Karotten gehen an die Ziegen. Bis 52 bleiben 4 Karotten für die Kaninchen."
+      },
+      {
+        id: 13,
+        title: "Bücherkisten für die Bücherei",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "📚",
+        text: "In der Schulbücherei treffen 3 Kisten mit je 24 neuen Büchern ein. 15 Bücher werden direkt an die Leseecke abgegeben.",
+        question: "Wie viele neue Bücher bleiben im Regal der Bücherei?",
+        steps: [
+          "1. Alle neuen Bücher berechnen: 3 · 24 = 72 Bücher (3 · 20 = 60, 3 · 4 = 12, 60 + 12 = 72)",
+          "2. Bücher für die Leseecke abziehen: 72 − 15 = 57 Bücher"
+        ],
+        answer: "Es bleiben 57 neue Bücher im Regal der Bücherei.",
+        expectedAnswer: 57,
+        unit: "Bücher",
+        tip: "Erst 3 · 24 ausrechnen (zerlege in 3 · 20 und 3 · 4 = 72), dann 15 Bücher abziehen."
+      },
+      {
+        id: 14,
+        title: "Blumen im Schulhof",
+        category: "natur",
+        categoryLabel: "🌳 Tiere & Natur",
+        icon: "🌷",
+        text: "Die Garten-AG hat 36 Tulpenzwiebeln und 28 Narzissenzwiebeln gekauft. Sie pflanzen alle Zwiebeln gleichmäßig in 8 Blumenkästen.",
+        question: "Wie viele Blumen blühen im Frühling in jedem Kasten?",
+        steps: [
+          "1. Alle Blumenzwiebeln zusammenzählen: 36 + 28 = 64 Zwiebeln",
+          "2. Gleichmäßig auf 8 Kästen aufteilen: 64 : 8 = 8 Blumen pro Kasten"
+        ],
+        answer: "In jedem Kasten blühen 8 Blumen.",
+        expectedAnswer: 8,
+        unit: "Blumen",
+        tip: "Zähle zuerst alle Blumen zusammen (36 + 28 = 64), dann hilft dir das 8er-Einmaleins (64 : 8 = 8)."
+      },
+      {
+        id: 15,
+        title: "Fahrradtour am Wochenende",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "🚲",
+        text: "Familie Müller macht eine 3-tägige Radtour. Am Freitag fahren sie 18 km, am Samstag doppelt so viel wie am Freitag und am Sonntag noch 16 km.",
+        question: "Wie viele Kilometer ist die Familie an den drei Tagen insgesamt gefahren?",
+        steps: [
+          "1. Strecke am Samstag berechnen: 2 · 18 km = 36 km",
+          "2. Alle drei Tage zusammenzählen: 18 km + 36 km + 16 km = 70 km"
+        ],
+        answer: "Die Familie ist insgesamt 70 km gefahren.",
+        expectedAnswer: 70,
+        unit: "km",
+        tip: "„Doppelt so viel“ bedeutet Malnehmen mit 2: 2 · 18 km = 36 km. Dann alle drei Tage addieren."
+      },
+      {
+        id: 16,
+        title: "Spielekiste auf dem Pausenhof",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "🪢",
+        text: "In der Pausenkiste liegen 47 Springseile. Jede der 5 Klassen leiht sich genau gleich viele Seile aus. Der Rest bleibt in der Kiste.",
+        question: "Wie viele Springseile bekommt jede Klasse und wie viele bleiben in der Kiste?",
+        steps: [
+          "1. Größte 5er-Zahl vor 47: 9 · 5 = 45",
+          "2. Geteilt mit Rest: 47 : 5 = 9 Rest 2"
+        ],
+        answer: "Jede Klasse bekommt 9 Seile, und 2 Seile bleiben in der Kiste.",
+        expectedAnswer: 9,
+        unit: "Seile (Rest 2)",
+        tip: "9 · 5 = 45 Seile werden verteilt. Von 45 bis 47 bleiben genau 2 Seile übrig."
+      },
+      {
+        id: 17,
+        title: "Kino-Nachmittag mit Freunden",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🍿",
+        text: "4 Freunde gehen ins Kino. Eine Eintrittskarte kostet 7 € und jedes Kind kauft sich Popcorn für 3 €.",
+        question: "Wie viel Euro bezahlen die vier Freunde zusammen?",
+        steps: [
+          "1. Kosten für ein Kind: 7 € (Karte) + 3 € (Popcorn) = 10 €",
+          "2. Kosten für alle 4 Kinder: 4 · 10 € = 40 €"
+        ],
+        answer: "Die vier Freunde bezahlen zusammen 40 €.",
+        expectedAnswer: 40,
+        unit: "€",
+        tip: "Rechne zuerst aus, was ein einzelnes Kind bezahlt (7 € + 3 € = 10 €), dann einfach mal 4."
+      },
+      {
+        id: 18,
+        title: "Sammelkarten tauschen",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "⚽",
+        text: "Paul hat 46 Fußballkarten. Er gibt seinem Freund Jonas 14 Karten ab. Zum Geburtstag bekommt er ein Päckchen mit 25 neuen Karten.",
+        question: "Wie viele Fußballkarten hat Paul jetzt?",
+        steps: [
+          "1. Karten nach der Abgabe: 46 − 14 = 32 Karten",
+          "2. Neue Karten dazuzählen: 32 + 25 = 57 Karten"
+        ],
+        answer: "Paul hat jetzt 57 Fußballkarten.",
+        expectedAnswer: 57,
+        unit: "Karten",
+        tip: "„Gibt ab“ bedeutet Minusrechnen (− 14), „bekommt dazu“ bedeutet Plusrechnen (+ 25)."
+      },
+      {
+        id: 19,
+        title: "Plätzchen backen",
+        category: "feiern",
+        categoryLabel: "🎉 Feste & Feiern",
+        icon: "🍪",
+        text: "Anna und Max backen 75 Vanillekipferl. Sie essen sofort 3 Stück warm vom Blech. Die restlichen Kipferl verteilen sie gerecht auf 8 Dosen.",
+        question: "Wie viele Kipferl kommen in jede Dose?",
+        steps: [
+          "1. Übrige Kipferl nach dem Naschen: 75 − 3 = 72 Kipferl",
+          "2. Auf 8 Dosen gerecht aufteilen: 72 : 8 = 9 Kipferl pro Dose"
+        ],
+        answer: "In jede Dose kommen 9 Kipferl.",
+        expectedAnswer: 9,
+        unit: "Kipferl",
+        tip: "Erst die 3 genaschten Kipferl abziehen (75 − 3 = 72). 72 : 8 gehört zur 8er-Reihe (9 · 8 = 72)."
+      },
+      {
+        id: 20,
+        title: "Basteln mit Kastanien",
+        category: "teilen",
+        categoryLabel: "👥 Gerecht Teilen",
+        icon: "🌰",
+        text: "4 Kinder haben im Park Kastanien gesammelt. Zusammen haben sie 68 Kastanien im Korb. Sie teilen sie gerecht unter sich auf.",
+        question: "Wie viele Kastanien bekommt jedes Kind?",
+        steps: [
+          "1. 68 schrittweise durch 4 teilen: 40 : 4 = 10",
+          "2. Restliche 28 durch 4 teilen: 28 : 4 = 7",
+          "3. Ergebnisse zusammenzählen: 10 + 7 = 17 Kastanien"
+        ],
+        answer: "Jedes Kind bekommt 17 Kastanien.",
+        expectedAnswer: 17,
+        unit: "Kastanien",
+        tip: "Halbiere zweimal: Die Hälfte von 68 ist 34. Die Hälfte von 34 ist 17!"
+      },
+      {
+        id: 21,
+        title: "Der Bäcker am Morgen",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🥨",
+        text: "Ein Bäcker backt 9 Bleche mit je 8 Laugenstangen. Am Vormittag verkauft er bereits 65 Laugenstangen.",
+        question: "Wie viele Laugenstangen hat der Bäcker noch in der Auslage?",
+        steps: [
+          "1. Gesamtzahl aller Laugenstangen: 9 · 8 = 72 Laugenstangen",
+          "2. Verkaufte Laugenstangen abziehen: 72 − 65 = 7 Laugenstangen"
+        ],
+        answer: "Der Bäcker hat noch 7 Laugenstangen in der Auslage.",
+        expectedAnswer: 7,
+        unit: "Laugenstangen",
+        tip: "9 · 8 = 72 ist eine wichtige Einmaleins-Aufgabe. Ziehe dann die 65 verkauften Stangen ab."
+      },
+      {
+        id: 22,
+        title: "Bausteine im Hort",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "🧱",
+        text: "In einer Holzkiste liegen 85 Bauklötze. 9 Kinder bauen jeweils einen Turm aus genau 9 Klötzen.",
+        question: "Wie viele Bauklötze bleiben in der Kiste übrig?",
+        steps: [
+          "1. Verbaute Klötze für 9 Türme: 9 · 9 = 81 Klötze",
+          "2. Übrige Klötze berechnen: 85 − 81 = 4 Klötze (oder: 85 : 9 = 9 Rest 4)"
+        ],
+        answer: "Es bleiben 4 Bauklötze in der Kiste übrig.",
+        expectedAnswer: 4,
+        unit: "Klötze",
+        tip: "9 Türme mit je 9 Klötzen brauchen 9 · 9 = 81 Klötze. Bis 85 bleiben 4 Klötze übrig."
+      },
+      {
+        id: 23,
+        title: "Zoobesuch mit der Familie",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🦁",
+        text: "Familie Becker besucht den Tierpark. Eine Erwachsenenkarte kostet 12 €, eine Kinderkarte 7 €. Es gehen 2 Erwachsene und 2 Kinder.",
+        question: "Wie viel Euro Eintritt bezahlt die Familie insgesamt?",
+        steps: [
+          "1. Eintritt für die 2 Erwachsenen: 2 · 12 € = 24 €",
+          "2. Eintritt für die 2 Kinder: 2 · 7 € = 14 €",
+          "3. Gesamter Eintrittspreis: 24 € + 14 € = 38 €"
+        ],
+        answer: "Die Familie bezahlt insgesamt 38 € Eintritt.",
+        expectedAnswer: 38,
+        unit: "€",
+        tip: "Rechne Erwachsene und Kinder getrennt aus und addiere dann beide Summen (24 € + 14 € = 38 €)."
+      },
+      {
+        id: 24,
+        title: "Zirkus in der Turnhalle",
+        category: "feiern",
+        categoryLabel: "🎉 Feste & Feiern",
+        icon: "🎪",
+        text: "Für die Zirkus-Vorführung werden Stühle in 6 Reihen mit je 14 Stühlen aufgestellt. Zur Vorstellung kommen 78 Zuschauer.",
+        question: "Wie viele Stühle bleiben noch frei?",
+        steps: [
+          "1. Alle aufgestellten Stühle berechnen: 6 · 14 = 84 Stühle (6 · 10 = 60, 6 · 4 = 24, 60 + 24 = 84)",
+          "2. Besetzte Stühle abziehen: 84 − 78 = 6 Stühle"
+        ],
+        answer: "Es bleiben noch 6 Stühle frei.",
+        expectedAnswer: 6,
+        unit: "Stühle",
+        tip: "6 Reihen mal 14 Stühle ergibt 84 Stühle. Von 78 Zuschauern bis 84 fehlen 6 Plätze."
+      },
+      {
+        id: 25,
+        title: "Limonade auf dem Sommerfest",
+        category: "feiern",
+        categoryLabel: "🎉 Feste & Feiern",
+        icon: "🥤",
+        text: "Auf dem Schulfest werden 3 Kästen Limonade gekauft. In jedem Kasten stehen 12 Flaschen. Am Ende des Festes sind noch 7 Flaschen ungeöffnet.",
+        question: "Wie viele Flaschen Limonade wurden auf dem Fest getrunken?",
+        steps: [
+          "1. Alle gekauften Flaschen berechnen: 3 · 12 = 36 Flaschen",
+          "2. Ungeöffnete Flaschen abziehen: 36 − 7 = 29 Flaschen"
+        ],
+        answer: "Es wurden 29 Flaschen Limonade getrunken.",
+        expectedAnswer: 29,
+        unit: "Flaschen",
+        tip: "3 Kästen mal 12 Flaschen sind 36 Flaschen. Ziehe die 7 übrig gebliebenen Flaschen ab."
+      },
+      {
+        id: 26,
+        title: "Eier im Hühnerstall",
+        category: "natur",
+        categoryLabel: "🌳 Tiere & Natur",
+        icon: "🥚",
+        text: "Bauer Hannes sammelt 53 frische Eier im Hühnerstall ein. Er packt immer 6 Eier in einen Eierkarton.",
+        question: "Wie viele Kartons kann er voll machen und wie viele Eier bleiben lose übrig?",
+        steps: [
+          "1. Größte 6er-Zahl vor 53 suchen: 8 · 6 = 48",
+          "2. Geteilt mit Rest: 53 : 6 = 8 Rest 5"
+        ],
+        answer: "Er kann 8 Kartons voll machen, und 5 Eier bleiben lose übrig.",
+        expectedAnswer: 8,
+        unit: "Kartons (Rest 5)",
+        tip: "8 Kartons fassen genau 8 · 6 = 48 Eier. Von 48 bis 53 bleiben 5 Eier lose übrig."
+      },
+      {
+        id: 27,
+        title: "Flohmarkt-Gewinn gerecht teilen",
+        category: "teilen",
+        categoryLabel: "👥 Gerecht Teilen",
+        icon: "🧸",
+        text: "Lukas und seine Schwester Marie verkaufen Spielzeug auf dem Flohmarkt. Lukas nimmt 23 € ein, Marie nimmt 31 € ein. Sie teilen das gesamte Geld gerecht durch zwei.",
+        question: "Wie viel Euro bekommt jedes Kind?",
+        steps: [
+          "1. Gesamteinnahmen zusammenzählen: 23 € + 31 € = 54 €",
+          "2. Durch 2 Kinder teilen: 54 € : 2 = 27 € (50 : 2 = 25, 4 : 2 = 2, 25 + 2 = 27)"
+        ],
+        answer: "Jedes Kind bekommt 27 €.",
+        expectedAnswer: 27,
+        unit: "€",
+        tip: "Erst das Geld beider Kinder zusammenzählen (54 €), dann halbieren (54 : 2 = 27 €)."
+      },
+      {
+        id: 28,
+        title: "Staffellauf beim Sportfest",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "🏃",
+        text: "Beim Schulsportfest laufen 4 Kinder einer Klasse eine Staffel. Jedes Kind läuft genau 75 Meter.",
+        question: "Wie viele Meter ist die Staffelstrecke insgesamt lang?",
+        steps: [
+          "1. 4 · 75 m geschickt verdoppeln: 2 · 75 m = 150 m",
+          "2. Nochmal verdoppeln: 2 · 150 m = 300 m"
+        ],
+        answer: "Die Staffelstrecke ist insgesamt 300 Meter lang.",
+        expectedAnswer: 300,
+        unit: "Meter",
+        tip: "Verdopplungstrick: 2 mal 75 ist 150. Das Doppelte von 150 ist 300 Meter!"
+      },
+      {
+        id: 29,
+        title: "Perlenketten fädeln",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "📿",
+        text: "Maya fädelt Halsketten. Für jede Kette braucht sie genau 8 Holzperlen. In ihrer Schachtel liegen 67 Perlen.",
+        question: "Wie viele ganze Ketten kann Maya fädeln und wie viele Perlen bleiben übrig?",
+        steps: [
+          "1. Größte 8er-Zahl vor 67: 8 · 8 = 64",
+          "2. Teilen mit Rest: 67 : 8 = 8 Rest 3"
+        ],
+        answer: "Maya kann 8 ganze Ketten fädeln, und 3 Perlen bleiben übrig.",
+        expectedAnswer: 8,
+        unit: "Ketten (Rest 3)",
+        tip: "8 · 8 = 64 Perlen werden für 8 Ketten gebraucht. Bis 67 bleiben 3 Perlen übrig."
+      },
+      {
+        id: 30,
+        title: "Eisdiele am Nachmittag",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🍦",
+        text: "Eine Kugel Eis kostet 2 €. Jonas kauft für sich und seine zwei Schwestern jeweils 2 Kugeln Eis. Er bezahlt mit einem 20-€-Schein.",
+        question: "Wie viel Euro Wechselgeld bekommt Jonas zurück?",
+        steps: [
+          "1. Alle Kinder zählen: Jonas + 2 Schwestern = 3 Kinder",
+          "2. Gesamtzahl der Eiskugeln: 3 Kinder · 2 Kugeln = 6 Kugeln",
+          "3. Kosten für das Eis: 6 · 2 € = 12 €",
+          "4. Wechselgeld vom 20-€-Schein: 20 € − 12 € = 8 €"
+        ],
+        answer: "Jonas bekommt 8 € Wechselgeld zurück.",
+        expectedAnswer: 8,
+        unit: "€",
+        tip: "Achtung: Jonas und 2 Schwestern sind 3 Kinder! 3 · 2 Kugeln = 6 Kugeln (12 €). 20 − 12 = 8 €."
+      },
+      {
+        id: 31,
+        title: "Bastelpapier für Laternen",
+        category: "schule",
+        categoryLabel: "🎒 Schule & Basteln",
+        icon: "🏮",
+        text: "Für die Martinslaternen kauft die Lehrerin 5 Pakete Transparentpapier mit je 15 Bögen. Beim Basteln verbrauchen die Kinder 62 Bögen.",
+        question: "Wie viele Bögen Transparentpapier bleiben übrig?",
+        steps: [
+          "1. Gekaufte Bögen berechnen: 5 · 15 = 75 Bögen (5 · 10 = 50, 5 · 5 = 25, 50 + 25 = 75)",
+          "2. Verbrauchte Bögen abziehen: 75 − 62 = 13 Bögen"
+        ],
+        answer: "Es bleiben 13 Bögen Transparentpapier übrig.",
+        expectedAnswer: 13,
+        unit: "Bögen",
+        tip: "5 Pakete mal 15 Bögen ergibt 75 Bögen. Ziehe davon die 62 verbrauchten Bögen ab."
+      },
+      {
+        id: 32,
+        title: "Wanderung zur Berghütte",
+        category: "sport",
+        categoryLabel: "⚽ Sport & Bewegung",
+        icon: "⛰️",
+        text: "Eine Wandergruppe wandert zu einer Hütte. Der Höhenunterschied beträgt 450 Meter. Am Vormittag schaffen sie 280 Höhenmeter, am Nachmittag noch 90 Höhenmeter.",
+        question: "Wie viele Höhenmeter fehlen der Gruppe noch bis zur Berghütte?",
+        steps: [
+          "1. Bereits gewanderte Höhenmeter: 280 m + 90 m = 370 m",
+          "2. Restliche Höhenmeter bis zur Hütte: 450 m − 370 m = 80 m"
+        ],
+        answer: "Der Gruppe fehlen noch 80 Höhenmeter bis zur Berghütte.",
+        expectedAnswer: 80,
+        unit: "Meter",
+        tip: "Rechne zuerst zusammen, wie viel die Gruppe schon geschafft hat (370 m), und ziehe das von 450 m ab."
+      },
+      {
+        id: 33,
+        title: "Tierpark-Eintritt für die Schulklasse",
+        category: "geld",
+        categoryLabel: "🛒 Geld & Einkaufen",
+        icon: "🎟️",
+        text: "In die Klasse 3c gehen 24 Kinder. 6 Kinder haben bereits eine Jahreskarte und zahlen nichts. Die restlichen Kinder zahlen je 4 € Eintritt.",
+        question: "Wie viel Euro kostet der Eintritt für die Klasse insgesamt?",
+        steps: [
+          "1. Kinder ermitteln, die zahlen müssen: 24 − 6 = 18 Kinder",
+          "2. Gesamteintritt berechnen: 18 · 4 € = 72 € (10 · 4 = 40, 8 · 4 = 32, 40 + 32 = 72)"
+        ],
+        answer: "Der Eintritt für die Klasse kostet insgesamt 72 €.",
+        expectedAnswer: 72,
+        unit: "€",
+        tip: "Erst die 6 Jahreskarten-Besitzer abziehen (24 − 6 = 18 Kinder), dann 18 · 4 € rechnen."
+      },
+      {
+        id: 34,
+        title: "Pflanztöpfe im Schulgewächshaus",
+        category: "natur",
+        categoryLabel: "🌳 Tiere & Natur",
+        icon: "🍅",
+        text: "Im Gewächshaus stehen 5 Reihen mit je 16 Pflanztöpfen für Tomaten. In 18 Töpfen sind die Samen leider nicht gekeimt.",
+        question: "In wie vielen Töpfen wachsen gesunde Tomatenpflanzen?",
+        steps: [
+          "1. Alle Töpfe berechnen: 5 · 16 = 80 Töpfe (5 · 10 = 50, 5 · 6 = 30, 50 + 30 = 80)",
+          "2. Nicht gekeimte Töpfe abziehen: 80 − 18 = 62 Töpfe"
+        ],
+        answer: "In 62 Töpfen wachsen gesunde Tomatenpflanzen.",
+        expectedAnswer: 62,
+        unit: "Töpfe",
+        tip: "5 Reihen mal 16 Töpfe = 80 Töpfe. 80 minus 18 ergibt 62 gesunde Pflänzchen."
+      }
+    ];
+
+    // Status für die Sachaufgaben
+    let wpCurrentIndex = 0;
+    let wpIsFlipped = false;
+    let wpCurrentFilter = 'all';
+    let wpCurrentView = 'card';
+    let wpMasteredSet = new Set();
+
+    function loadWpMastered() {
+      try {
+        const saved = localStorage.getItem(WP_STORAGE_KEY);
+        if (saved) {
+          wpMasteredSet = new Set(JSON.parse(saved));
+        }
+      } catch (e) {
+        wpMasteredSet = new Set();
+      }
+    }
+
+    function saveWpMastered() {
+      try {
+        localStorage.setItem(WP_STORAGE_KEY, JSON.stringify(Array.from(wpMasteredSet)));
+      } catch (e) {}
+    }
+
+    function initWordProblems() {
+      loadWpMastered();
+      updateWordProblemProgress();
+      renderWordProblemCard();
+      renderWordProblemList();
+    }
+
+    function getFilteredWordProblems() {
+      if (wpCurrentFilter === 'all') return WORD_PROBLEMS_DB;
+      if (wpCurrentFilter === 'mastered') return WORD_PROBLEMS_DB.filter(q => wpMasteredSet.has(q.id));
+      if (wpCurrentFilter === 'open') return WORD_PROBLEMS_DB.filter(q => !wpMasteredSet.has(q.id));
+      return WORD_PROBLEMS_DB.filter(q => q.category === wpCurrentFilter);
+    }
+
+    function updateWordProblemProgress() {
+      const count = wpMasteredSet.size;
+      const total = WORD_PROBLEMS_DB.length;
+      const pct = Math.round((count / total) * 100);
+
+      const lbl = document.getElementById('wpProgressLabel');
+      const bar = document.getElementById('wpProgressBar');
+      if (lbl) lbl.textContent = `${count} / ${total} gemeistert (${pct}%)`;
+      if (bar) bar.style.width = `${pct}%`;
+    }
+
+    function renderWordProblemCard() {
+      const list = getFilteredWordProblems();
+      const cardEl = document.getElementById('wpFlashcard');
+      const badge = document.getElementById('wpCardIndexBadge');
+      const quickBtn = document.getElementById('wpMasteryQuickBtn');
+      if (!cardEl) return;
+
+      if (list.length === 0) {
+        cardEl.className = 'flashcard';
+        cardEl.innerHTML = `
+          <div class="flashcard-face flashcard-front" style="justify-content: center; align-items: center; text-align: center; gap: 14px;">
+            <span style="font-size: 48px;">🌟</span>
+            <h3 style="margin: 0; color: #78350f;">Keine Aufgaben in dieser Kategorie</h3>
+            <p style="margin: 0; color: #64748b; font-size: 14px; max-width: 380px;">
+              ${wpCurrentFilter === 'mastered' ? 'Du hast in dieser Kategorie noch keine Aufgaben als gemeistert markiert. Weiter so!' : 'Wähle oben eine andere Kategorie aus, um weiter zu üben.'}
+            </p>
+            <button onclick="filterWordProblems('all')" class="btn btn-primary" style="margin-top: 8px;">🌟 Alle 34 Aufgaben anzeigen</button>
+          </div>
+        `;
+        if (badge) badge.textContent = '0 von 0';
+        return;
+      }
+
+      if (wpCurrentIndex >= list.length) wpCurrentIndex = 0;
+      if (wpCurrentIndex < 0) wpCurrentIndex = list.length - 1;
+
+      const q = list[wpCurrentIndex];
+      const isMastered = wpMasteredSet.has(q.id);
+
+      if (badge) badge.textContent = `Karte ${wpCurrentIndex + 1} von ${list.length}`;
+      if (quickBtn) {
+        quickBtn.innerHTML = isMastered ? '🏆 Gemeistert! (Klick zum Aufheben)' : '⭐ Als gemeistert markieren';
+        quickBtn.className = isMastered ? 'btn btn-success' : 'btn btn-secondary';
+      }
+
+      // VORDERSEITE HTML
+      const frontHtml = `
+        <div class="flashcard-face flashcard-front">
+          <!-- Kopfzeile -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;">
+                ${q.categoryLabel}
+              </span>
+              <span class="font-num" style="font-size: 11px; font-weight: 800; color: #94a3b8;">#${q.id}</span>
+              ${isMastered ? '<span style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">🏆 Gemeistert</span>' : ''}
+            </div>
+            <button onclick="speakText('${q.text.replace(/'/g, "\\'")} ${q.question.replace(/'/g, "\\'")}', event)" class="btn btn-secondary" style="padding: 5px 9px; font-size: 13px; border: 1.5px solid #cbd5e1;" title="Aufgabe vorlesen">
+              🔊 Vorlesen
+            </button>
+          </div>
+
+          <!-- Titel & Text -->
+          <div style="display: flex; flex-direction: column; gap: 10px; margin: 12px 0;">
+            <div style="font-size: 15px; font-weight: 900; color: #78350f; display: flex; align-items: center; gap: 6px;">
+              <span>${q.icon}</span> <span>${q.title}</span>
+            </div>
+            <div style="font-size: 17px; font-weight: 700; color: #1e293b; line-height: 1.5; background: #ffffff; padding: 14px; border-radius: 16px; border: 1.5px solid #e2e8f0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
+              ${q.text}
+            </div>
+            <!-- Frage (F) -->
+            <div style="background: #eff6ff; border: 2px solid #93c5fd; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 8px;">
+              <span style="font-size: 20px; line-height: 1;">❓</span>
+              <div style="font-size: 16px; font-weight: 900; color: #1e40af; line-height: 1.35;">
+                <span style="color: #2563eb;">Frage:</span> ${q.question}
+              </div>
+            </div>
+          </div>
+
+          <!-- Interaktiver Schnell-Check & Umdreh-Hinweis -->
+          <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1.5px dashed #e2e8f0; padding-top: 10px;" onclick="event.stopPropagation()">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: #475569;">
+                <span>Dein Ergebnis:</span>
+                <input type="number" id="wpQuickInput" class="quiz-input font-num" placeholder="?" style="width: 76px; padding: 5px 6px; font-size: 16px;" onkeydown="if(event.key==='Enter')checkWordProblemQuickAnswer(event)">
+                <span class="font-num" style="color: #64748b; font-weight: 800; font-size: 14px;">${q.unit}</span>
+                <button onclick="checkWordProblemQuickAnswer(event)" class="btn btn-primary" style="padding: 6px 14px; font-size: 12.5px;">✨ Prüfen</button>
+              </div>
+              <button onclick="toggleCardHint(event)" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11.5px; border: 1.5px solid #cbd5e1;">
+                💡 Tipp
+              </button>
+            </div>
+            <div id="wpQuickFeedback" style="font-size: 12.5px; font-weight: 800; min-height: 18px;"></div>
+            <div id="wpCardHintBox" class="hidden" style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; color: #92400e;">
+              💡 <strong>Rechen-Tipp:</strong> ${q.tip}
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-align: center; margin-top: 2px;">
+              👉 Tippe auf die Karte oder klicke unten auf „Karte umdrehen“, um Rechnung & Antwortsatz zu sehen!
+            </div>
+          </div>
+        </div>
+      `;
+
+      // RÜCKSEITE HTML
+      const backHtml = `
+        <div class="flashcard-face flashcard-back">
+          <!-- Kopfzeile Rückseite -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="background: #dcfce7; color: #166534; border: 1.5px solid #86efac; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;">
+                ✨ Lösung & Rechenweg
+              </span>
+              <span class="font-num" style="font-size: 11px; font-weight: 800; color: #94a3b8;">#${q.id}</span>
+            </div>
+            <button onclick="speakText('${q.steps.join('. ').replace(/'/g, "\\'")} ${q.answer.replace(/'/g, "\\'")}', event)" class="btn btn-secondary" style="padding: 5px 9px; font-size: 13px; border: 1.5px solid #86efac; background: #ffffff;" title="Lösungsweg vorlesen">
+              🔊 Vorlesen
+            </button>
+          </div>
+
+          <!-- Didaktische Lösung: Frage, Rechnung, Antwort -->
+          <div style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0;">
+            <!-- F: Frage nochmals sichtbar -->
+            <div style="font-size: 13px; font-weight: 800; color: #15803d; border-bottom: 1.5px dashed #86efac; padding-bottom: 4px;">
+              <strong>F (Frage):</strong> ${q.question}
+            </div>
+
+            <!-- R: Rechnung -->
+            <div style="background: #ffffff; border: 2px solid #22c55e; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 2px 6px rgba(34,197,94,0.08);">
+              <span style="font-size: 12px; font-weight: 900; color: #15803d; text-transform: uppercase;">🧮 R (Rechnung):</span>
+              <div class="font-num" style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 900; color: #1e293b;">
+                ${q.steps.map(s => `
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="color: #16a34a;">➔</span>
+                    <span>${s}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- A: Antwortsatz -->
+            <div style="background: #fef9c3; border: 2px solid #eab308; border-radius: 16px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+              <span style="font-size: 20px; line-height: 1;">💬</span>
+              <div style="font-size: 15.5px; font-weight: 900; color: #713f12; line-height: 1.35;">
+                <span style="color: #a16207;">A (Antwortsatz):</span> ${q.answer}
+              </div>
+            </div>
+
+            <!-- Merksatz / Tipp -->
+            <div style="font-size: 11.5px; font-weight: 700; color: #166534; background: rgba(34,197,94,0.1); padding: 6px 10px; border-radius: 10px;">
+              💡 <strong>Didaktischer Tipp:</strong> ${q.tip}
+            </div>
+          </div>
+
+          <!-- Selbstbewertung / Lernfortschritt auf Rückseite -->
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; border-top: 1.5px dashed #86efac; padding-top: 8px;" onclick="event.stopPropagation()">
+            <div style="font-size: 12px; font-weight: 800; color: #15803d;">
+              Wie hat es geklappt?
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="toggleWordProblemMastery(${q.id}, true, event)" class="btn btn-success" style="padding: 6px 12px; font-size: 12px;">
+                ✅ Gewusst! (+2 ⭐)
+              </button>
+              <button onclick="toggleWordProblemMastery(${q.id}, false, event)" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                🔄 Nochmal üben
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      cardEl.innerHTML = frontHtml + backHtml;
+      cardEl.className = wpIsFlipped ? 'flashcard flipped' : 'flashcard';
+    }
+
+    function flipWordProblemCard() {
+      wpIsFlipped = !wpIsFlipped;
+      const cardEl = document.getElementById('wpFlashcard');
+      if (cardEl) {
+        cardEl.classList.toggle('flipped', wpIsFlipped);
+      }
+      playTone(wpIsFlipped ? 540 : 440, 'sine', 0.05);
+    }
+
+    function onCardClick(e) {
+      if (e.target.closest('button, input, textarea, label')) return;
+      flipWordProblemCard();
+    }
+
+    function toggleCardHint(e) {
+      if (e) e.stopPropagation();
+      const hint = document.getElementById('wpCardHintBox');
+      if (hint) hint.classList.toggle('hidden');
+    }
+
+    function checkWordProblemQuickAnswer(e) {
+      if (e) e.stopPropagation();
+      const list = getFilteredWordProblems();
+      if (!list[wpCurrentIndex]) return;
+      const q = list[wpCurrentIndex];
+      const inputEl = document.getElementById('wpQuickInput');
+      const fb = document.getElementById('wpQuickFeedback');
+      if (!inputEl || !fb) return;
+
+      const userVal = parseInt(inputEl.value, 10);
+      if (isNaN(userVal)) {
+        fb.style.color = '#dc2626';
+        fb.textContent = '⚠️ Bitte trage zuerst eine Zahl als Ergebnis ein.';
+        return;
+      }
+
+      if (userVal === q.expectedAnswer) {
+        fb.style.color = '#15803d';
+        fb.textContent = '🎉 Richtig! Fantastisch gerechnet!';
+        addStars(2);
+        playChime();
+        fireConfetti();
+        wpMasteredSet.add(q.id);
+        saveWpMastered();
+        updateWordProblemProgress();
+        setTimeout(() => {
+          if (!wpIsFlipped) flipWordProblemCard();
+        }, 600);
+      } else {
+        fb.style.color = '#b45309';
+        fb.textContent = `💡 Fast! Schau dir den Lösungsweg an.`;
+        playTone(280, 'sine', 0.15);
+        setTimeout(() => {
+          if (!wpIsFlipped) flipWordProblemCard();
+        }, 700);
+      }
+    }
+
+    function toggleWordProblemMastery(id, isMastered, e) {
+      if (e) e.stopPropagation();
+      if (isMastered) {
+        if (!wpMasteredSet.has(id)) {
+          wpMasteredSet.add(id);
+          addStars(2);
+          playChime();
+          fireConfetti();
+        }
+      } else {
+        wpMasteredSet.delete(id);
+        playTone(400, 'sine', 0.06);
+      }
+      saveWpMastered();
+      updateWordProblemProgress();
+      renderWordProblemCard();
+      renderWordProblemList();
+    }
+
+    function toggleWordProblemMasteryCurrent() {
+      const list = getFilteredWordProblems();
+      if (!list[wpCurrentIndex]) return;
+      const q = list[wpCurrentIndex];
+      const currentlyMastered = wpMasteredSet.has(q.id);
+      toggleWordProblemMastery(q.id, !currentlyMastered);
+    }
+
+    function prevWordProblem() {
+      const list = getFilteredWordProblems();
+      if (list.length === 0) return;
+      wpCurrentIndex = (wpCurrentIndex - 1 + list.length) % list.length;
+      wpIsFlipped = false;
+      renderWordProblemCard();
+      playTone(480, 'sine', 0.04);
+    }
+
+    function nextWordProblem() {
+      const list = getFilteredWordProblems();
+      if (list.length === 0) return;
+      wpCurrentIndex = (wpCurrentIndex + 1) % list.length;
+      wpIsFlipped = false;
+      renderWordProblemCard();
+      playTone(520, 'sine', 0.04);
+    }
+
+    function randomWordProblem() {
+      const list = getFilteredWordProblems();
+      if (list.length <= 1) return;
+      let nextIdx = wpCurrentIndex;
+      while (nextIdx === wpCurrentIndex) {
+        nextIdx = Math.floor(Math.random() * list.length);
+      }
+      wpCurrentIndex = nextIdx;
+      wpIsFlipped = false;
+      renderWordProblemCard();
+      playTone(600, 'sine', 0.05);
+    }
+
+    function filterWordProblems(filter) {
+      wpCurrentFilter = filter;
+      wpCurrentIndex = 0;
+      wpIsFlipped = false;
+
+      // Filter-Pills aktualisieren
+      ['all', 'geld', 'sport', 'teilen', 'schule', 'feiern', 'natur', 'mastered', 'open'].forEach(f => {
+        const btn = document.getElementById(`wpFilter-${f}`);
+        if (btn) btn.className = (f === filter) ? 'wp-filter-pill active' : 'wp-filter-pill';
+      });
+
+      renderWordProblemCard();
+      renderWordProblemList();
+      playTone(500, 'sine', 0.04);
+    }
+
+    function setWordProblemView(view) {
+      wpCurrentView = view;
+      const cardSec = document.getElementById('wpSec-card');
+      const listSec = document.getElementById('wpSec-list');
+      const cardBtn = document.getElementById('wpViewBtn-card');
+      const listBtn = document.getElementById('wpViewBtn-list');
+
+      if (view === 'card') {
+        if (cardSec) cardSec.classList.remove('hidden');
+        if (listSec) listSec.classList.add('hidden');
+        if (cardBtn) cardBtn.className = 'btn btn-primary';
+        if (listBtn) listBtn.className = 'btn btn-secondary';
+      } else {
+        if (cardSec) cardSec.classList.add('hidden');
+        if (listSec) listSec.classList.remove('hidden');
+        if (cardBtn) cardBtn.className = 'btn btn-secondary';
+        if (listBtn) listBtn.className = 'btn btn-primary';
+        renderWordProblemList();
+      }
+      playTone(460, 'sine', 0.04);
+    }
+
+    function renderWordProblemList() {
+      const cont = document.getElementById('wpListContainer');
+      const badge = document.getElementById('wpListCountBadge');
+      if (!cont) return;
+
+      const list = getFilteredWordProblems();
+      if (badge) badge.textContent = `${list.length} Aufgaben`;
+
+      if (list.length === 0) {
+        cont.innerHTML = `
+          <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1.5px solid #cbd5e1; text-align: center; color: #64748b;">
+            Keine Aufgaben für den aktuellen Filter gefunden.
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = list.map((q, idx) => {
+        const isMastered = wpMasteredSet.has(q.id);
+        return `
+          <div style="background: #ffffff; border: 2px solid ${isMastered ? '#86efac' : '#e2e8f0'}; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">${q.icon}</span>
+                <span style="font-size: 14px; font-weight: 800; color: #1e293b;">${q.title}</span>
+                <span style="font-size: 11px; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 6px; font-weight: 700;">${q.categoryLabel}</span>
+                ${isMastered ? '<span style="font-size: 11px; background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 6px; font-weight: 800;">🏆 Gemeistert</span>' : ''}
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button onclick="jumpToWordProblemCard(${idx})" class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">
+                  🎴 Auf Karte üben
+                </button>
+                <button onclick="toggleListAccordion(${q.id})" class="btn btn-primary" style="padding: 4px 10px; font-size: 11px;">
+                  🔍 Lösung
+                </button>
+              </div>
+            </div>
+
+            <div style="font-size: 13.5px; font-weight: 600; color: #334155; line-height: 1.4;">
+              ${q.text}
+            </div>
+            <div style="font-size: 13.5px; font-weight: 800; color: #1d4ed8; background: #eff6ff; padding: 6px 10px; border-radius: 8px;">
+              ❓ <strong>Frage:</strong> ${q.question}
+            </div>
+
+            <!-- Aufklappbare Lösung -->
+            <div id="wpListAcc-${q.id}" class="hidden" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+              <div class="font-num" style="font-size: 13.5px; font-weight: 800; color: #166534;">
+                ${q.steps.map(s => `<div>➔ ${s}</div>`).join('')}
+              </div>
+              <div style="font-size: 13.5px; font-weight: 800; color: #713f12; background: #fef9c3; padding: 6px 8px; border-radius: 8px;">
+                💬 <strong>Antwort:</strong> ${q.answer}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleListAccordion(id) {
+      const el = document.getElementById(`wpListAcc-${id}`);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function jumpToWordProblemCard(filteredIdx) {
+      wpCurrentIndex = filteredIdx;
+      wpIsFlipped = false;
+      setWordProblemView('card');
+      renderWordProblemCard();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function speakText(text, e) {
+      if (e) e.stopPropagation();
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'de-DE';
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+
+    function speakCurrentWordProblem() {
+      const list = getFilteredWordProblems();
+      if (!list[wpCurrentIndex]) return;
+      const q = list[wpCurrentIndex];
+      if (wpIsFlipped) {
+        speakText(q.steps.join('. ') + '. ' + q.answer);
+      } else {
+        speakText(q.text + ' ' + q.question);
+      }
+    }
+
+    function toggleScratchpad() {
+      const box = document.getElementById('wpScratchpadBox');
+      if (box) box.classList.toggle('hidden');
+    }
+
+    function clearScratchpad() {
+      const area = document.getElementById('wpScratchpadText');
+      if (area) area.value = '';
+    }
+
+    // =========================================================
     // INITIALISIERUNG BEI LADEN
     // =========================================================
     window.onload = function() {
@@ -6413,6 +7671,7 @@
       initPM100Quiz();
       initMDQuiz();
       initTHQuiz();
+      initWordProblems();
     };
   </script>
 </body>
